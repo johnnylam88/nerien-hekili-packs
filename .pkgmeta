@@ -1,0 +1,6 @@
+package-as: nerien-hekili-packs
+
+enable-nolib-creation: no
+
+required-dependencies:
+  - Hekili
