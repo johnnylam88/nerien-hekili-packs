@@ -1,6 +1,6 @@
 local _, Private = ...
 
-if Private.hekili then
+if Private.hekili and Private.class == "DEATHKNIGHT" then
 	local spec = Private.hekili:GetSpecialization(250)
 	local name = string.format("Blood %s,kyrasis", Private.shortName)
 	local date = 20240102
