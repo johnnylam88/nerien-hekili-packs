@@ -10,8 +10,10 @@ The action packs are my interpretations of the advice from [Wowhead], [Icy Veins
 
 ### How to Use ###
 
-Install **Nerien's Hekili Packs** like any other addon.
-Use `/hekili` to open the **Hekili** configuration panel and select the action pack to by *Active* for your specialization.
+1. Install **Nerien's Hekili Packs** like any other addon.
+2. Use `/hekili` to open the **Hekili** configuration panel.
+3. Select the action pack for your specialization.
+4. Click the *Active* checkbox to enable the action pack.
 
 ### Status ###
 
