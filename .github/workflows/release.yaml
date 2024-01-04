@@ -12,6 +12,7 @@ jobs:
 
     # Environment variables used by BigWigs/packager.
     env:
+      CF_API_KEY: ${{ secrets.CF_API_KEY }}
       GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
