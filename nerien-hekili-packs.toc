@@ -9,6 +9,8 @@
 ## X-License: BSD-2-Clause
 ## X-Website: https://github.com/johnnylam88/nerien-hekili-packs
 ## X-Curse-Project-ID: 957848
+## X-WoWI-ID: 26675
+## X-Wago-ID: 5NReazG3
 
 ## Dependencies: Hekili
 
