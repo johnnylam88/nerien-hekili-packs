@@ -30,7 +30,7 @@ actions+=/run_action_list,name=st
 
 # Active Mitigation
 actions.am+=/black_ox_brew,if=variable.energy_at_next_keg_smash<40&cooldown.celestial_brew.remains>gcd.remains&cooldown.purifying_brew.charges_fractional<0.75
-actions.am+=/purifying_brew,if=time_to_max_charges<gcd.max|(buff.purified_chi.up&buff.purified_chi.remains<(1.5*gcd.max))
+actions.am+=/purifying_brew,if=full_recharge_time<gcd.max|(buff.purified_chi.up&buff.purified_chi.remains<(1.5*gcd.max))
 actions.am+=/purifying_brew,if=stagger.pct>variable.purify_stagger_pct
 actions.am+=/celestial_brew,if=variable.has_defensive_buff=0&(!talent.improved_celestial_brew.enabled|buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold)
 
