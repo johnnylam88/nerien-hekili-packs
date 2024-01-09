@@ -20,6 +20,7 @@ actions+=/dampen_harm,if=variable.has_defensive_buff=0&health.pct<75&incoming_da
 actions+=/fortifying_brew,if=variable.has_defensive_buff=0&health.pct<50&incoming_damage_3s>(health.max*0.2)
 actions+=/touch_of_death
 actions+=/summon_white_tiger_statue
+actions+=/call_action_list,name=race_actions
 actions+=/invoke_niuzao_the_black_ox,if=!talent.improved_invoke_niuzao_the_black_ox.enabled|stagger.pct>variable.defensive_stagger_pct
 actions+=/bonedust_brew
 actions+=/call_action_list,name=boc,if=talent.blackout_combo.enabled
@@ -78,6 +79,14 @@ actions.opener+=/rising_sun_kick
 actions.opener+=/blackout_kick,if=!talent.blackout_combo.enabled&talent.press_the_advantage.enabled
 actions.opener+=/rushing_jade_wind
 actions.opener+=/blackout_kick,if=talent.blackout_combo.enabled&talent.press_the_advantage.enabled
+
+actions.race_actions=blood_fury
+actions.race_actions+=/berserking
+#actions.race_actions+=/arcane_torrent
+actions.race_actions+=/lights_judgment
+actions.race_actions+=/ancestral_call
+#actions.race_actions+=/fireblood
+actions.race_actions+=/bag_of_tricks
 
 actions.st+=/rising_sun_kick
 actions.st+=/exploding_keg,if=buff.rushing_jade_wind.up
