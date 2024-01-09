@@ -66,20 +66,6 @@ actions.nonboc+=/weapons_of_order
 actions.nonboc+=/blackout_kick,if=active_enemies=1
 actions.nonboc+=/breath_of_fire,if=!(talent.charred_passions.enabled|talent.dragonfire_brew.enabled)
 
-actions.opener+=/blackout_kick,if=!talent.blackout_combo.enabled
-actions.opener+=/keg_smash
-actions.opener+=/blackout_kick,if=talent.blackout_combo.enabled
-actions.opener+=/tiger_palm,if=buff.blackout_combo.up
-actions.opener+=/breath_of_fire
-actions.opener+=/weapons_of_order
-actions.opener+=/blackout_kick,if=!talent.blackout_combo.enabled
-actions.opener+=/keg_smash
-actions.opener+=/blackout_kick,if=talent.blackout_combo.enabled&!talent.press_the_advantage.enabled
-actions.opener+=/rising_sun_kick
-actions.opener+=/blackout_kick,if=!talent.blackout_combo.enabled&talent.press_the_advantage.enabled
-actions.opener+=/rushing_jade_wind
-actions.opener+=/blackout_kick,if=talent.blackout_combo.enabled&talent.press_the_advantage.enabled
-
 actions.race_actions=blood_fury
 actions.race_actions+=/berserking
 #actions.race_actions+=/arcane_torrent
