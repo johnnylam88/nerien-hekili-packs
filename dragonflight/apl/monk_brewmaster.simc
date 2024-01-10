@@ -15,7 +15,8 @@ actions+=/variable,name=should_be_defensive,value=1,op=setif,condition=health.pc
 
 actions+=/spear_hand_strike
 actions+=/call_action_list,name=heal
-actions+=/call_action_list,name=am,if=tanking&!buff.blackout_combo.up
+actions+=/call_action_list,name=am,if=!buff.blackout_combo.up
+actions+=/diffuse_magic,if=variable.has_defensive_buff=0&health.pct<75&incoming_magic_3s>(health.max*0.2)
 actions+=/dampen_harm,if=variable.has_defensive_buff=0&health.pct<75&incoming_damage_3s>(health.max*0.2)
 actions+=/fortifying_brew,if=variable.has_defensive_buff=0&health.pct<50&incoming_damage_3s>(health.max*0.2)
 actions+=/touch_of_death
