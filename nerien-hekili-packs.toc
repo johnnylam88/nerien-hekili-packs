@@ -18,3 +18,4 @@ main.lua
 dragonflight/deathknight_blood.lua
 dragonflight/deathknight_blood_kyrasis.lua
 dragonflight/monk_brewmaster.lua
+dragonflight/warrior_protection.lua

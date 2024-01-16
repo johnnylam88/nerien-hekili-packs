@@ -22,6 +22,7 @@ The following classes and specializations are supported:
 
 - Death Knight: Blood
 - Monk: Brewmaster
+- Warrior: Protection
 
 ### Links ###
 
