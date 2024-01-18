@@ -5,7 +5,10 @@ actions.precombat+=/use_item,name=algethar_puzzle_box
 actions+=/variable,name=rage_cost_ignore_pain,value=35
 actions+=/variable,name=rage_cost_revenge,value=20+10*talent.barbaric_training.enabled
 actions+=/variable,name=rage_cost_shield_block,value=30
-actions+=/variable,name=rage_gen_shield_slam,value=15+2*talent.heavy_repercussions.enabled+3*talent.impenetrable_wall.enabled
+
+actions+=/variable,name=rage_multiplier_outburst,value=2,op=setif,condition=buff.violent_outburst.up,value_else=1
+actions+=/variable,name=rage_gen_shield_slam,value=(15+2*talent.heavy_repercussions.enabled+3*talent.impenetrable_wall.enabled)*variable.rage_multiplier_outburst
+actions+=/variable,name=rage_gen_thunder_clap,value=5*variable.rage_multiplier_outburst
 
 actions+=/variable,name=rage_dump_value,value=rage.max-10
 actions+=/variable,name=rage_pool_value,value=variable.rage_dump_value-variable.rage_cost_shield_block-variable.rage_cost_ignore_pain
@@ -17,7 +20,7 @@ actions+=/variable,name=rage_check_demoralizing_shout,value=1,op=setif,condition
 actions+=/variable,name=rage_check_shield_charge,value=1,op=setif,condition=talent.shield_charge.enabled&cooldown.shield_charge.remains<gcd.max&rage+(20+20*talent.champions_bulwark.enabled)*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
 actions+=/variable,name=rage_check_shield_slam,value=1,op=setif,condition=cooldown.shield_slam.remains<gcd.max&rage+variable.rage_gen_shield_slam*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
 actions+=/variable,name=rage_check_spear_of_bastion,value=1,op=setif,condition=talent.spear_of_bastion.enabled&cooldown.spear_of_bastion.remains<gcd.max&rage+20*(1+talent.piercing_verdict.enabled)*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
-actions+=/variable,name=rage_check_thunder_clap,value=1,op=setif,condition=talent.thunder_clap.enabled&cooldown.thunder_clap.remains<gcd.max&rage+5*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
+actions+=/variable,name=rage_check_thunder_clap,value=1,op=setif,condition=talent.thunder_clap.enabled&cooldown.thunder_clap.remains<gcd.max&rage+variable.rage_gen_thunder_clap*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
 actions+=/variable,name=rage_check_thunderous_roar,value=1,op=setif,condition=talent.thunderous_roar.enabled&cooldown.thunderous_roar.remains<gcd.max&rage+10*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
 actions+=/variable,name=should_dump_rage,value=1,op=setif,condition=variable.rage_check>0|variable.rage_check_avatar>0|variable.rage_check_demoralizing_shout>0|variable.rage_check_shield_charge>0|variable.rage_check_shield_slam>0|variable.rage_check_spear_of_bastion>0|variable.rage_check_thunder_clap>0|variable.rage_check_thunderous_roar>0,value_else=0
 
