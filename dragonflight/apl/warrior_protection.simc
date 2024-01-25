@@ -56,6 +56,9 @@ actions+=/battle_stance,if=!buff.battle_stance.up&health.pct>70
 actions+=/call_action_list,name=mitigation
 actions+=/call_action_list,name=standard
 
+actions.dump_rage+=/execute,if=active_enemies=1
+actions.dump_rage+=/revenge
+
 actions.mitigation+=/shield_block,if=buff.shield_block.remains<4&charges_fractional>1
 actions.mitigation+=/last_stand,if=talent.bolster.enabled&!buff.shield_block.up
 actions.mitigation+=/ignore_pain,if=variable.should_ignore_pain>0&(buff.seeing_red.stack>6|variable.rage_at_next_shield_block>=variable.rage_dump_value&rage-variable.rage_cost_ignore_pain>=variable.rage_pool_value)
@@ -73,9 +76,6 @@ actions.racials+=/lights_judgment
 actions.racials+=/ancestral_call
 #actions.racials+=/fireblood
 actions.racials+=/bag_of_tricks
-
-actions.dump_rage+=/execute,if=active_enemies=1
-actions.dump_rage+=/revenge
 
 actions.ravager_up+=/revenge,if=!debuff.deep_wounds.up
 actions.ravager_up+=/shield_slam,if=talent.heavy_repercussions.enabled
