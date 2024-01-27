@@ -3,37 +3,41 @@ actions.precombat+=/chi_wave
 
 # Tunable variables
 # Minimum number of Purified Chi stacks before using Celestial Brew.
-actions+=/variable,name=celestial_brew_purified_chi_threshold,value=5,op=set
-# Stagger at which you should use Purifying Brew.
-actions+=/variable,name=purify_stagger_pct,value=12,op=set
+actions+=/variable,name=celestial_brew_purified_chi_threshold,value=6
+# Stagger at which you should use Purifying Brew in an emergency.
+actions+=/variable,name=purify_stagger_pct,value=20
 # Stagger at which you should play defensively.
-actions+=/variable,name=defensive_stagger_pct,value=20,op=set
+actions+=/variable,name=defensive_stagger_pct,value=20
+# Health percent at which you should play defensively.
+actions+=/variable,name=defensive_health_pct,value=70
+actions+=/variable,name=high_incoming_damage_pct,value=20
 
-actions+=/variable,name=energy_at_next_keg_smash,value=(energy+energy.regen*(gcd.max+cooldown.keg_smash.remains)),op=set
-actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.dampen_harm.up|buff.fortifying_brew.up,value_else=0
-actions+=/variable,name=should_be_defensive,value=1,op=setif,condition=health.pct<50&stagger.pct>variable.defensive_stagger_pct,value_else=0
+actions+=/variable,name=energy_cost_keg_smash,value=40
+actions+=/variable,name=energy_cost_spinning_crane_kick,value=25
+actions+=/variable,name=energy_cost_tiger_palm,value=25
+actions+=/variable,name=energy_at_next_keg_smash,value=energy+energy.regen*cooldown.keg_smash.remains
+actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.celestial_brew.up|buff.dampen_harm.up|buff.fortifying_brew.up,value_else=0
+# Play defensively if major damage-reduction cooldowns are on cooldown and either health is too low or Stagger is too high.
+actions+=/variable,name=should_be_defensive,value=1,op=setif,condition=(!talent.fortifying_brew.enabled|cooldown.fortifying_brew.remains>0)&(!talent.dampen_harm.enabled|cooldown.dampen_harm.remains>0)&(health.pct<variable.defensive_health_pct|stagger.pct>variable.defensive_stagger_pct),value_else=0
+actions+=/variable,name=high_incoming_damage_amount,value=health.max*variable.high_incoming_damage_pct%100
 
 actions+=/spear_hand_strike
 actions+=/call_action_list,name=heal
-actions+=/call_action_list,name=am,if=!buff.blackout_combo.up
-actions+=/diffuse_magic,if=variable.has_defensive_buff=0&health.pct<75&incoming_magic_3s>(health.max*0.2)
-actions+=/dampen_harm,if=variable.has_defensive_buff=0&health.pct<75&incoming_damage_3s>(health.max*0.2)
-actions+=/fortifying_brew,if=variable.has_defensive_buff=0&health.pct<50&incoming_damage_3s>(health.max*0.2)
+actions+=/call_action_list,name=defensives,if=health.pct<variable.defensive_health_pct&variable.has_defensive_buff=0
+actions+=/call_action_list,name=mitigation,if=!buff.blackout_combo.up
 actions+=/touch_of_death
+# Keg Smash on the opener for immediate threat and to activate Shuffle.
+actions+=/keg_smash,if=time=0
+# Use Weapons of Order early in the opener so subsequent damage abilities all benefit from the stacking debuff on the targets.
+actions+=/weapons_of_order,if=time<5
 actions+=/summon_white_tiger_statue
-actions+=/call_action_list,name=race_actions
+actions+=/call_action_list,name=racials
 actions+=/invoke_niuzao_the_black_ox,if=!talent.improved_invoke_niuzao_the_black_ox.enabled|stagger.pct>variable.defensive_stagger_pct
 actions+=/bonedust_brew
 actions+=/call_action_list,name=boc,if=talent.blackout_combo.enabled
 actions+=/call_action_list,name=nonboc,if=!talent.blackout_combo.enabled
 actions+=/run_action_list,name=aoe,if=active_enemies>1
 actions+=/run_action_list,name=st
-
-# Active Mitigation
-actions.am+=/black_ox_brew,if=variable.energy_at_next_keg_smash<40&cooldown.celestial_brew.remains>gcd.remains&cooldown.purifying_brew.charges_fractional<0.75
-actions.am+=/purifying_brew,if=full_recharge_time<gcd.max|(buff.purified_chi.up&buff.purified_chi.remains<(1.5*gcd.max))
-actions.am+=/purifying_brew,if=stagger.pct>variable.purify_stagger_pct
-actions.am+=/celestial_brew,if=variable.has_defensive_buff=0&(!talent.improved_celestial_brew.enabled|buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold)
 
 actions.aoe+=/exploding_keg,if=buff.rushing_jade_wind.up
 actions.aoe+=/blackout_kick,if=talent.dragonfire_brew.enabled
@@ -42,8 +46,8 @@ actions.aoe+=/spinning_crane_kick,if=buff.charred_passions.up&(!talent.press_the
 actions.aoe+=/rushing_jade_wind,if=buff.rushing_jade_wind.remains<gcd
 actions.aoe+=/keg_smash,if=talent.stormstouts_last_keg.enabled
 actions.aoe+=/chi_burst,if=active_enemies>=3
-actions.aoe+=/tiger_palm,if=variable.energy_at_next_keg_smash>65&variable.should_be_defensive=1
-actions.aoe+=/spinning_crane_kick,if=variable.energy_at_next_keg_smash>65&(!talent.press_the_advantage.enabled|!prev_gcd=spinning_crane_kick|active_enemies>=3)
+actions.aoe+=/tiger_palm,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm&variable.should_be_defensive=1
+actions.aoe+=/spinning_crane_kick,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick&(!talent.press_the_advantage.enabled|!prev_gcd=spinning_crane_kick|active_enemies>=3)
 actions.aoe+=/chi_wave
 
 actions.boc+=/blackout_kick
@@ -54,9 +58,19 @@ actions.boc+=/keg_smash,if=!talent.press_the_advantage.enabled|buff.press_the_ad
 actions.boc+=/weapons_of_order
 actions.boc+=/breath_of_fire
 
-actions.heal+=/variable,healing_sphere_amount,value=3*stat.attack_power*(1+stat.versatility),op=set
-actions.heal+=/expel_harm,if=variable.energy_at_next_keg_smash>65&((!talent.gift_of_the_ox.enabled&health.pct<70)|(buff.gift_of_the_ox.stack>=3&health.pct+(buff.gift_of_the_ox.stack*variable.healing_sphere_amount)<90))
+actions.defensives+=/fortifying_brew,if=incoming_damage_3s>variable.high_incoming_damage_amount
+actions.defensives+=/diffuse_magic,if=incoming_magic_damage_3s>variable.high_incoming_damage_amount
+actions.defensives+=/dampen_harm,if=incoming_damage_3s>variable.high_incoming_damage_amount
+actions.defensives+=/celestial_brew,if=(!talent.improved_celestial_brew.enabled|buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold)&incoming_damage_3s>variable.high_incoming_damage_amount
+
+actions.heal+=/variable,expel_harm_heal_amount,value=(buff.gift_of_the_ox.stack*stat.attack_power)+(stat.spell_power*(1+stat.versatility_atk_mod%100))
+actions.heal+=/expel_harm,if=health.pct<70|(buff.gift_of_the_ox.stack>=3&health+variable.expel_harm_heal_amount<=1.2*health.max)
 actions.heal+=/healing_elixir,if=health.pct<(70-30*(max_charges-charges_fractional))
+
+actions.mitigation+=/black_ox_brew,if=cooldown.celestial_brew.remains>5&(!talent.improved_purifying_brew.enabled&cooldown.purifying_brew.remains>gcd|cooldown.purifying_brew.charges_fractional<0.75)
+actions.mitigation+=/purifying_brew,if=talent.improved_purifying_brew.enabled&full_recharge_time<gcd.max&(stagger.heavy|time>5)
+actions.mitigation+=/purifying_brew,if=talent.improved_celestial_brew.enabled&buff.purified_chi.up&buff.purified_chi.remains<3
+actions.mitigation+=/purifying_brew,if=stagger.pct>variable.purify_stagger_pct
 
 actions.nonboc+=/rising_sun_kick,if=buff.press_the_advantage.stack=10&active_enemies<=3
 actions.nonboc+=/blackout_kick,if=buff.charred_passions.up
@@ -67,13 +81,13 @@ actions.nonboc+=/weapons_of_order
 actions.nonboc+=/blackout_kick,if=active_enemies=1
 actions.nonboc+=/breath_of_fire,if=!(talent.charred_passions.enabled|talent.dragonfire_brew.enabled)
 
-actions.race_actions=blood_fury
-actions.race_actions+=/berserking
-#actions.race_actions+=/arcane_torrent
-actions.race_actions+=/lights_judgment
-actions.race_actions+=/ancestral_call
-#actions.race_actions+=/fireblood
-actions.race_actions+=/bag_of_tricks
+actions.racials=blood_fury
+actions.racials+=/berserking
+#actions.racials+=/arcane_torrent
+actions.racials+=/lights_judgment
+actions.racials+=/ancestral_call
+#actions.racials+=/fireblood
+actions.racials+=/bag_of_tricks
 
 actions.st+=/rising_sun_kick
 actions.st+=/exploding_keg,if=buff.rushing_jade_wind.up
