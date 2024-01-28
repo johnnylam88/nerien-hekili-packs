@@ -20,8 +20,8 @@ The action packs are my interpretations of the advice from [Wowhead], [Icy Veins
 
 The following classes and specializations are supported:
 
-- Death Knight: Blood
-- Monk: Brewmaster
+- Death Knight: Blood, Blood (Kyrasis)
+- Monk: Brewmaster, Brewmaster (Equinox)
 - Warrior: Protection
 
 ### Links ###
