@@ -15,7 +15,7 @@ actions+=/variable,name=rage_pool_value,value=variable.rage_dump_value-variable.
 
 actions+=/variable,name=rage_gen_multiplier,value=1+0.5*buff.unnerving_focus.up
 actions+=/variable,name=rage_per_second_auto_attack,value=1*(1+0.5*talent.war_machine.enabled)+(2-talent.devastator.enabled)*talent.instigator.enabled
-actions+=/variable,name=rage_per_second_incoming_damage,value=3
+actions+=/variable,name=rage_per_second_incoming_damage,value=3%5*active_enemies,op=setif,condition=active_enemies<=5,value_else=3
 actions+=/variable,name=rage_per_second_bloodsurge,value=talent.bloodsurge.enabled*((0.1*5%3)*(active_dot.deep_wounds+active_dot.rend)+(0.1*5%2)*active_dot.thunderous_roar)
 actions+=/variable,name=rage_per_second_ravager,value=buff.ravager.up*5
 actions+=/variable,name=rage_per_second_shield_slam,value=variable.rage_gen_shield_slam%cooldown.shield_slam.duration
