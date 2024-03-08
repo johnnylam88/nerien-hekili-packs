@@ -58,10 +58,10 @@ actions.boc+=/keg_smash,if=!talent.press_the_advantage.enabled|buff.press_the_ad
 actions.boc+=/weapons_of_order
 actions.boc+=/breath_of_fire
 
+actions.defensives+=/celestial_brew,if=!talent.improved_celestial_brew.enabled|buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold
 actions.defensives+=/fortifying_brew,if=incoming_damage_3s>variable.high_incoming_damage_amount
 actions.defensives+=/diffuse_magic,if=incoming_magic_damage_3s>variable.high_incoming_damage_amount
 actions.defensives+=/dampen_harm,if=incoming_damage_3s>variable.high_incoming_damage_amount
-actions.defensives+=/celestial_brew,if=(!talent.improved_celestial_brew.enabled|buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold)&incoming_damage_3s>variable.high_incoming_damage_amount
 
 actions.heal+=/variable,expel_harm_heal_amount,value=(buff.gift_of_the_ox.stack*stat.attack_power)+(stat.spell_power*(1+stat.versatility_atk_mod%100))
 actions.heal+=/expel_harm,if=health.pct<70|(buff.gift_of_the_ox.stack>=3&health+variable.expel_harm_heal_amount<=1.2*health.max)

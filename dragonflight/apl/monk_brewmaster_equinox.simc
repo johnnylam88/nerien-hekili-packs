@@ -74,10 +74,10 @@ actions.core_dragonfire+=/call_action_list,name=keg_smash
 actions.core_dragonfire+=/call_action_list,name=sck
 actions.core_dragonfire+=/call_action_list,name=filler
 
-actions.defensives+=/fortifying_brew,if=incoming_damage_3s>variable.high_incoming_damage_amount
-actions.defensives+=/diffuse_magic,if=incoming_magic_damage_3s>variable.high_incoming_damage_amount
-actions.defensives+=/dampen_harm,if=incoming_damage_3s>variable.high_incoming_damage_amount
-actions.defensives+=/celestial_brew,if=(!talent.improved_celestial_brew.enabled|buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold)&incoming_damage_3s>variable.high_incoming_damage_amount
+actions.defensives+=/celestial_brew,if=!talent.improved_celestial_brew.enabled|buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold
+actions.defensives+=/fortifying_brew,use_off_gcd=1,if=incoming_damage_3s>variable.high_incoming_damage_amount
+actions.defensives+=/diffuse_magic,use_off_gcd=1,if=incoming_magic_damage_3s>variable.high_incoming_damage_amount
+actions.defensives+=/dampen_harm,use_off_gcd=1,if=incoming_damage_3s>variable.high_incoming_damage_amount
 
 actions.filler+=/rushing_jade_wind
 actions.filler+=/chi_burst
