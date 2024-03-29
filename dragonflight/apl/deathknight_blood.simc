@@ -12,6 +12,7 @@ actions+=/variable,name=death_strike_health_pct_threshold,value=70
 # Dump Runic Power with Death Strike to avoid capping.
 actions+=/variable,name=death_strike_dump_amount,value=variable.death_strike_pool_value,op=setif,condition=buff.dancing_rune_weapon.down&variable.death_strike_pool_value>=75,value_else=75
 
+actions+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,time=0
 actions+=/mind_freeze
 actions+=/strangulate
 actions+=/call_action_list,name=defensives,if=tanking
@@ -25,7 +26,9 @@ actions+=/empower_rune_weapon,if=rune<6&runic_power.deficit>5
 actions+=/raise_dead
 actions+=/run_action_list,name=drw_up,strict=1,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=standard
+actions+=/use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&buff.dancing_rune_weapon.down
 
+actions.defensives+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)
 actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)
 actions.defensives+=/vampiric_blood,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.vampiric_blood.up|buff.vampiric_strength.up)
 actions.defensives+=/rune_tap,if=incoming_damage_5s>=rt_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up|buff.icebound_fortitude.up)

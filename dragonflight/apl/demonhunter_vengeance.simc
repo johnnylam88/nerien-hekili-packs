@@ -63,6 +63,7 @@ actions+=/variable,name=frailty_ready,value=1,op=setif,condition=(talent.the_hun
 actions+=/variable,name=frail_target,value=1,op=setif,condition=!talent.vulnerability.enabled|(variable.aoe=0&(talent.soulcrush.enabled&debuff.frailty.stack>=6)|active_dot.frailty>0),value_else=0
 actions+=/variable,name=frail_multitarget,value=1,op=setif,condition=!talent.vulnerability.enabled|(variable.aoe=1&(!talent.spirit_bomb_enabled&active_dot.frailty>1)|active_dot.frailty>=variable.num_targets),value_else=0
 
+actions+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,time=0
 actions+=/disrupt
 actions+=/consume_magic
 actions+=/call_action_list,name=heal
@@ -75,6 +76,7 @@ actions.heal+=/soul_cleave,if=(health.pct<variable.soul_cleave_health_pct_thresh
 
 actions.mitigation+=/demon_spikes,use_off_gcd=1,if=buff.demon_spikes.down&cooldown.fel_devastation.remains>(execute_time+gcd.remains)
 actions.mitigation+=/soul_barrier,if=soul_fragments>=4&buff.demon_spikes.down
+actions.mitigation+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,if=buff.demon_spikes.down
 actions.mitigation+=/metamorphosis,use_off_gcd=1,if=!talent.demonic.enabled|cooldown.fel_devastation.remains>12
 
 actions.racials=blood_fury

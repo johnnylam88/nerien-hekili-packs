@@ -14,6 +14,7 @@ actions+=/variable,name=death_strike_dump_amount,value=variable.death_strike_poo
 # Refresh Bone Shield with Marrowrend to maintain high stack count.
 actions+=/variable,name=bone_shield_refresh_value,value=8,op=setif,condition=(!talent.insatiable_blade.enabled|(buff.dancing_rune_weapon.down&cooldown.dancing_rune_weapon.remains>60))&(!talent.abomination_limb.enabled|(buff.abomination_limb.down&cooldown.abomination_limb.remains>20)),value_else=6
 
+actions+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,time=0
 actions+=/mind_freeze
 actions+=/strangulate
 actions+=/call_action_list,name=defensives,if=tanking
@@ -28,6 +29,7 @@ actions+=/raise_dead
 actions+=/call_action_list,name=core
 actions+=/gorefiends_grasp,if=talent.tightening_grasp.enabled
 actions+=/sacrificial_pact,if=buff.dancing_rune_weapon.down&(pet.ghoul.remains<3|boss&fight_remains<3)
+actions+=/use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&buff.dancing_rune_weapon.down
 
 actions.core+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold
 actions.core+=/abomination_limb
@@ -45,6 +47,7 @@ actions.core+=/blood_boil,if=charges_fractional>=1.8|buff.hemostasis.stack<5
 actions.core+=/consumption
 actions.core+=/deaths_caress,if=buff.bone_shield.stack<9
 
+actions.defensives+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)
 actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)
 actions.defensives+=/vampiric_blood,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.vampiric_blood.up|buff.vampiric_strength.up)
 actions.defensives+=/rune_tap,if=incoming_damage_5s>=rt_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up|buff.icebound_fortitude.up)

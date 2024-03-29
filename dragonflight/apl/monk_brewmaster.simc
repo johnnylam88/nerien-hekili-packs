@@ -21,6 +21,7 @@ actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.celes
 actions+=/variable,name=should_be_defensive,value=1,op=setif,condition=(!talent.fortifying_brew.enabled|cooldown.fortifying_brew.remains>0)&(!talent.dampen_harm.enabled|cooldown.dampen_harm.remains>0)&(health.pct<variable.defensive_health_pct|stagger.pct>variable.defensive_stagger_pct),value_else=0
 actions+=/variable,name=high_incoming_damage_amount,value=health.max*variable.high_incoming_damage_pct%100
 
+actions+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,time=0
 actions+=/spear_hand_strike
 actions+=/call_action_list,name=heal
 actions+=/call_action_list,name=defensives,if=health.pct<variable.defensive_health_pct&variable.has_defensive_buff=0
@@ -58,7 +59,8 @@ actions.boc+=/keg_smash,if=!talent.press_the_advantage.enabled|buff.press_the_ad
 actions.boc+=/weapons_of_order
 actions.boc+=/breath_of_fire
 
-actions.defensives+=/celestial_brew,if=!talent.improved_celestial_brew.enabled|buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold
+actions.defensives+=/celestial_brew,if=(!talent.improved_celestial_brew.enabled|buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold)&buff.wall_of_hate.down
+actions.defensives+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,if=buff.celestial_brew.down
 actions.defensives+=/fortifying_brew,use_off_gcd=1,if=incoming_damage_3s>variable.high_incoming_damage_amount
 actions.defensives+=/diffuse_magic,use_off_gcd=1,if=incoming_magic_damage_3s>variable.high_incoming_damage_amount
 actions.defensives+=/dampen_harm,use_off_gcd-1,if=incoming_damage_3s>variable.high_incoming_damage_amount
