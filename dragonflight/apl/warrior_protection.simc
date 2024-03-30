@@ -1,6 +1,7 @@
 actions.precombat+=/defensive_stance,if=!buff.defensive_stance.up
 actions.precombat+=/battle_shout
 actions.precombat+=/use_item,name=algethar_puzzle_box
+actions.precombat+=/use_item,name=fyrakks_tainted_rageheart
 
 actions+=/variable,name=rage_cost_ignore_pain,value=35
 actions+=/variable,name=rage_cost_revenge,value=20+10*talent.barbaric_training.enabled
@@ -40,7 +41,6 @@ actions+=/variable,name=ignore_pain_absorb,value=buff.ignore_pain.v2,op=setif,co
 actions+=/variable,name=ignore_pain_absorb_oncast,value=stat.attack_power*4.375*(1+stat.versatility_atk_mod%100)
 actions+=/variable,name=should_ignore_pain,value=1,op=setif,condition=(!buff.ignore_pain.up|buff.ignore_pain.remains<3.6|variable.ignore_pain_absorb+variable.ignore_pain_absorb_oncast<1.5*variable.ignore_pain_cap)&incoming_damage_5s>0,value_else=0
 
-actions+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,time=0
 actions+=/ravager,if=time=0
 actions+=/charge,if=time=0
 actions+=/pummel

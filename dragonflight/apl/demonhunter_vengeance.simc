@@ -1,6 +1,7 @@
 actions.precombat+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0
 actions.precombat+=/metamorphosis,if=buff.metamorphosis.down
 actions.precombat+=/demon_spikes,use_off_gcd=1,if=buff.demon_spikes.down&buff.metamorphosis.down
+actions.precombat+=/use_item,name=fyrakks_tainted_rageheart,if=buff.demon_spikes.down&buff.metamorphosis.down
 actions.precombat+=/infernal_strike,use_off_gcd=1
 actions.precombat+=/fiery_brand,if=active_dot.fiery_brand_dot=0
 actions.precombat+=/the_hunt
@@ -63,7 +64,6 @@ actions+=/variable,name=frailty_ready,value=1,op=setif,condition=(talent.the_hun
 actions+=/variable,name=frail_target,value=1,op=setif,condition=!talent.vulnerability.enabled|(variable.aoe=0&(talent.soulcrush.enabled&debuff.frailty.stack>=6)|active_dot.frailty>0),value_else=0
 actions+=/variable,name=frail_multitarget,value=1,op=setif,condition=!talent.vulnerability.enabled|(variable.aoe=1&(!talent.spirit_bomb_enabled&active_dot.frailty>1)|active_dot.frailty>=variable.num_targets),value_else=0
 
-actions+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,time=0
 actions+=/disrupt
 actions+=/consume_magic
 actions+=/call_action_list,name=heal

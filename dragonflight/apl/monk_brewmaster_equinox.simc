@@ -1,5 +1,6 @@
 actions.precombat+=/rushing_jade_wind,if=buff.rushing_jade_wind.remains<gcd
 actions.precombat+=/breath_of_fire,if=talent.charred_passions.enabled&buff.charred_passions.down
+actions.precombat+=/use_item,name=fyrakks_tainted_rageheart,if=buff.celestial_brew.down
 actions.precombat+=/summon_white_tiger_statue
 actions.precombat+=/keg_smash
 
@@ -19,7 +20,6 @@ actions+=/variable,name=energy_at_next_keg_smash,value=energy+energy.regen*coold
 actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.celestial_brew.up|buff.dampen_harm.up|buff.fortifying_brew.up,value_else=0
 actions+=/variable,name=high_incoming_damage_amount,value=health.max*variable.high_incoming_damage_pct%100
 
-actions+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,time=0
 actions+=/spear_hand_strike
 actions+=/call_action_list,name=heal
 actions+=/call_action_list,name=defensives,if=health.pct<variable.defensive_health_pct&variable.has_defensive_buff=0

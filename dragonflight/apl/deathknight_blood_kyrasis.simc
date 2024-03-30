@@ -1,5 +1,6 @@
 # Use either Abomination Limb or Death's Caress if you need to maintain Bone Shield between pulls.
 actions.precombat+=/abomination_limb,if=buff.bone_shield.down|buff.bone_shield.remains<3
+actions.precombat+=/use_item,name=fyrakks_tainted_rageheart
 actions.precombat+=/deaths_caress,if=buff.bone_shield.down|buff.bone_shield.remains<3
 actions.precombat+=/blooddrinker,if=buff.dancing_rune_weapon.down
 actions.precombat+=/death_and_decay,if=!death_and_decay.ticking|rune.time_to_6<gcd
@@ -14,7 +15,6 @@ actions+=/variable,name=death_strike_dump_amount,value=variable.death_strike_poo
 # Refresh Bone Shield with Marrowrend to maintain high stack count.
 actions+=/variable,name=bone_shield_refresh_value,value=8,op=setif,condition=(!talent.insatiable_blade.enabled|(buff.dancing_rune_weapon.down&cooldown.dancing_rune_weapon.remains>60))&(!talent.abomination_limb.enabled|(buff.abomination_limb.down&cooldown.abomination_limb.remains>20)),value_else=6
 
-actions+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,time=0
 actions+=/mind_freeze
 actions+=/strangulate
 actions+=/call_action_list,name=defensives,if=tanking
