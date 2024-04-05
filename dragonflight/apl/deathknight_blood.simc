@@ -1,6 +1,7 @@
 # Use either Abomination Limb or Death's Caress if you need to maintain Bone Shield between pulls.
 actions.precombat+=/abomination_limb,if=buff.bone_shield.down|buff.bone_shield.remains<3
 actions.precombat+=/use_item,name=fyrakks_tainted_rageheart
+actions.precombat+=/use_item,name=leaf_of_the_ancient_protectors
 actions.precombat+=/deaths_caress,if=buff.bone_shield.down|buff.bone_shield.remains<3
 actions.precombat+=/blooddrinker,if=buff.dancing_rune_weapon.down
 actions.precombat+=/death_and_decay,if=!death_and_decay.ticking|rune.time_to_6<gcd
@@ -29,6 +30,7 @@ actions+=/call_action_list,name=standard
 actions+=/use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking&buff.dancing_rune_weapon.down
 
 actions.defensives+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)
+actions.defensives+=/use_item,name=leaf_of_the_ancient_protectors,use_off_gcd=1,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)
 actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)
 actions.defensives+=/vampiric_blood,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.vampiric_blood.up|buff.vampiric_strength.up)
 actions.defensives+=/rune_tap,if=incoming_damage_5s>=rt_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up|buff.icebound_fortitude.up)

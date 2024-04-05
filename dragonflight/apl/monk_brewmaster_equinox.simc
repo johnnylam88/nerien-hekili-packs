@@ -1,6 +1,7 @@
 actions.precombat+=/rushing_jade_wind,if=buff.rushing_jade_wind.remains<gcd
 actions.precombat+=/breath_of_fire,if=talent.charred_passions.enabled&buff.charred_passions.down
 actions.precombat+=/use_item,name=fyrakks_tainted_rageheart,if=buff.celestial_brew.down
+actions.precombat+=/use_item,name=leaf_of_the_ancient_protectors,if=buff.celestial_brew.down
 actions.precombat+=/summon_white_tiger_statue
 actions.precombat+=/keg_smash
 
@@ -75,8 +76,10 @@ actions.core_dragonfire+=/call_action_list,name=keg_smash
 actions.core_dragonfire+=/call_action_list,name=sck
 actions.core_dragonfire+=/call_action_list,name=filler
 
-actions.defensives+=/celestial_brew,if=(!talent.improved_celestial_brew.enabled|buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold)&buff.wall_of_hate.down
+actions.defensives+=/variable,name=has_trinket_shield,value=1,op=setif,condition=buff.wall_of_hate.up|buff.ancient_protection.up,value_else=0
+actions.defensives+=/celestial_brew,if=(!talent.improved_celestial_brew.enabled|buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold)&variable.has_trinket_shield=0
 actions.defensives+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,if=buff.celestial_brew.down
+actions.defensives+=/use_item,name=leaf_of_the_ancient_protectors,use_off_gcd=1,if=buff.celestial_brew.down
 actions.defensives+=/fortifying_brew,use_off_gcd=1,if=incoming_damage_3s>variable.high_incoming_damage_amount
 actions.defensives+=/diffuse_magic,use_off_gcd=1,if=incoming_magic_damage_3s>variable.high_incoming_damage_amount
 actions.defensives+=/dampen_harm,use_off_gcd=1,if=incoming_damage_3s>variable.high_incoming_damage_amount

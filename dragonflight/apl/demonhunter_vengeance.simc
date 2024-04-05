@@ -2,6 +2,7 @@ actions.precombat+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0
 actions.precombat+=/metamorphosis,if=buff.metamorphosis.down
 actions.precombat+=/demon_spikes,use_off_gcd=1,if=buff.demon_spikes.down&buff.metamorphosis.down
 actions.precombat+=/use_item,name=fyrakks_tainted_rageheart,if=buff.demon_spikes.down&buff.metamorphosis.down
+actions.precombat+=/use_item,name=leaf_of_the_ancient_protectors,if=buff.demon_spikes.down&buff.metamorphosis.down
 actions.precombat+=/infernal_strike,use_off_gcd=1
 actions.precombat+=/fiery_brand,if=active_dot.fiery_brand_dot=0
 actions.precombat+=/the_hunt
@@ -77,6 +78,7 @@ actions.heal+=/soul_cleave,if=(health.pct<variable.soul_cleave_health_pct_thresh
 actions.mitigation+=/demon_spikes,use_off_gcd=1,if=buff.demon_spikes.down&cooldown.fel_devastation.remains>(execute_time+gcd.remains)
 actions.mitigation+=/soul_barrier,if=soul_fragments>=4&buff.demon_spikes.down
 actions.mitigation+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,if=buff.demon_spikes.down
+actions.mitigation+=/use_item,name=leaf_of_the_ancient_protectors,use_off_gcd=1,if=buff.demon_spikes.down
 actions.mitigation+=/metamorphosis,use_off_gcd=1,if=!talent.demonic.enabled|cooldown.fel_devastation.remains>12
 
 actions.racials=blood_fury
