@@ -48,14 +48,14 @@ actions.aoe+=/spinning_crane_kick,if=buff.charred_passions.up&(!talent.press_the
 actions.aoe+=/rushing_jade_wind,if=buff.rushing_jade_wind.remains<gcd
 actions.aoe+=/keg_smash,if=talent.stormstouts_last_keg.enabled
 actions.aoe+=/chi_burst,if=active_enemies>=3
-actions.aoe+=/tiger_palm,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm&variable.should_be_defensive=1
+actions.aoe+=/tiger_palm,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm&!talent.press_the_advantage.enabled&variable.should_be_defensive=1
 actions.aoe+=/spinning_crane_kick,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick&(!talent.press_the_advantage.enabled|!prev_gcd=spinning_crane_kick|active_enemies>=3)
 actions.aoe+=/chi_wave
 
 actions.boc+=/blackout_kick
 actions.boc+=/rising_sun_kick,if=buff.blackout_combo.up&buff.press_the_advantage.stack=10
 actions.boc+=/breath_of_fire,if=buff.blackout_combo.up&(active_enemies>=3|variable.should_be_defensive=1)
-actions.boc+=/tiger_palm,if=buff.blackout_combo.up
+actions.boc+=/tiger_palm,if=!talent.press_the_advantage.enabled&buff.blackout_combo.up
 actions.boc+=/keg_smash,if=!talent.press_the_advantage.enabled|buff.press_the_advantage.stack<10|active_enemies>=4|variable.should_be_defensive=1
 actions.boc+=/weapons_of_order
 actions.boc+=/breath_of_fire
@@ -100,5 +100,5 @@ actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.remains<gcd
 actions.st+=/keg_smash,if=talent.stormstouts_last_keg.enabled
 actions.st+=/chi_wave
 actions.st+=/chi_burst
-actions.st+=/spinning_crane_kick,if=variable.energy_at_next_keg_smash>65&talent.press_the_advantage.enabled&!prev_gcd=spinning_crane_kick
-actions.st+=/tiger_palm,if=variable.energy_at_next_keg_smash>65
+actions.st+=/spinning_crane_kick,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick&talent.press_the_advantage.enabled&!prev_gcd=spinning_crane_kick
+actions.st+=/tiger_palm,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm&!talent.press_the_advantage.enabled

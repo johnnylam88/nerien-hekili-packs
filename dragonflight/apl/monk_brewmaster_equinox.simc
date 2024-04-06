@@ -112,4 +112,4 @@ actions.racials+=/bag_of_tricks
 # Only cast Spinning Crane Kick or Tiger Palm if it won't push back the next Keg Smash.
 # Spinning Crane Kick shouldn't be cast consecutively with Press the Advantage.
 actions.sck+=/spinning_crane_kick,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick&(!talent.press_the_advantage.enabled|!prev_gcd=spinning_crane_kick)
-actions.tp+=/tiger_palm,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm
+actions.tp+=/tiger_palm,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm&!talent.press_the_advantage.enabled
