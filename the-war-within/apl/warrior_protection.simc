@@ -2,7 +2,6 @@ actions.precombat+=/defensive_stance,if=!buff.defensive_stance.up
 actions.precombat+=/battle_shout
 actions.precombat+=/use_item,name=algethar_puzzle_box
 actions.precombat+=/use_item,name=fyrakks_tainted_rageheart
-actions.precombat+=/use_item,name=leaf_of_the_ancient_protectors
 
 actions+=/variable,name=rage_cost_ignore_pain,value=35
 actions+=/variable,name=rage_cost_revenge,value=20+10*talent.barbaric_training.enabled
@@ -12,35 +11,45 @@ actions+=/variable,name=rage_gen_multiplier_outburst,value=2,op=setif,condition=
 actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercussions.enabled+3*talent.impenetrable_wall.enabled)*variable.rage_gen_multiplier_outburst
 actions+=/variable,name=rage_gain_thunder_clap,value=5*variable.rage_gen_multiplier_outburst
 
-actions+=/variable,name=rage_dump_value,value=rage.max-10
-actions+=/variable,name=rage_pool_value,value=variable.rage_dump_value-variable.rage_cost_shield_block-variable.rage_cost_ignore_pain
+# Try to pool enough Rage to cast both Shield Block and Ignore Pain.
+actions+=/variable,name=rage_pool_value,value=variable.rage_cost_shield_block+variable.rage_cost_ignore_pain
 
-actions+=/variable,name=rage_gen_multiplier,value=1+0.5*buff.unnerving_focus.up
-actions+=/variable,name=rage_per_second_auto_attack,value=1*(1+0.5*talent.war_machine.enabled)+(2-talent.devastator.enabled)*talent.instigator.enabled
-actions+=/variable,name=rage_per_second_incoming_damage,value=3%5*active_enemies,op=setif,condition=active_enemies<=5,value_else=3
-actions+=/variable,name=rage_per_second_bloodsurge,value=talent.bloodsurge.enabled*((0.1*5%3)*(active_dot.deep_wounds+active_dot.rend)+(0.1*5%2)*active_dot.thunderous_roar)
+# should_spend_rage   Set to 1 if there is the expected Rage by the next
+#                     Shield Block exceeds the target pool value.
+#
+# should_dump_rage    Set to 1 if a Rage generator is coming off cooldown
+#                     and using it will overcap on Rage.
+#
+# should_ignore_pain  Set to 1 if Ignore Pain is down, expires in the next GCD,
+#                     or won't waste more than 50% of the on-cast absorb value.
+
+actions+=/variable,name=rage_gen_multiplier,value=1+0.5*buff.unnerving_focus.remains%buff.unnerving_focus.duration
+actions+=/variable,name=rage_per_second_auto_attack,value=1*(1+0.5*talent.war_machine.enabled)+(2-talent.devastator.enabled)*talent.instigate.enabled
+# 3 Rage per incoming auto-attack, and incoming auto-attack every 2s with 1 mob.
+# Assume at 5+ mobs, that we gain 3 Rage every second.
+actions+=/variable,name=rage_per_second_incoming_damage,value=(3%2)+((3%2)%(5-1))*(active_enemies-1),op=setif,condition=active_enemies<5,value_else=3
+# Bloodsurge has a 10% chance to gain 5 rage per Bleed tick.
+actions+=/variable,name=rage_per_second_bloodsurge,value=talent.bloodsurge.enabled*((0.1*5%3)*active_dot.deep_wounds+(0.1*5%3)*active_dot.rend+(0.1*5%2)*active_dot.thunderous_roar)
 actions+=/variable,name=rage_per_second_ravager,value=buff.ravager.up*5
 actions+=/variable,name=rage_per_second_shield_slam,value=variable.rage_gain_shield_slam%cooldown.shield_slam.duration
-actions+=/variable,name=rage_per_second_thunder_clap,value=5%cooldown.thunder_clap.duration
+actions+=/variable,name=rage_per_second_thunder_clap,value=variable.rage_gain_thunder_clap%cooldown.thunder_clap.duration
 actions+=/variable,name=rage_per_second,value=(variable.rage_per_second_auto_attack+variable.rage_per_second_incoming_damage+variable.rage_per_second_ravager+variable.rage_per_second_shield_slam+variable.rage_per_second_thunder_clap)*variable.rage_gen_multiplier
 actions+=/variable,name=rage_at_next_shield_block,value=rage,op=setif,condition=cooldown.shield_block.charges>0,value_else=rage+cooldown.shield_block.remains*variable.rage_per_second
-actions+=/variable,name=should_spend_rage,value=1,op=setif,condition=variable.rage_at_next_shield_block>variable.rage_dump_value,value_else=0
+actions+=/variable,name=should_spend_rage,value=1,op=setif,condition=variable.rage_at_next_shield_block>variable.rage_pool_value,value_else=0
 
-actions+=/variable,name=rage_check,value=1,op=setif,condition=rage+variable.rage_per_second*gcd>variable.rage_dump_value,value_else=0
-actions+=/variable,name=rage_check_avatar,value=1,op=setif,condition=talent.avatar.enabled&cooldown.avatar.remains<gcd&rage+10*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
-actions+=/variable,name=rage_check_demoralizing_shout,value=1,op=setif,condition=talent.demoralizing_shout.enabled&talent.booming_voice.enabled&cooldown.demoralizing_shout.remains<gcd&rage+30*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
-actions+=/variable,name=rage_check_shield_charge,value=1,op=setif,condition=talent.shield_charge.enabled&cooldown.shield_charge.remains<gcd&rage+(20+20*talent.champions_bulwark.enabled)*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
-actions+=/variable,name=rage_check_shield_slam,value=1,op=setif,condition=cooldown.shield_slam.remains<gcd&rage+variable.rage_gain_shield_slam*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
-actions+=/variable,name=rage_check_spear_of_bastion,value=1,op=setif,condition=talent.spear_of_bastion.enabled&cooldown.spear_of_bastion.remains<gcd&rage+20*(1+talent.piercing_verdict.enabled)*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
-actions+=/variable,name=rage_check_thunder_clap,value=1,op=setif,condition=talent.thunder_clap.enabled&cooldown.thunder_clap.remains<gcd&rage+variable.rage_gain_thunder_clap*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
-actions+=/variable,name=rage_check_thunderous_roar,value=1,op=setif,condition=talent.thunderous_roar.enabled&cooldown.thunderous_roar.remains<gcd&rage+10*variable.rage_gen_multiplier>variable.rage_dump_value,value_else=0
-actions+=/variable,name=should_dump_rage,value=1,op=setif,condition=variable.rage_check>0|variable.rage_check_avatar>0|variable.rage_check_demoralizing_shout>0|variable.rage_check_shield_charge>0|variable.rage_check_shield_slam>0|variable.rage_check_spear_of_bastion>0|variable.rage_check_thunder_clap>0|variable.rage_check_thunderous_roar>0,value_else=0
+actions+=/variable,name=rage_check,value=1,op=setif,condition=rage+variable.rage_per_second*gcd>rage.max,value_else=0
+actions+=/variable,name=rage_check_avatar,value=1,op=setif,condition=talent.avatar.enabled&cooldown.avatar.remains<gcd&rage+10*variable.rage_gen_multiplier>rage.max,value_else=0
+actions+=/variable,name=rage_check_champions_spear,value=1,op=setif,condition=talent.champions_spear.enabled&cooldown.champions_spear.remains<gcd&rage+20*variable.rage_gen_multiplier>rage.max,value_else=0
+actions+=/variable,name=rage_check_demoralizing_shout,value=1,op=setif,condition=talent.demoralizing_shout.enabled&talent.booming_voice.enabled&cooldown.demoralizing_shout.remains<gcd&rage+30*variable.rage_gen_multiplier>rage.max,value_else=0
+actions+=/variable,name=rage_check_shield_charge,value=1,op=setif,condition=talent.shield_charge.enabled&cooldown.shield_charge.remains<gcd&rage+(20+20*talent.champions_bulwark.enabled)*variable.rage_gen_multiplier>rage.max,value_else=0
+actions+=/variable,name=rage_check_shield_slam,value=1,op=setif,condition=cooldown.shield_slam.remains<gcd&rage+variable.rage_gain_shield_slam*variable.rage_gen_multiplier>rage.max,value_else=0
+actions+=/variable,name=rage_check_thunder_clap,value=1,op=setif,condition=talent.thunder_clap.enabled&cooldown.thunder_clap.remains<gcd&rage+variable.rage_gain_thunder_clap*variable.rage_gen_multiplier>rage.max,value_else=0
+actions+=/variable,name=should_dump_rage,value=1,op=setif,condition=variable.rage_check>0|variable.rage_check_avatar>0|variable.rage_check_demoralizing_shout>0|variable.rage_check_shield_charge>0|variable.rage_check_shield_slam>0|variable.rage_check_champions_spear>0|variable.rage_check_thunder_clap>0,value_else=0
 
-# Only use Ignore Pain if it won't waste more than 50% of the on-cast absorb value.
 actions+=/variable,name=ignore_pain_cap,value=0.3*health.max
 actions+=/variable,name=ignore_pain_absorb,value=buff.ignore_pain.v2,op=setif,condition=buff.ignore_pain.up,value_else=0
 actions+=/variable,name=ignore_pain_absorb_oncast,value=stat.attack_power*4.375*(1+stat.versatility_atk_mod%100)
-actions+=/variable,name=should_ignore_pain,value=1,op=setif,condition=(!buff.ignore_pain.up|buff.ignore_pain.remains<3.6|variable.ignore_pain_absorb+variable.ignore_pain_absorb_oncast<1.5*variable.ignore_pain_cap)&incoming_damage_5s>0,value_else=0
+actions+=/variable,name=should_ignore_pain,value=1,op=setif,condition=(buff.ignore_pain.down|buff.ignore_pain.remains<gcd|variable.ignore_pain_absorb+variable.ignore_pain_absorb_oncast<1.5*variable.ignore_pain_cap)&incoming_damage_5s>0,value_else=0
 
 actions+=/ravager,if=time=0
 actions+=/charge,if=time=0
@@ -48,32 +57,33 @@ actions+=/pummel
 actions+=/spell_reflection
 actions+=/defensive_stance,if=!buff.defensive_stance.up&health.pct<70&incoming_damage_3s>0.2*health.max
 actions+=/call_action_list,name=defensives
+actions+=/victory_rush,if=buff.victorious.up&health.pct<50
+actions+=/impending_victory,if=health.pct<50
 actions+=/battle_stance,if=!buff.battle_stance.up&health.pct>70
 actions+=/call_action_list,name=mitigation
 actions+=/call_action_list,name=standard
 
-# Usage of Last Stand is also governed by specialization settings; see /hekili > Protection.
-actions.defensives+=/last_stand,if=!talent.bolster.enabled
+# Last Stand is affected by specialization settings; see /hekili > Protection.
+actions.defensives+=/last_stand,use_off_gcd=1,if=!talent.bolster.enabled
 actions.defensives+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,if=incoming_damage_5s>0.2*health.max
-actions.defensives+=/use_item,name=leaf_of_the_ancient_protectors,use_off_gcd=1,if=incoming_damage_5s>0.2*health.max
-# Usage of Shield Wall is also governed by specialization settings; see /hekili > Protection.
-actions.defensives+=/shield_wall,if=talent.immovable_object.enabled&!buff.avatar.up
-# Usage of Rallying Cry is also governed by specialization settings; see /hekili > Protection.
+# Shield Wall is affected by specialization settings; see /hekili > Protection.
+actions.defensives+=/shield_wall,if=!talent.immovable_object_enabled|buff.avatar.down
+# Rallying Cry is affected by specialization settings; see /hekili > Protection.
 actions.defensives+=/rallying_cry
-actions.defensives+=/spell_block,if=!buff.shield_wall.up&incoming_magic_damage_5s>0.2*health.max
+actions.defensives+=/spell_block,if=buff.shield_wall.down&incoming_magic_damage_5s>0.2*health.max
 
-actions.dump_rage+=/execute,if=active_enemies=1
-actions.dump_rage+=/revenge
+actions.dump_rage+=/revenge,if=spell_targets.revenge>1
+actions.dump_rage+=/execute
 
-actions.mitigation+=/shield_block,if=buff.shield_block.remains<4&charges_fractional>1
-actions.mitigation+=/last_stand,if=talent.bolster.enabled&!buff.shield_block.up
-actions.mitigation+=/ignore_pain,if=variable.should_ignore_pain>0&(buff.seeing_red.stack>6|variable.rage_at_next_shield_block>=variable.rage_dump_value&rage-variable.rage_cost_ignore_pain>=variable.rage_pool_value)
+actions.mitigation+=/shield_block,if=buff.shield_block.down|buff.shield_block.remains<4
+actions.mitigation+=/last_stand,if=talent.bolster.enabled&buff.shield_block.down
+actions.mitigation+=/ignore_pain,if=variable.should_ignore_pain>0&(buff.seeing_red.stack=7|variable.should_spend_rage>0)
 
 actions.outburst+=/shield_slam,if=buff.violent_outburst.up
-actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&cooldown.shield_slam.remains>2&spell_targets.thunder_clap>1
+actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&cooldown.shield_slam.remains>2&spell_targets.thunder_clap>2
 # Put Thunder Clap on cooldown so Violent Outburst is consumed by Shield Slam instead.
-actions.outburst+=/thunder_clap,if=buff.seeing_red.stack>6
-actions.outburst+=/revenge,if=buff.seeing_red.stack>6&variable.should_ignore_pain=0
+actions.outburst+=/thunder_clap,if=buff.seeing_red.stack=7
+actions.outburst+=/revenge,if=buff.seeing_red.stack=7&variable.should_ignore_pain=0
 
 actions.racials+=/blood_fury
 actions.racials+=/berserking
@@ -83,14 +93,14 @@ actions.racials+=/ancestral_call
 #actions.racials+=/fireblood
 actions.racials+=/bag_of_tricks
 
-actions.ravager_up+=/revenge,if=!debuff.deep_wounds.up
+actions.ravager_up+=/revenge,if=debuff.deep_wounds.down
 actions.ravager_up+=/shield_slam,if=talent.heavy_repercussions.enabled
 actions.ravager_up+=/revenge
 
-actions.spend_rage+=/execute,if=active_enemies=1&rage-40>=variable.rage_pool_value
-actions.spend_rage+=/revenge,if=rage-variable.rage_cost_revenge>=variable.rage_pool_value
+actions.spend_rage+=/revenge,if=rage-variable.rage_cost_revenge>=variable.rage_pool_value&spell_targets.revenge>1
+actions.spend_rage+=/execute,if=rage-40>=variable.rage_pool_value
 
-actions.standard+=/thunder_clap,if=prev.charge&spell_targets.thunder_clap>=3
+actions.standard+=/thunder_clap,if=prev.charge&spell_targets.thunder_clap>2
 actions.standard+=/shield_slam,if=prev.charge
 actions.standard+=/thunder_clap,if=talent.unstoppable_force.enabled&buff.avatar.up
 actions.standard+=/call_action_list,name=dump_rage,if=variable.should_ignore_pain=0&variable.should_dump_rage>0
@@ -99,14 +109,14 @@ actions.standard+=/call_action_list,name=racials
 actions.standard+=/potion,if=buff.avatar.up
 actions.standard+=/demoralizing_shout,if=talent.booming_voice.enabled
 actions.standard+=/ravager
-actions.standard+=/spear_of_bastion
+actions.standard+=/champions_spear
 actions.standard+=/thunderous_roar
 actions.standard+=/shield_charge
 actions.standard+=/call_action_list,name=outburst,if=talent.violent_outburst.enabled
-actions.standard+=/victory_rush,if=buff.victorious.up&health.pct<90
 actions.standard+=/call_action_list,name=ravager_up,if=talent.ravager.enabled&buff.shield_block.up&buff.ravager.remains>0
-actions.standard+=/revenge,if=buff.revenge.up
 actions.standard+=/shield_slam
-actions.standard+=/thunder_clap,if=!buff.violent_outburst.up|spell_targets.thunder_clap>=3
+actions.standard+=/thunder_clap,if=buff.violent_outburst.down|spell_targets.thunder_clap>2
+actions.standard+=/revenge,if=buff.revenge.up
 actions.standard+=/call_action_list,name=spend_rage,if=variable.should_ignore_pain=0&variable.should_spend_rage>0
+actions.standard+=/victory_rush,if=buff.victorious.up&health.pct<80
 actions.standard+=/devastate
