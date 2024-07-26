@@ -1,4 +1,4 @@
-## Interface: 100206
+## Interface: 110000
 
 ## Title: Nerien's Hekili Packs
 ## Notes: Nerien's collection of Hekili action packs for various classes and specializations.
@@ -15,9 +15,10 @@
 ## Dependencies: Hekili
 
 main.lua
-dragonflight/deathknight_blood.lua
-dragonflight/deathknight_blood_kyrasis.lua
-dragonflight/demonhunter_vengeance.lua
-dragonflight/monk_brewmaster.lua
-dragonflight/monk_brewmaster_equinox.lua
-dragonflight/warrior_protection.lua
+
+the-war-within/deathknight_blood.lua
+the-war-within/deathknight_blood_kyrasis.lua
+the-war-within/demonhunter_vengeance.lua
+the-war-within/monk_brewmaster.lua
+the-war-within/monk_brewmaster_equinox.lua
+the-war-within/warrior_protection.lua
