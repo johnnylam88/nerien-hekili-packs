@@ -1,7 +1,6 @@
 actions.precombat+=/rushing_jade_wind
 actions.precombat+=/use_item,name=fyrakks_tainted_rageheart,if=buff.celestial_brew.down
 actions.precombat+=/chi_burst
-#actions.precombat+=/chi_wave
 
 # Tunable variables
 # Minimum number of Purified Chi stacks before using Celestial Brew.
@@ -54,7 +53,6 @@ actions.boc+=/rising_sun_kick,if=buff.blackout_combo.up&buff.press_the_advantage
 actions.boc+=/breath_of_fire,if=buff.blackout_combo.up&buff.press_the_advantage.stack<10&(active_enemies>=3|variable.should_be_defensive=1)
 actions.boc+=/tiger_palm,if=buff.blackout_combo.up&buff.press_the_advantage.stack<10
 actions.boc+=/chi_burst,if=active_enemies>1
-#actions.boc+=/chi_wave,if=active_enemies>1
 actions.boc+=/keg_smash,if=!talent.press_the_advantage.enabled|buff.press_the_advantage.stack<10|(active_enemies>=4|variable.should_be_defensive>0)
 actions.boc+=/weapons_of_order
 # Get the amount of damage reduction from the Breath of Fire DoT on the target.
@@ -79,7 +77,6 @@ actions.mitigation+=/purifying_brew,if=stagger.pct>variable.purify_stagger_pct
 actions.nonboc+=/rising_sun_kick,if=buff.press_the_advantage.stack=10&active_enemies<=3
 actions.nonboc+=/blackout_kick,if=buff.charred_passions.up
 actions.nonboc+=/chi_burst,if=active_enemies>1
-#actions.nonboc+=/chi_wave,if=active_enemies>1
 actions.nonboc+=/breath_of_fire,if=talent.dragonfire_brew.enabled&active_enemies>1
 actions.nonboc+=/keg_smash,if=!talent.press_the_advantage.enabled|buff.press_the_advantage.stack<10|(active_enemies>=4|variable.should_be_defensive>0)
 actions.nonboc+=/breath_of_fire,if=talent.charred_passions.enabled|(talent.dragonfire_brew.enabled&active_enemies=1)
@@ -97,7 +94,6 @@ actions.racials+=/bag_of_tricks
 
 actions.st+=/rising_sun_kick
 actions.st+=/chi_burst
-#actions.st+=/chi_wave
 actions.st+=/exploding_keg,if=buff.rushing_jade_wind.up
 actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.remains<gcd
 actions.st+=/keg_smash,if=talent.stormstouts_last_keg.enabled
