@@ -72,7 +72,7 @@ actions+=/run_action_list,name=multitarget,if=variable.aoe=1
 actions+=/call_action_list,name=priority
 
 actions.heal+=/bulk_extraction,if=talent.bulk_extraction.enabled&(health.pct<variable.bulk_extraction_health_pct_threshold)&(variable.soul_fragments_deficit<=variable.num_targets)&(soul_fragments<=2)
-actions.heal+=/soul_cleave,if=(health.pct<variable.soul_cleave_health_pct_threshold)&(incoming_damage_2s>(health.max*0.2))
+actions.heal+=/soul_cleave,if=(health.pct<variable.soul_cleave_health_pct_threshold)&(incoming_damage_5s>(health.max*0.2))
 
 actions.mitigation+=/demon_spikes,use_off_gcd=1,if=buff.demon_spikes.down&cooldown.fel_devastation.remains>(execute_time+gcd.remains)
 actions.mitigation+=/soul_barrier,if=soul_fragments>=4&buff.demon_spikes.down
