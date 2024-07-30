@@ -47,7 +47,7 @@ actions+=/variable,name=rage_check_thunder_clap,value=1,op=setif,condition=talen
 actions+=/variable,name=should_dump_rage,value=1,op=setif,condition=variable.rage_check>0|variable.rage_check_avatar>0|variable.rage_check_demoralizing_shout>0|variable.rage_check_shield_charge>0|variable.rage_check_shield_slam>0|variable.rage_check_champions_spear>0|variable.rage_check_thunder_clap>0,value_else=0
 
 actions+=/variable,name=ignore_pain_cap,value=0.3*health.max
-actions+=/variable,name=ignore_pain_absorb,value=buff.ignore_pain.v2,op=setif,condition=buff.ignore_pain.up,value_else=0
+actions+=/variable,name=ignore_pain_absorb,value=buff.ignore_pain.v1,op=setif,condition=buff.ignore_pain.up,value_else=0
 actions+=/variable,name=ignore_pain_absorb_oncast,value=stat.attack_power*4.375*(1+stat.versatility_atk_mod%100)
 actions+=/variable,name=should_ignore_pain,value=1,op=setif,condition=(buff.ignore_pain.down|buff.ignore_pain.remains<gcd|variable.ignore_pain_absorb+variable.ignore_pain_absorb_oncast<1.5*variable.ignore_pain_cap)&incoming_damage_5s>0,value_else=0
 
