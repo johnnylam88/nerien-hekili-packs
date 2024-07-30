@@ -53,14 +53,14 @@ actions+=/variable,name=num_targets,value=active_enemies,op=setif,condition=!tal
 actions+=/variable,name=aoe,value=1,op=setif,condition=variable.num_targets>1,value_else=0
 
 # Check if a sigil has already been placed and waiting for activation.
-actions+=/variable,name=elysian_decree_placed,value=1,op=setif,condition=prev_gcd.elysian_decree&(talent.quickened_sigils.enabled|prev_gcd.2.elysian_decree),value_else=0
+actions+=/variable,name=sigil_of_spite_placed,value=1,op=setif,condition=prev_gcd.sigil_of_spite&(talent.quickened_sigils.enabled|prev_gcd.2.sigil_of_spite),value_else=0
 actions+=/variable,name=sigil_of_flame_placed,value=1,op=setif,condition=prev_gcd.sigil_of_flame&(talent.quickened_sigils.enabled|prev_gcd.2.sigil_of_flame),value_else=0
 
 # Try to synchronize Fiery Brand with major fire spells if Fiery Demise is talented.
 actions+=/variable,name=fiery_demise_ready,value=1,op=setif,condition=cooldown.sigil_of_flame.remains<=(execute_time+gcd.remains)|(talent.soul_carver.enabled&cooldown.soul_carver.remains<=(execute_time+gcd.remains))|cooldown.fel_devastation.remains<=(execute_time+gcd.remains),value_else=0
 
 # Try to synchronize major offensive cooldowns with Frailty on targets.
-actions+=/variable,name=frailty_ready,value=1,op=setif,condition=(talent.the_hunt.enabled&cooldown.the_hunt.remains<=(execute_time+gcd.remains))|(talent.elysian_decree.enabled&cooldown.elysian_decree.remains<=(execute_time+gcd.remains))|(talent.soul_carver.enabled&cooldown.soul_carver.remains<=(execute_time+gcd.remains)),value_else=0
+actions+=/variable,name=frailty_ready,value=1,op=setif,condition=(talent.the_hunt.enabled&cooldown.the_hunt.remains<=(execute_time+gcd.remains))|(talent.sigil_of_spite.enabled&cooldown.sigil_of_spite.remains<=(execute_time+gcd.remains))|(talent.soul_carver.enabled&cooldown.soul_carver.remains<=(execute_time+gcd.remains)),value_else=0
 actions+=/variable,name=frail_target,value=1,op=setif,condition=!talent.vulnerability.enabled|(variable.aoe=0&(talent.soulcrush.enabled&debuff.frailty.stack>=6)|active_dot.frailty>0),value_else=0
 actions+=/variable,name=frail_multitarget,value=1,op=setif,condition=!talent.vulnerability.enabled|(variable.aoe=1&(!talent.spirit_bomb_enabled&active_dot.frailty>1)|active_dot.frailty>=variable.num_targets),value_else=0
 
@@ -94,7 +94,7 @@ actions.multitarget+=/fiery_brand,if=(!talent.fiery_demise.enabled|variable.fier
 actions.multitarget+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0&(!talent.illuminated_sigils.enabled|(active_dot.sigil_of_flame=0&fury.deficit>=variable.fury_gain_sigil_of_flame))
 actions.multitarget+=/fel_devastation,if=talent.fiery_demise.enabled
 actions.multitarget+=/the_hunt,if=variable.frail_multitarget=1
-actions.multitarget+=/elysian_decree,if=variable.elysian_decree_placed=0&variable.frail_multitarget=1
+actions.multitarget+=/sigil_of_spite,if=variable.sigil_of_spite_placed=0&variable.frail_multitarget=1
 actions.multitarget+=/soul_carver,if=(variable.soul_fragments_deficit>=variable.soul_fragments_gain_soul_carver)&variable.frail_multitarget=1
 actions.multitarget+=/spirit_bomb,if=(buff.metamorphosis.up&variable.soul_fragments_deficit<=2)|variable.soul_fragments_deficit<=1
 actions.multitarget+=/soul_cleave,if=variable.should_pool_fury=0
@@ -111,7 +111,7 @@ actions.priority+=/fiery_brand,if=(!talent.fiery_demise.enabled|variable.fiery_d
 actions.priority+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0&(!talent.illuminated_sigils.enabled|(active_dot.sigil_of_flame=0&fury.deficit>=variable.fury_gain_sigil_of_flame))
 actions.priority+=/fel_devastation,if=talent.fiery_demise.enabled
 actions.priority+=/the_hunt,if=variable.frail_target=1
-actions.priority+=/elysian_decree,if=variable.elysian_decree_placed=0&variable.frail_target=1
+actions.priority+=/sigil_of_spite,if=variable.sigil_of_spite_placed=0&variable.frail_target=1
 actions.priority+=/soul_carver,if=(variable.soul_fragments_deficit>=variable.soul_fragments_gain_soul_carver)&variable.frail_target=1&debuff.fiery_brand_dot.remains>3
 actions.priority+=/spirit_bomb,if=talent.fiery_demise.enabled&debuff.fiery_brand_dot.up&variable.soul_fragments_deficit=0
 actions.priority+=/soul_cleave,if=variable.should_pool_fury=0
