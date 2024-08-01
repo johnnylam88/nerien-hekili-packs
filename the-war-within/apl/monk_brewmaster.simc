@@ -40,7 +40,7 @@ actions+=/call_action_list,name=nonboc,if=!talent.blackout_combo.enabled
 actions+=/run_action_list,name=aoe,if=active_enemies>1
 actions+=/run_action_list,name=st
 
-actions.aoe+=/exploding_keg,if=buff.rushing_jade_wind.up
+actions.aoe+=/exploding_keg,if=!talent.rushing_jade_wind.enabled|buff.rushing_jade_wind.up
 actions.aoe+=/rising_sun_kick
 actions.aoe+=/spinning_crane_kick,if=buff.charred_passions.up&(!prev_gcd=spinning_crane_kick|(talent.press_the_advantage.enabled&active_enemies>=3))
 actions.aoe+=/rushing_jade_wind,if=buff.rushing_jade_wind.remains<gcd
@@ -94,7 +94,7 @@ actions.racials+=/bag_of_tricks
 
 actions.st+=/rising_sun_kick
 actions.st+=/chi_burst
-actions.st+=/exploding_keg,if=buff.rushing_jade_wind.up
+actions.st+=/exploding_keg,if=!talent.rushing_jade_wind.enabled|buff.rushing_jade_wind.up
 actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.remains<gcd
 actions.st+=/keg_smash,if=talent.stormstouts_last_keg.enabled
 actions.st+=/tiger_palm,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm)&!talent.press_the_advantage.enabled
