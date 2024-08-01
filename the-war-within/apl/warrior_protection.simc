@@ -117,6 +117,7 @@ actions.standard+=/call_action_list,name=ravager_up,if=talent.ravager.enabled&bu
 actions.standard+=/shield_slam
 actions.standard+=/thunder_clap,if=buff.violent_outburst.down|spell_targets.thunder_clap>2
 actions.standard+=/revenge,if=buff.revenge.up
+actions.standard+=/execute,if=talent.sudden_death.enabled&buff.sudden_death.up&spell_targets.thunder_clap<=2
 actions.standard+=/call_action_list,name=spend_rage,if=variable.should_ignore_pain=0&variable.should_spend_rage>0
 actions.standard+=/victory_rush,if=buff.victorious.up&health.pct<80
 actions.standard+=/devastate
