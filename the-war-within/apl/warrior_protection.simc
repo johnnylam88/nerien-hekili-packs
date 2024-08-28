@@ -9,6 +9,7 @@ actions+=/variable,name=rage_cost_shield_block,value=30
 
 actions+=/variable,name=rage_gen_multiplier_outburst,value=2,op=setif,condition=buff.violent_outburst.up,value_else=1
 actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercussions.enabled+3*talent.impenetrable_wall.enabled)*variable.rage_gen_multiplier_outburst
+actions+=/variable,name=rage_gain_thunder_blast,value=5*variable.rage_gen_multiplier_outburst
 actions+=/variable,name=rage_gain_thunder_clap,value=5*variable.rage_gen_multiplier_outburst
 
 # Try to pool enough Rage to cast both Shield Block and Ignore Pain.
@@ -43,22 +44,26 @@ actions+=/variable,name=rage_check_champions_spear,value=1,op=setif,condition=ta
 actions+=/variable,name=rage_check_demoralizing_shout,value=1,op=setif,condition=talent.demoralizing_shout.enabled&talent.booming_voice.enabled&cooldown.demoralizing_shout.remains<gcd&rage+30*variable.rage_gen_multiplier>rage.max,value_else=0
 actions+=/variable,name=rage_check_shield_charge,value=1,op=setif,condition=talent.shield_charge.enabled&cooldown.shield_charge.remains<gcd&rage+(20+20*talent.champions_bulwark.enabled)*variable.rage_gen_multiplier>rage.max,value_else=0
 actions+=/variable,name=rage_check_shield_slam,value=1,op=setif,condition=cooldown.shield_slam.remains<gcd&rage+variable.rage_gain_shield_slam*variable.rage_gen_multiplier>rage.max,value_else=0
+actions+=/variable,name=rage_check_thunder_blast,value=1,op=setif,condition=talent.thunder_blast.enabled&cooldown.thunder_blast.remains<gcd&rage+variable.rage_gain_thunder_blast*variable.rage_gen_multiplier>rage.max,value_else=0
 actions+=/variable,name=rage_check_thunder_clap,value=1,op=setif,condition=talent.thunder_clap.enabled&cooldown.thunder_clap.remains<gcd&rage+variable.rage_gain_thunder_clap*variable.rage_gen_multiplier>rage.max,value_else=0
-actions+=/variable,name=should_dump_rage,value=1,op=setif,condition=variable.rage_check>0|variable.rage_check_avatar>0|variable.rage_check_demoralizing_shout>0|variable.rage_check_shield_charge>0|variable.rage_check_shield_slam>0|variable.rage_check_champions_spear>0|variable.rage_check_thunder_clap>0,value_else=0
+actions+=/variable,name=should_dump_rage,value=1,op=setif,condition=variable.rage_check>0|variable.rage_check_avatar>0|variable.rage_check_demoralizing_shout>0|variable.rage_check_shield_charge>0|variable.rage_check_shield_slam>0|variable.rage_check_champions_spear>0|variable.rage_check_thunder_blast>0|variable.rage_check_thunder_clap>0,value_else=0
 
 actions+=/variable,name=ignore_pain_cap,value=0.3*health.max
 actions+=/variable,name=ignore_pain_absorb,value=buff.ignore_pain.v1,op=setif,condition=buff.ignore_pain.up,value_else=0
 actions+=/variable,name=ignore_pain_absorb_oncast,value=stat.attack_power*4.375*(1+stat.versatility_atk_mod%100)
+# Don't overcap by more than 50% of the absorb from casting Ignore Pain.
 actions+=/variable,name=should_ignore_pain,value=1,op=setif,condition=(buff.ignore_pain.down|buff.ignore_pain.remains<gcd|variable.ignore_pain_absorb+variable.ignore_pain_absorb_oncast<1.5*variable.ignore_pain_cap)&incoming_damage_5s>0,value_else=0
 
 actions+=/ravager,if=time=0
 actions+=/charge,if=time=0
+actions+=/thunder_blast,if=prev.charge&spell_targets.thunder_clap>2
+actions+=/thunder_clap,if=prev.charge&spell_targets.thunder_clap>2
+actions+=/shield_slam,if=prev.charge
 actions+=/pummel
 actions+=/spell_reflection
 actions+=/defensive_stance,if=!buff.defensive_stance.up&health.pct<70&incoming_damage_3s>0.2*health.max
 actions+=/call_action_list,name=defensives
-actions+=/victory_rush,if=buff.victorious.up&health.pct<50
-actions+=/impending_victory,if=health.pct<50
+actions+=/call_action_list,name=heal
 actions+=/battle_stance,if=!buff.battle_stance.up&health.pct>70
 actions+=/call_action_list,name=mitigation
 actions+=/call_action_list,name=standard
@@ -75,15 +80,19 @@ actions.defensives+=/spell_block,if=buff.shield_wall.down&incoming_magic_damage_
 actions.dump_rage+=/revenge,if=spell_targets.revenge>1
 actions.dump_rage+=/execute
 
+actions.heal+=/victory_rush,if=buff.victorious.up&health.pct<70
+actions.heal+=/impending_victory,if=health.pct<70
+
 actions.mitigation+=/shield_block,if=buff.shield_block.down|buff.shield_block.remains<4
 actions.mitigation+=/last_stand,if=talent.bolster.enabled&buff.shield_block.down
 actions.mitigation+=/ignore_pain,if=variable.should_ignore_pain>0&(buff.seeing_red.stack=7|variable.should_spend_rage>0)
 
+actions.outburst+=/thunder_blast,if=buff.violent_outburst.up&spell_targets.thunder_clap>=2
+actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&spell_targets.thunder_clap>=8
 actions.outburst+=/shield_slam,if=buff.violent_outburst.up
-actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&cooldown.shield_slam.remains>2&spell_targets.thunder_clap>2
-# Put Thunder Clap on cooldown so Violent Outburst is consumed by Shield Slam instead.
-actions.outburst+=/thunder_clap,if=buff.seeing_red.stack=7
-actions.outburst+=/revenge,if=buff.seeing_red.stack=7&variable.should_ignore_pain=0
+actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&cooldown.shield_slam.remains>2
+actions.outburst+=/revenge,if=variable.should_ignore_pain=0&buff.seeing_red.stack=7&spell_targets.revenge>1
+actions.outburst+=/execute,if=variable.should_ignore_pain=0&buff.seeing_red.stack=7
 
 actions.racials+=/blood_fury
 actions.racials+=/berserking
@@ -98,26 +107,26 @@ actions.ravager_up+=/shield_slam,if=talent.heavy_repercussions.enabled
 actions.ravager_up+=/revenge
 
 actions.spend_rage+=/revenge,if=rage-variable.rage_cost_revenge>=variable.rage_pool_value&spell_targets.revenge>1
-actions.spend_rage+=/execute,if=rage-40>=variable.rage_pool_value
+actions.spend_rage+=/execute,if=rage-40>=variable.rage_pool_value&spell_targets.revenge<=4
 
-actions.standard+=/thunder_clap,if=prev.charge&spell_targets.thunder_clap>2
-actions.standard+=/shield_slam,if=prev.charge
+actions.standard+=/thunder_blast,if=talent.unstoppable_force.enabled&buff.avatar.up
 actions.standard+=/thunder_clap,if=talent.unstoppable_force.enabled&buff.avatar.up
-actions.standard+=/call_action_list,name=dump_rage,if=variable.should_ignore_pain=0&variable.should_dump_rage>0
+actions.standard+=/ravager
 actions.standard+=/avatar
 actions.standard+=/call_action_list,name=racials
 actions.standard+=/potion,if=buff.avatar.up
 actions.standard+=/demoralizing_shout,if=talent.booming_voice.enabled
-actions.standard+=/ravager
+actions.standard+=/call_action_list,name=dump_rage,if=variable.should_ignore_pain=0&variable.should_dump_rage>0
+actions.standard+=/demolish,if=buff.colossal_might.stack>=3
 actions.standard+=/champions_spear
 actions.standard+=/thunderous_roar
-actions.standard+=/shield_charge
 actions.standard+=/call_action_list,name=outburst,if=talent.violent_outburst.enabled
 actions.standard+=/call_action_list,name=ravager_up,if=talent.ravager.enabled&buff.shield_block.up&buff.ravager.remains>0
-actions.standard+=/shield_slam
-actions.standard+=/thunder_clap,if=buff.violent_outburst.down|spell_targets.thunder_clap>2
-actions.standard+=/revenge,if=buff.revenge.up
-actions.standard+=/execute,if=talent.sudden_death.enabled&buff.sudden_death.up&spell_targets.thunder_clap<=2
+actions.standard+=/shield_charge
+actions.standard+=/shield_slam,if=buff.thunder_blast.stack<2
+actions.standard+=/thunder_blast,if=buff.burst_of_power.stack<2
+actions.standard+=/thunder_clap
+actions.standard+=/revenge,if=buff.revenge.up|debuff.deep_wounds.down
+actions.standard+=/execute,if=talent.sudden_death.enabled&buff.sudden_death.up&spell_targets.revenge<=4
 actions.standard+=/call_action_list,name=spend_rage,if=variable.should_ignore_pain=0&variable.should_spend_rage>0
-actions.standard+=/victory_rush,if=buff.victorious.up&health.pct<80
 actions.standard+=/devastate
