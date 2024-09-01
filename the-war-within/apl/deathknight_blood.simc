@@ -1,49 +1,60 @@
 # Use Death's Caress if you need to maintain Bone Shield between pulls.
-actions.precombat+=/deaths_caress,if=buff.bone_shield.up&buff.bone_shield.remains<3
 actions.precombat+=/use_item,name=fyrakks_tainted_rageheart
+actions.precombat+=/blooddrinker,if=buff.dancing_rune_weapon.down
 actions.precombat+=/abomination_limb
 actions.precombat+=/raise_dead
-actions.precombat+=/blooddrinker,if=buff.dancing_rune_weapon.down
-actions.precombat+=/deaths_caress,if=buff.bone_shield.down
 actions.precombat+=/death_and_decay,if=!death_and_decay.ticking|rune.time_to_6<gcd
+actions.precombat+=/deaths_caress,if=buff.bone_shield.down|buff.bone_shield.remains<3
 
-# Bank Runic Power for 3 Death Strikes (must be more than 75).
-actions+=/variable,name=death_strike_pool_value,value=105
+# Bank Runic Power for 2 Death Strikes (must be more than 75).
+actions+=/variable,name=death_strike_pool_value,value=75
 # Death Strike below 70% health.
 actions+=/variable,name=death_strike_health_pct_threshold,value=70
+# Death Strike only if the damage taken events exceed 28% of maximum health.
+actions+=/variable,name=death_strike_damage_taken_pct_threshold,value=28
 
 # Dump Runic Power with Death Strike to avoid capping.
 actions+=/variable,name=death_strike_dump_amount,value=variable.death_strike_pool_value,op=setif,condition=buff.dancing_rune_weapon.down&variable.death_strike_pool_value>=75,value_else=75
+
+actions+=/variable,name=death_strike_heal_multiplier,value=(1+0.05*talent.improved_death_strike.enabled)*(1+0.15*talent.voracious.enabled)*(1+0.08*buff.hemostasis.stack)
+# Minimum Death Strike heal is 7% of maximum health.
+actions+=/variable,name=death_strike_heal_pct,value=(7<?25*(buff.coagulating_blood.stack%100))*variable.death_strike_heal_multiplier
+actions+=/variable,name=death_strike_heal_amount,value=health.max*variable.death_strike_heal_pct
 
 actions+=/mind_freeze
 actions+=/strangulate
 actions+=/call_action_list,name=defensives,if=tanking
 actions+=/potion,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.up
-actions+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold
+actions+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold&buff.coagulating_blood.stack>variable.death_strike_damage_taken_pct_threshold
 actions+=/sacrificial_pact,if=buff.dancing_rune_weapon.down&(pet.ghoul.remains<2|boss&fight_remains<gcd)
 actions+=/blood_tap,if=(rune<=2&rune.time_to_4>gcd&charges_fractional>=1.8)|rune.time_to_3>gcd
-actions+=/gorefiends_grasp,if=talent.tightening_grasp.enabled
 actions+=/raise_dead
 actions+=/run_action_list,name=drw_up,strict=1,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=standard
 
 actions.defensives+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)
 actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)
-actions.defensives+=/vampiric_blood,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.vampiric_blood.up|buff.vampiric_strength.up)
+actions.defensives+=/vampiric_blood,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.vampiric_blood.up|buff.vampiric_strength.up)&!talent.gift_of_the_sanlayn.enabled
 actions.defensives+=/rune_tap,if=incoming_damage_5s>=rt_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up|buff.icebound_fortitude.up)
 
+actions.drw_up+=/vampiric_blood,if=talent.gift_of_the_sanlayn.enabled
+# There is more nuance than just consuming all of the Exterminate procs.
+actions.drw_up+=/marrowrend,if=buff.exterminate.up
+actions.drw_up+=/reapers_mark,if=debuff.reapers_mark.down
+actions.drw_up+=/marrowrend,if=buff.exterminate.up&debuff.reapers_mark.down
 # Cast Marrowrend as one of the last three GCDs of Dancing Rune Weapon.
-actions.drw_up+=/marrowrend,if=buff.dancing_rune_weapon.remains<(3*gcd.max)&buff.bone_shield.remains<(buff.bone_shield.duration-3*gcd.max)
+actions.drw_up+=/marrowrend,if=buff.dancing_rune_weapon.remains<(3*gcd.max)&buff.bone_shield.remains<(buff.bone_shield.duration-3*gcd.max)&buff.bonestorm.down
 actions.drw_up+=/consumption
 actions.drw_up+=/death_and_decay,if=!death_and_decay.ticking
+actions.drw_up+=/marrowrend,if=cooldown.bonestorm.remains<gcd
+actions.drw_up+=/bonestorm,if=buff.bone_shield.stack>5&(!talent.shattering_bone.enabled|death_and_decay.ticking)&talent.dancing_rune_weapon.enabled&(!talent.insatiable_blade.enabled|cooldown.dancing_rune_weapon.remains>20)
 actions.drw_up+=/soul_reaper,if=active_enemies=1&target.time_to_pct_35<5&target.time_to_die>(dot.soul_reaper.remains+5)
 actions.drw_up+=/soul_reaper,cycle_targets=1,if=target.time_to_pct_35<5&active_enemies>=2&target.time_to_die>(dot.soul_reaper.remains+5)
-actions.drw_up+=/marrowrend,if=buff.bone_shield.stack<2
-actions.drw_up+=/bonestorm,if=buff.bone_shield.stack>=10&(!talent.shattering_bone.enabled|death_and_decay.ticking)&talent.dancing_rune_weapon.enabled&(!talent.insatiable_blade.enabled|cooldown.dancing_rune_weapon.remains>40)
+actions.drw_up+=/marrowrend,if=buff.bone_shield.down
 actions.drw_up+=/tombstone,if=buff.bone_shield.stack>5&(!talent.shattering_bone.enabled|death_and_decay.ticking)&talent.dancing_rune_weapon.enabled&(!talent.insatiable_blade.enabled|cooldown.dancing_rune_weapon.remains>20)
-actions.drw_up+=/death_strike,if=runic_power>variable.death_strike_dump_amount|(talent.coagulopathy.enabled&buff.coagulopathy.remains<gcd)
-actions.drw_up+=/blood_boil,if=charges_fractional>=1.8
+actions.drw_up+=/death_strike,if=runic_power>variable.death_strike_dump_amount|(talent.icy_talons.enabled&buff.icy_talons.remains<2)|(talent.coagulopathy.enabled&buff.coagulopathy.remains<2)
+actions.drw_up+=/blood_boil,if=full_recharge_time<gcd
 actions.drw_up+=/heart_strike,if=rune.time_to_3<gcd
 
 actions.racials=blood_fury,if=cooldown.dancing_rune_weapon.ready&(!talent.blooddrinker.enabled|!cooldown.blooddrinker.ready)
@@ -56,17 +67,21 @@ actions.racials+=/bag_of_tricks
 #actions.racials+=/arcane_torrent,if=runic_power.deficit>20
 
 actions.standard+=/marrowrend,if=buff.bone_shield.remains<3
-actions.standard+=/abomination_limb
-actions.standard+=/death_and_decay,if=!death_and_decay.ticking
 actions.standard+=/blooddrinker,if=buff.dancing_rune_weapon.down
-actions.standard+=/consumption
+actions.standard+=/vampiric_blood,if=talent.gift_of_the_sanlayn.enabled
+# There is more nuance than just consuming all of the Exterminate procs.
+actions.standard+=/marrowrend,if=buff.exterminate.up
+actions.standard+=/reapers_mark,if=debuff.reapers_mark.down
+actions.standard+=/marrowrend,if=buff.exterminate.up&debuff.reapers_mark.down
+actions.standard+=/abomination_limb
+actions.standard+=/bonestorm,if=buff.bone_shield.stack>5&(!talent.shattering_bone.enabled|death_and_decay.ticking)&(!talent.dancing_rune_weapon.enabled|!talent.insatiable_blade.enabled|cooldown.dancing_rune_weapon.remains>20)
+actions.standard+=/consumption,if=!talent.dancing_rune_weapon.enabled|cooldown.dancing_rune_weapon.remains>5
+actions.standard+=/death_and_decay,if=!death_and_decay.ticking
 actions.standard+=/soul_reaper,if=active_enemies=1&target.time_to_pct_35<5&target.time_to_die>(dot.soul_reaper.remains+5)
 actions.standard+=/soul_reaper,cycle_targets=1,if=target.time_to_pct_35<5&active_enemies>=2&target.time_to_die>(dot.soul_reaper.remains+5)
-actions.standard+=/marrowrend,if=buff.bone_shield.stack<=5&buff.bone_shield.remains>10&(!talent.dancing_rune_weapon.enabled|cooldown.dancing_rune_weapon.remains>10)
-actions.standard+=/use_item,name=fyralath_the_dreamrender,if=dot.mark_of_fyralath.ticking
+actions.standard+=/marrowrend,if=buff.bone_shield.stack<5&buff.bone_shield.remains<10&(!talent.dancing_rune_weapon.enabled|cooldown.dancing_rune_weapon.remains>5)
 actions.standard+=/dancing_rune_weapon,if=buff.dancing_rune_weapon.down
 actions.standard+=/tombstone,if=buff.bone_shield.stack>5&(!talent.shattering_bone.enabled|death_and_decay.ticking)&(!talent.dancing_rune_weapon.enabled|!talent.insatiable_blade.enabled|cooldown.dancing_rune_weapon.remains>20)
-actions.standard+=/bonestorm,if=buff.bone_shield.stack>=10&(!talent.shattering_bone.enabled|death_and_decay.ticking)&(!talent.dancing_rune_weapon.enabled|!talent.insatiable_blade.enabled|cooldown.dancing_rune_weapon.remains>40)
-actions.standard+=/death_strike,if=runic_power>variable.death_strike_dump_amount|(talent.icy_talons&buff.icy_talons.remains<gcd)
-actions.standard+=/blood_boil,if=charges_fractional>=1.8
+actions.standard+=/death_strike,if=runic_power>variable.death_strike_dump_amount|(talent.icy_talons.enabled&buff.icy_talons.remains<2)|(talent.coagulopathy.enabled&buff.coagulopathy.remains<2)
+actions.standard+=/blood_boil,if=full_recharge_time<gcd
 actions.standard+=/heart_strike,if=rune.time_to_3<gcd
