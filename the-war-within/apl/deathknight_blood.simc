@@ -1,3 +1,7 @@
+# Blood Death Knight Action Priority List
+# Based on *Blood Death Knight Tank Guide* by Panthea and Mandl
+# [https://www.wowhead.com/guide/classes/death-knight/blood/overview-pve-tank]
+
 actions.precombat+=/blooddrinker,if=buff.dancing_rune_weapon.down
 actions.precombat+=/abomination_limb
 actions.precombat+=/raise_dead

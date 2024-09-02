@@ -1,3 +1,7 @@
+# Protection Warrior Priority List
+# Based on *Protection Warrior Tank Guide* by Nomeratur
+# [https://www.wowhead.com/guide/classes/warrior/protection/overview-pve-tank]
+
 actions.precombat+=/defensive_stance,if=!buff.defensive_stance.up
 actions.precombat+=/battle_shout
 

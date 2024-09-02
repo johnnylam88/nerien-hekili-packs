@@ -1,3 +1,7 @@
+# Brewmaster Monk Priority List
+# Based on *Brewmaster Monk Tank Guide* by Sinzhu
+# [https://www.wowhead.com/guide/classes/monk/brewmaster/overview-pve-tank]
+
 actions.precombat+=/variable,name=opener,value=1,op=set
 actions.precombat+=/rushing_jade_wind
 actions.precombat+=/chi_burst

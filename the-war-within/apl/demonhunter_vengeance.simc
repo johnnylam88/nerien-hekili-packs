@@ -1,3 +1,7 @@
+# Vengeance Demon Hunter Priority List
+# Based on *Vengeance Demon Hunter Tank Guide* by Itamae
+# [https://www.wowhead.com/guide/classes/demon-hunter/vengeance/overview-pve-tank]
+
 actions.precombat+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0
 actions.precombat+=/metamorphosis,if=buff.metamorphosis.down
 actions.precombat+=/demon_spikes,use_off_gcd=1,if=buff.demon_spikes.down&buff.metamorphosis.down
