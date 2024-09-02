@@ -76,11 +76,11 @@ actions.aoe+=/blackout_kick,if=buff.charred_passions.up
 actions.aoe+=/exploding_keg
 actions.aoe+=/weapons_of_order
 actions.aoe+=/rising_sun_kick
-actions.aoe+=/spinning_crane_kick,if=buff.charred_passions.up&!prev_gcd=spinning_crane_kick
+actions.aoe+=/spinning_crane_kick,if=buff.charred_passions.up&!prev_gcd.spinning_crane_kick
 actions.aoe+=/rushing_jade_wind
 actions.aoe+=/keg_smash,if=talent.stormstouts_last_keg.enabled
 actions.aoe+=/tiger_palm,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm)&(!talent.press_the_advantage.enabled&variable.should_be_defensive>0)
-actions.aoe+=/spinning_crane_kick,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)&(!talent.press_the_advantage.enabled|!prev_gcd=spinning_crane_kick)
+actions.aoe+=/spinning_crane_kick,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)&(!talent.press_the_advantage.enabled|!prev_gcd.spinning_crane_kick)
 
 actions.st+=/touch_of_death
 actions.st+=/blackout_kick
@@ -96,4 +96,4 @@ actions.st+=/exploding_keg
 actions.st+=/rushing_jade_wind
 actions.st+=/keg_smash,if=talent.stormstouts_last_keg.enabled
 actions.st+=/tiger_palm,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm)&!talent.press_the_advantage.enabled
-actions.st+=/spinning_crane_kick,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)&(talent.press_the_advantage.enabled&!prev_gcd=spinning_crane_kick)
+actions.st+=/spinning_crane_kick,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)&(talent.press_the_advantage.enabled&!prev_gcd.spinning_crane_kick)
