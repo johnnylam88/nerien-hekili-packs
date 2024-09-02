@@ -4,12 +4,16 @@ actions.precombat+=/raise_dead
 actions.precombat+=/death_and_decay,if=!death_and_decay.ticking|rune.time_to_6<gcd
 actions.precombat+=/deaths_caress,if=buff.bone_shield.down|buff.bone_shield.remains<3
 
+### Tunables ###
+
 # Bank Runic Power for 2 Death Strikes (must be more than 75).
 actions+=/variable,name=death_strike_pool_value,value=75
 # Death Strike below 70% health.
 actions+=/variable,name=death_strike_health_pct_threshold,value=70
 # Death Strike only if the damage taken events exceed 28% of maximum health.
 actions+=/variable,name=death_strike_damage_taken_pct_threshold,value=28
+
+################
 
 # Dump Runic Power with Death Strike to avoid capping.
 actions+=/variable,name=death_strike_dump_amount,value=variable.death_strike_pool_value,op=setif,condition=buff.dancing_rune_weapon.down&variable.death_strike_pool_value>=75,value_else=75

@@ -5,6 +5,15 @@ actions.precombat+=/infernal_strike,use_off_gcd=1
 actions.precombat+=/fiery_brand,if=active_dot.fiery_brand_dot=0
 actions.precombat+=/the_hunt
 
+### Tunables ###
+
+# Health percent threshold to cast Bulk Extraction for healing.
+actions+=/variable,name=bulk_extraction_health_pct_threshold,value=70
+# Health percent threshold to cast Soul Cleave for healing.
+actions+=/variable,name=soul_cleave_health_pct_threshold,value=70
+
+################
+
 actions+=/variable,name=fury_cost_fel_devastation,value=50
 actions+=/variable,name=fury_cost_soul_cleave,value=30
 actions+=/variable,name=fury_cost_spirit_bomb,value=40
@@ -13,9 +22,6 @@ actions+=/variable,name=fury_gain_fracture,value=45,op=setif,condition=buff.meta
 actions+=/variable,name=fury_gain_shear_base,value=10+(10*talent.shear_fury.enabled)
 actions+=/variable,name=fury_gain_shear,value=variable.fury_gain_shear_base+20,op=setif,condition=buff.metamorphosis.up,value_else=variable.fury_gain_shear_base
 actions+=/variable,name=fury_gain_sigil_of_flame,value=30
-
-actions+=/variable,name=bulk_extraction_health_pct_threshold,value=70
-actions+=/variable,name=soul_cleave_health_pct_threshold,value=70
 
 actions+=/variable,name=fiery_demise_pool_amount,value=100
 # Pool enough Fury so that the Fury bar is not empty when exiting Fel Devastation.

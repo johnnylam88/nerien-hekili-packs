@@ -2,7 +2,8 @@ actions.precombat+=/variable,name=opener,value=1,op=set
 actions.precombat+=/rushing_jade_wind
 actions.precombat+=/chi_burst
 
-# Tunable variables
+### Tunables ###
+
 # Minimum number of Purified Chi stacks before using Celestial Brew.
 actions+=/variable,name=celestial_brew_purified_chi_threshold,value=3
 # Stagger at which you should use Purifying Brew in an emergency.
@@ -12,6 +13,8 @@ actions+=/variable,name=defensive_stagger_pct,value=20
 # Health percent at which you should play defensively.
 actions+=/variable,name=defensive_health_pct,value=70
 actions+=/variable,name=high_incoming_damage_pct,value=20
+
+################
 
 actions+=/variable,name=energy_cost_keg_smash,value=40
 actions+=/variable,name=energy_cost_spinning_crane_kick,value=25
