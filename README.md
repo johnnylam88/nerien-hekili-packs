@@ -20,7 +20,7 @@ The action packs are my interpretations of the advice from [Wowhead], [Icy Veins
 
 The following classes and specializations are supported:
 
-- Death Knight: Blood
+- Death Knight: Blood, Blood (Kyrasis)
 - Demon Hunter: Vengeance (not updated for The War Within)
 - Monk: Brewmaster
 - Warrior: Protection
