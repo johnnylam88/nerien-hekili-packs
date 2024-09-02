@@ -1,7 +1,5 @@
 actions.precombat+=/defensive_stance,if=!buff.defensive_stance.up
 actions.precombat+=/battle_shout
-actions.precombat+=/use_item,name=algethar_puzzle_box
-actions.precombat+=/use_item,name=fyrakks_tainted_rageheart
 
 actions+=/variable,name=rage_cost_ignore_pain,value=35
 actions+=/variable,name=rage_cost_revenge,value=20+10*talent.barbaric_training.enabled
@@ -70,7 +68,6 @@ actions+=/call_action_list,name=standard
 
 # Last Stand is affected by specialization settings; see /hekili > Protection.
 actions.defensives+=/last_stand,use_off_gcd=1,if=!talent.bolster.enabled
-actions.defensives+=/use_item,name=fyrakks_tainted_rageheart,use_off_gcd=1,if=incoming_damage_5s>0.2*health.max
 # Shield Wall is affected by specialization settings; see /hekili > Protection.
 actions.defensives+=/shield_wall,if=!talent.immovable_object_enabled|buff.avatar.down
 # Rallying Cry is affected by specialization settings; see /hekili > Protection.
