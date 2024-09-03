@@ -52,7 +52,7 @@ actions+=/variable,name=soul_fragments_gain_shear,value=2,op=setif,condition=buf
 actions+=/variable,name=soul_fragments_gain_soul_carver,value=3
 
 actions+=/variable,name=shattered_souls_heal_amount_base,value=(0.06*incoming_damage_5s)<?(0.01*health.max)
-actions+=/variable,name=shattered_souls_heal_amount,value=variable.shattered_souls_healing_amount_base*0.1,op=setif,condition=talent.shattered_restoration.enabled,value_else=variable.shattered_souls_healing_amount_base
+actions+=/variable,name=shattered_souls_heal_amount,value=variable.shattered_souls_healing_amount_base*1.1,op=setif,condition=talent.shattered_restoration.enabled,value_else=variable.shattered_souls_healing_amount_base
 actions+=/variable,name=spirit_bomb_heal_amount,value=variable.shattered_souls_heal_amount*soul_fragments
 actions+=/variable,name=soul_cleave_heal_amount_base,value=0.5*stat.attack_power
 actions+=/variable,name=soul_cleave_heal_amount,value=variable.soul_cleave_heal_amount_base+((variable.soul_cleave_heal_amount_base+variable.shattered_souls_heal_amount)*(soul_fragments<?2))
