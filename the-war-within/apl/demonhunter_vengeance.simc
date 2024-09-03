@@ -62,8 +62,8 @@ actions+=/variable,name=num_targets,value=active_enemies,op=setif,condition=!tal
 actions+=/variable,name=aoe,value=1,op=setif,condition=variable.num_targets>1,value_else=0
 
 # Check if a sigil has already been placed and waiting for activation.
-actions+=/variable,name=sigil_of_spite_placed,value=1,op=setif,condition=prev_gcd.sigil_of_spite&(talent.quickened_sigils.enabled|prev_gcd.2.sigil_of_spite),value_else=0
-actions+=/variable,name=sigil_of_flame_placed,value=1,op=setif,condition=prev_gcd.sigil_of_flame&(talent.quickened_sigils.enabled|prev_gcd.2.sigil_of_flame),value_else=0
+actions+=/variable,name=sigil_of_spite_placed,value=1,op=setif,condition=prev_gcd.sigil_of_spite|(!talent.quickened_sigils.enabled&prev_gcd.2.sigil_of_spite),value_else=0
+actions+=/variable,name=sigil_of_flame_placed,value=1,op=setif,condition=prev_gcd.sigil_of_flame|(!talent.quickened_sigils.enabled&prev_gcd.2.sigil_of_flame),value_else=0
 
 # Try to synchronize Fiery Brand with major fire spells if Fiery Demise is talented.
 actions+=/variable,name=fiery_demise_ready,value=1,op=setif,condition=cooldown.sigil_of_flame.remains<=(execute_time+gcd.remains)|(talent.soul_carver.enabled&cooldown.soul_carver.remains<=(execute_time+gcd.remains))|cooldown.fel_devastation.remains<=(execute_time+gcd.remains),value_else=0
