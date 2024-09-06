@@ -34,7 +34,7 @@ actions+=/potion,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.up
 actions+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold&buff.coagulating_blood.stack>variable.death_strike_damage_taken_pct_threshold
 actions+=/sacrificial_pact,if=buff.dancing_rune_weapon.down&(pet.ghoul.remains<2|boss&fight_remains<gcd)
-actions+=/blood_tap,if=(rune<=2&rune.time_to_4>gcd&full_recharge_time<2*gcd)|rune.time_to_3>gcd
+actions+=/blood_tap,if=(rune<=2&rune.time_to_3>gcd&full_recharge_time<2*gcd)|(rune<=1&rune.time_to_3>gcd)
 actions+=/raise_dead
 actions+=/run_action_list,name=drw_up,strict=1,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=standard
@@ -43,11 +43,11 @@ actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage&!(buff
 actions.defensives+=/vampiric_blood,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.vampiric_blood.up|buff.vampiric_strength.up)&!talent.gift_of_the_sanlayn.enabled
 actions.defensives+=/rune_tap,if=incoming_damage_5s>=rt_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up|buff.icebound_fortitude.up)
 
-actions.drw_up+=/vampiric_blood,if=talent.gift_of_the_sanlayn.enabled
+actions.drw_up+=/vampiric_blood,if=buff.vampiric_blood.down&talent.gift_of_the_sanlayn.enabled
 # There is more nuance than just consuming all of the Exterminate procs.
-actions.drw_up+=/marrowrend,if=buff.exterminate.up
+actions.drw_up+=/marrowrend,if=buff.exterminate.up|buff.exterminate_painful_death.up
 actions.drw_up+=/reapers_mark,if=debuff.reapers_mark.down
-actions.drw_up+=/marrowrend,if=buff.exterminate.up&debuff.reapers_mark.down
+actions.drw_up+=/marrowrend,if=(buff.exterminate.up|buff.exterminate_painful_death.up)&debuff.reapers_mark.down
 # Cast Marrowrend as one of the last three GCDs of Dancing Rune Weapon.
 actions.drw_up+=/marrowrend,if=buff.dancing_rune_weapon.remains<(3*gcd.max)&buff.bone_shield.remains<(buff.bone_shield.duration-3*gcd.max)&buff.bonestorm.down
 actions.drw_up+=/consumption
@@ -73,11 +73,11 @@ actions.racials+=/bag_of_tricks
 
 actions.standard+=/marrowrend,if=buff.bone_shield.remains<3
 actions.standard+=/blooddrinker,if=buff.dancing_rune_weapon.down
-actions.standard+=/vampiric_blood,if=talent.gift_of_the_sanlayn.enabled
+actions.standard+=/vampiric_blood,if=buff.vampiric_blood.down&talent.gift_of_the_sanlayn.enabled
 # There is more nuance than just consuming all of the Exterminate procs.
-actions.standard+=/marrowrend,if=buff.exterminate.up
+actions.standard+=/marrowrend,if=buff.exterminate.up|buff.exterminate_painful_death.up
 actions.standard+=/reapers_mark,if=debuff.reapers_mark.down
-actions.standard+=/marrowrend,if=buff.exterminate.up&debuff.reapers_mark.down
+actions.standard+=/marrowrend,if=(buff.exterminate.up|buff.exterminate_painful_death.up)&debuff.reapers_mark.down
 actions.standard+=/abomination_limb
 actions.standard+=/bonestorm,if=buff.bone_shield.stack>5&(!talent.shattering_bone.enabled|death_and_decay.ticking)&(!talent.dancing_rune_weapon.enabled|!talent.insatiable_blade.enabled|cooldown.dancing_rune_weapon.remains>20)
 actions.standard+=/consumption,if=!talent.dancing_rune_weapon.enabled|cooldown.dancing_rune_weapon.remains>5
