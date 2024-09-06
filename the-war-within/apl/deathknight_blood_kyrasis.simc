@@ -34,7 +34,6 @@ actions+=/potion,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=core
 
-actions.core+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold
 actions.core+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold&buff.coagulating_blood.stack>variable.death_strike_damage_taken_pct_threshold
 actions.core+=/dancing_rune_weapon,if=buff.dancing_rune_weapon.down&(buff.bone_shield.down|buff.bone_shield.stack<3)
 actions.core+=/marrowrend,if=buff.bone_shield.down|buff.bone_shield.remains<5|buff.bone_shield.stack<3|(talent.reapers_mark.enabled&buff.exterminate.up&cooldown.reapers_mark.remains<3)
