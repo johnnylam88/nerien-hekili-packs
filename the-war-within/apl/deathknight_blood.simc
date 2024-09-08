@@ -2,9 +2,9 @@
 # Based on *Blood Death Knight Tank Guide* by Panthea and Mandl
 # [https://www.wowhead.com/guide/classes/death-knight/blood/overview-pve-tank]
 
-actions.precombat+=/blooddrinker,if=buff.dancing_rune_weapon.down
 actions.precombat+=/abomination_limb
 actions.precombat+=/raise_dead
+actions.precombat+=/rune_tap,if=buff.rune_tap.down&rune.time_to_6<gcd
 actions.precombat+=/death_and_decay,if=!death_and_decay.ticking|rune.time_to_6<gcd
 actions.precombat+=/deaths_caress,if=buff.bone_shield.down|buff.bone_shield.remains<3
 
@@ -27,9 +27,12 @@ actions+=/variable,name=death_strike_heal_multiplier,value=(1+0.05*talent.improv
 actions+=/variable,name=death_strike_heal_pct,value=(7<?25*(buff.coagulating_blood.stack%100))*variable.death_strike_heal_multiplier
 actions+=/variable,name=death_strike_heal_amount,value=health.max*variable.death_strike_heal_pct
 
+# has_defensive_buff is 1 if Vampiric Blood, Dancing Rune Weapon, Icebound Fortitude, Rune Tap, or Lichborne are active.
+actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.vampiric_blood.up|buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.rune_tap.up|(talent.unholy_endurance.enabled&buff.lichborne.up),value_else=0
+
 actions+=/mind_freeze
 actions+=/strangulate
-actions+=/call_action_list,name=defensives,if=tanking
+actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0
 actions+=/potion,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.up
 actions+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold&buff.coagulating_blood.stack>variable.death_strike_damage_taken_pct_threshold
@@ -39,9 +42,12 @@ actions+=/raise_dead
 actions+=/run_action_list,name=drw_up,strict=1,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=standard
 
-actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up)
-actions.defensives+=/vampiric_blood,if=incoming_damage_5s>=vb_damage&!(buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.vampiric_blood.up|buff.vampiric_strength.up)&!talent.gift_of_the_sanlayn.enabled
-actions.defensives+=/rune_tap,if=incoming_damage_5s>=rt_damage&!(buff.dancing_rune_weapon.up|buff.vampiric_blood.up|buff.icebound_fortitude.up)
+#actions.defensives+=/antimagic_shell,if=incoming_magic_damage_5s>=0.2*health.max
+actions.defensives+=/vampiric_blood,if=buff.vampiric_blood.down&incoming_damage_5s>=vb_damage&!talent.gift_of_the_sanlayn.enabled
+actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage
+actions.defensives+=/rune_tap,if=buff.rune_tap.down&incoming_damage_5s>=rt_damage
+#actions.defensives+=/antimagic_zone,if=incoming_magic_damage_5s>=0.2*health.max
+actions.defensives+=/lichborne,if=talent.unholy_endurance.enabled&incoming_damage_5s>=0.2*health.max
 
 actions.drw_up+=/vampiric_blood,if=buff.vampiric_blood.down&talent.gift_of_the_sanlayn.enabled
 # There is more nuance than just consuming all of the Exterminate procs.
