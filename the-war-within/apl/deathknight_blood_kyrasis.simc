@@ -35,7 +35,7 @@ actions+=/strangulate
 actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0
 actions+=/potion,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.up
-actions+=/call_action_list,name=core
+actions+=/run_action_list,name=core
 
 actions.core+=/vampiric_blood,if=buff.vampiric_blood.down&talent.gift_of_the_sanlayn.enabled
 actions.core+=/raise_dead
