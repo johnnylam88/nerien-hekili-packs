@@ -32,6 +32,7 @@ actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.vampi
 
 actions+=/mind_freeze
 actions+=/strangulate
+actions+=/gorefiends_grasp,if=talent.tightening_grasp.enabled
 actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0
 actions+=/potion,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.up
