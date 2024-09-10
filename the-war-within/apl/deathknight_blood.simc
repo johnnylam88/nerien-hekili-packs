@@ -1,6 +1,11 @@
 # Blood Death Knight Action Priority List
 # Based on *Blood Death Knight Tank Guide* by Panthea and Mandl
 # [https://www.wowhead.com/guide/classes/death-knight/blood/overview-pve-tank]
+#
+# NOTE: Using this profile with Hekili requires using the actual cooldown of
+#       *cooldown* spells. This may be set in `/hekili` > *Abilities* and
+#       checking the option:
+#       *[GLOBAL] When Cooldowns Show Separately, Use Actual Cooldown*
 
 actions.precombat+=/abomination_limb
 actions.precombat+=/raise_dead
