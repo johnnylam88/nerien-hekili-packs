@@ -1,6 +1,11 @@
 # Protection Warrior Priority List
 # Based on *Protection Warrior Tank Guide* by Nomeratur
 # [https://www.wowhead.com/guide/classes/warrior/protection/overview-pve-tank]
+#
+# NOTE: Using this profile with Hekili requires using the actual cooldown of
+#       *cooldown* spells. This may be set in `/hekili` > *Abilities* and
+#       checking the option:
+#       *[GLOBAL] When Cooldowns Show Separately, Use Actual Cooldown*
 
 actions.precombat+=/defensive_stance,if=!buff.defensive_stance.up
 actions.precombat+=/battle_shout
