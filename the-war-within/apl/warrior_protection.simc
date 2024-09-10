@@ -56,27 +56,30 @@ actions+=/variable,name=ignore_pain_absorb_oncast,value=stat.attack_power*4.375*
 # Don't overcap by more than 50% of the absorb from casting Ignore Pain.
 actions+=/variable,name=should_ignore_pain,value=1,op=setif,condition=(buff.ignore_pain.down|buff.ignore_pain.remains<gcd|variable.ignore_pain_absorb+variable.ignore_pain_absorb_oncast<1.5*variable.ignore_pain_cap)&incoming_damage_5s>0,value_else=0
 
+actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=active_dot.demoralizing_shout>0|buff.shield_wall.up|buff.spell_block.up|buff.last_stand.up|buff.rallying_cry.up
+
 actions+=/ravager,if=time=0
 actions+=/charge,if=time=0
 actions+=/thunder_blast,if=prev.charge&spell_targets.thunder_clap>2
 actions+=/thunder_clap,if=prev.charge&spell_targets.thunder_clap>2
 actions+=/shield_slam,if=prev.charge
 actions+=/pummel
-actions+=/spell_reflection
 actions+=/defensive_stance,if=!buff.defensive_stance.up&health.pct<70&incoming_damage_3s>0.2*health.max
-actions+=/call_action_list,name=defensives
+actions+=/spell_reflection
+actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0
 actions+=/call_action_list,name=heal
 actions+=/battle_stance,if=!buff.battle_stance.up&health.pct>70
 actions+=/call_action_list,name=mitigation
 actions+=/run_action_list,name=standard
 
+actions.defensives+=/demoralizing_shout,if=!talent.booming_voice.enabled&incoming_damage_5s>0.2*health.max
+# Shield Wall is affected by specialization settings; see /hekili > Protection.
+actions.defensives+=/shield_wall,use_off_gcd=1,if=!talent.immovable_object.enabled|!cooldown.avatar.ready
+actions.defensives+=/spell_block,if=incoming_magic_damage_5s>0.2*health.max
 # Last Stand is affected by specialization settings; see /hekili > Protection.
 actions.defensives+=/last_stand,use_off_gcd=1,if=!talent.bolster.enabled
-# Shield Wall is affected by specialization settings; see /hekili > Protection.
-actions.defensives+=/shield_wall,if=!talent.immovable_object_enabled|buff.avatar.down
 # Rallying Cry is affected by specialization settings; see /hekili > Protection.
-actions.defensives+=/rallying_cry
-actions.defensives+=/spell_block,if=buff.shield_wall.down&incoming_magic_damage_5s>0.2*health.max
+actions.defensives+=/rallying_cry,use_off_gcd=1
 
 actions.dump_rage+=/revenge,if=spell_targets.revenge>1
 actions.dump_rage+=/execute
