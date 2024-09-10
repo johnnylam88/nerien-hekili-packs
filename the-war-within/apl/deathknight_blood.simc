@@ -6,6 +6,9 @@
 #       *cooldown* spells. This may be set in `/hekili` > *Abilities* and
 #       checking the option:
 #       *[GLOBAL] When Cooldowns Show Separately, Use Actual Cooldown*
+#
+# NOTE: It is recommended to adjust the settings in `/hekili` > *Blood*
+#       so that the *Damage Threshold* sliders are set to *20%*.
 
 actions.precombat+=/abomination_limb
 actions.precombat+=/raise_dead

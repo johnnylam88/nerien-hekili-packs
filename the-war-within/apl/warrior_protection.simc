@@ -6,6 +6,10 @@
 #       *cooldown* spells. This may be set in `/hekili` > *Abilities* and
 #       checking the option:
 #       *[GLOBAL] When Cooldowns Show Separately, Use Actual Cooldown*
+#
+# NOTE: It is recommended to adjust the settings in `/hekili` > *Protection*
+#       so that the *Damage Required* sliders are set to *20%* and the
+#       *Health Percentage* sliders are set to *80%*.
 
 actions.precombat+=/defensive_stance,if=!buff.defensive_stance.up
 actions.precombat+=/battle_shout
