@@ -15,6 +15,7 @@ The action packs are my interpretations of the advice from [Wowhead], [Icy Veins
 3. Use `/hekili` to open the **Hekili** configuration panel.
 4. Select the action pack for your specialization; all of this addon's packs are tagged *nerien*.
 5. Click the *Active* checkbox to enable the action pack.
+6. Check the *Description* to see if any additional settings should be made and follow the advice.
 
 ### Status ###
 
