@@ -40,7 +40,7 @@ actions+=/variable,name=rage_per_second,value=(variable.rage_per_second_auto_att
 actions+=/variable,name=rage_at_next_shield_block,value=rage,op=setif,condition=cooldown.shield_block.charges>0,value_else=rage+cooldown.shield_block.remains*variable.rage_per_second
 actions+=/variable,name=should_spend_rage,value=1,op=setif,condition=variable.rage_at_next_shield_block>variable.rage_pool_value,value_else=0
 
-actions+=/variable,name=rage_check,value=1,op=setif,condition=(rage+variable.rage_per_second*gcd>rage.max|rage.deficit<10),value_else=0
+actions+=/variable,name=rage_check,value=1,op=setif,condition=(rage+variable.rage_per_second*gcd>rage.max|rage.deficit<20),value_else=0
 actions+=/variable,name=rage_check_avatar,value=1,op=setif,condition=talent.avatar.enabled&cooldown.avatar.remains<gcd&rage+10*variable.rage_gen_multiplier>rage.max,value_else=0
 actions+=/variable,name=rage_check_champions_spear,value=1,op=setif,condition=talent.champions_spear.enabled&cooldown.champions_spear.remains<gcd&rage+20*variable.rage_gen_multiplier>rage.max,value_else=0
 actions+=/variable,name=rage_check_demoralizing_shout,value=1,op=setif,condition=talent.demoralizing_shout.enabled&talent.booming_voice.enabled&cooldown.demoralizing_shout.remains<gcd&rage+30*variable.rage_gen_multiplier>rage.max,value_else=0
