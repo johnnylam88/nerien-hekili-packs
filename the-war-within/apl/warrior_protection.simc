@@ -90,22 +90,17 @@ actions.defensives+=/last_stand,use_off_gcd=1,if=!talent.bolster.enabled
 # Rallying Cry is affected by specialization settings; see /hekili > Protection.
 actions.defensives+=/rallying_cry,use_off_gcd=1
 
-actions.dump_rage+=/revenge,if=spell_targets.revenge>1
-actions.dump_rage+=/execute
-
 actions.heal+=/victory_rush,if=buff.victorious.up&health.pct<70
 actions.heal+=/impending_victory,if=health.pct<70
 
 actions.mitigation+=/shield_block,if=buff.shield_block.down|buff.shield_block.remains<4
 actions.mitigation+=/last_stand,if=talent.bolster.enabled&buff.shield_block.down
-actions.mitigation+=/ignore_pain,if=variable.should_ignore_pain>0&(buff.seeing_red.stack=7|variable.should_spend_rage>0)
+actions.mitigation+=/ignore_pain,if=variable.should_ignore_pain>0|buff.seeing_red.stack=7|variable.should_dump_rage>0
 
 actions.outburst+=/thunder_blast,if=buff.violent_outburst.up&spell_targets.thunder_clap>=2
 actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&spell_targets.thunder_clap>=8
 actions.outburst+=/shield_slam,if=buff.violent_outburst.up
 actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&cooldown.shield_slam.remains>2
-actions.outburst+=/revenge,if=variable.should_ignore_pain=0&buff.seeing_red.stack=7&spell_targets.revenge>1
-actions.outburst+=/execute,if=variable.should_ignore_pain=0&buff.seeing_red.stack=7
 
 actions.racials+=/blood_fury
 actions.racials+=/berserking
@@ -129,7 +124,6 @@ actions.standard+=/avatar
 actions.standard+=/call_action_list,name=racials
 actions.standard+=/potion,if=buff.avatar.up
 actions.standard+=/demoralizing_shout,if=talent.booming_voice.enabled
-actions.standard+=/call_action_list,name=dump_rage,if=variable.should_ignore_pain=0&variable.should_dump_rage>0
 actions.standard+=/demolish,if=buff.colossal_might.stack>=3
 actions.standard+=/champions_spear
 actions.standard+=/thunderous_roar
