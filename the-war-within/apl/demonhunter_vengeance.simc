@@ -2,6 +2,7 @@
 # Based on *Vengeance Demon Hunter Tank Guide* by Itamae
 # [https://www.wowhead.com/guide/classes/demon-hunter/vengeance/overview-pve-tank]
 
+actions.precombat+=/sigil_of_doom,if=variable.sigil_of_doom=0
 actions.precombat+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0
 actions.precombat+=/metamorphosis,if=buff.metamorphosis.down
 actions.precombat+=/demon_spikes,use_off_gcd=1,if=buff.demon_spikes.down&buff.metamorphosis.down
@@ -48,7 +49,7 @@ actions+=/variable,name=fury_per_second_sigil_of_flame,value=variable.fury_gain_
 actions+=/variable,name=fury_per_second,value=variable.fury_per_second_felblade+variable.fury_per_second_fracture+variable.fury_per_second_immolation_aura+variable.fury_per_second_shear+variable.fury_per_second_sigil_of_flame
 
 # fury_at_next_fel_devastation is the expected Fury when Fel Devastation is ready.
-actions+=/variable,name=fury_at_next_fel_devastation,value=fury+cooldown.fel_devastation.remains*variable.fury_per_second
+actions+=/variable,name=fury_at_next_fel_devastation,value=fury+cooldown.fel_devastation.remains*variable.fury_per_second,op=setif,condition=!talent.demonic_intensity.enabled|buff.metamorphosis.down,value_else=fury+cooldown.fel_desolation.remains*variable.fury_per_second
 # fury_at_next_fiery_brand is the expected Fury when Fiery Brand is ready.
 actions+=/variable,name=fury_at_next_fiery_brand,value=fury+cooldown.fiery_brand.remains*variable.fury_per_second
 # should_pool_fury is 1 if we should pool Fury for Fel Devastation and Fiery Demise windows.
@@ -57,13 +58,15 @@ actions+=/variable,name=should_pool_fury,value=0,op=setif,condition=(variable.fu
 actions+=/variable,name=fury_check,value=1,op=setif,condition=fury+variable.fury_per_second*gcd>fury.max,value_else=0
 actions+=/variable,name=fury_check_felblade,value=1,op=setif,condition=talent.felblade.enabled&cooldown.felblade.remains<gcd&fury+variable.fury_gain_felblade>fury.max,value_else=0
 actions+=/variable,name=fury_check_fracture,value=1,op=setif,condition=talent.fracture.enabled&cooldown.fracture.remains<gcd&fury+variable.fury_gain_fracture>fury.max,value_else=0
-# Immolation Aura generates 8 Fury on use, then 2 Fury per second afterwards.
-actions+=/variable,name=fury_check_immolation_aura,value=1,op=setif,condition=cooldown.immolation_aura.remains<gcd&fury+8>fury.max,value_else=0
+# Immolation Aura (and Cosuming Fire) generates 8 Fury on use, then 2 Fury per second afterwards.
+actions+=/variable,name=fury_check_immolation_aura,value=1,op=setif,condition=(!talent.demonic_intensity.enabled|buff.metamorphosis.down)&cooldown.immolation_aura.remains<gcd&fury+8>fury.max,value_else=0
+actions+=/variable,name=fury_check_consuming_fire,value=1,op=setif,condition=(talent.demonic_intensity.enabled&buff.metamorphosis.up)&cooldown.consuming_fire.remains<gcd&fury+8>fury.max,value_else=0
 actions+=/variable,name=fury_check_shear,value=1,op=setif,condition=!talent.fracture.enabled&fury+variable.fury_gain_shear>fury.max,value_else=0
-# Sigil of Flame is only cast if it's ready and there's no active DoT.
-actions+=/variable,name=fury_check_sigil_of_flame,value=1,op=setif,condition=active_dot.sigil_of_flame=0&cooldown.sigil_of_flame.charges>0&fury+variable.fury_gain_sigil_of_flame>fury.max,value_else=0
+# Sigil of Flame (and Sigil of Doom) is only cast if it's ready and there's no active DoT.
+actions+=/variable,name=fury_check_sigil_of_flame,value=1,op=setif,condition=(!talent.demonic_intensity.enabled|buff.metamorphosis.down)&active_dot.sigil_of_flame=0&cooldown.sigil_of_flame.charges>0&fury+variable.fury_gain_sigil_of_flame>fury.max,value_else=0
+actions+=/variable,name=fury_check_sigil_of_flame,value=1,op=setif,condition=(talent.demonic_intensity.enabled&buff.metamorphosis.up)&active_dot.sigil_of_doom=0&cooldown.sigil_of_doom.charges>0&fury+variable.fury_gain_sigil_of_flame>fury.max,value_else=0
 # should_dump_fury is 1 if Fury will cap with the next ability.
-actions+=/variable,name=should_dump_fury,value=1,op=setif,condition=variable.fury_check>0|variable.fury_check_felblade>0|variable.fury_check_fracture>0|variable.fury_check_immolation_aura>0|variable.fury_check_shear>0|variable.fury_check_sigil_of_flame>0
+actions+=/variable,name=should_dump_fury,value=1,op=setif,condition=variable.fury_check>0|variable.fury_check_felblade>0|variable.fury_check_fracture>0|variable.fury_check_immolation_aura>0|variable.fury_check_consuming_fire>0|variable.fury_check_shear>0|variable.fury_check_sigil_of_flame>0|variable.fury_check_sigil_of_doom>0
 
 # Variables to treat soul_fragments as a resource.
 actions+=/variable,name=soul_fragments_max,value=5
@@ -79,14 +82,17 @@ actions+=/variable,name=shattered_souls_heal_amount,value=variable.shattered_sou
 actions+=/variable,name=spirit_bomb_heal_amount,value=variable.shattered_souls_heal_amount*soul_fragments
 actions+=/variable,name=soul_cleave_heal_amount_base,value=0.4*stat.attack_power
 actions+=/variable,name=soul_cleave_heal_amount,value=variable.soul_cleave_heal_amount_base+((variable.soul_cleave_heal_amount_base+variable.shattered_souls_heal_amount)*(soul_fragments<?2))
+actions+=/variable,name=soul_sunder_heal_amount_base,value=0.5*stat.attack_power
+actions+=/variable,name=soul_sunder_heal_amount,value=variable.soul_sunder_heal_amount_base+((variable.soul_sunder_heal_amount_base+variable.shattered_souls_heal_amount)*(soul_fragments<?2))
 
 # Check whether you are in a multi-target situation.
 actions+=/variable,name=num_targets,value=active_enemies,op=setif,condition=!talent.spirit_bomb.enabled,value_else=spell_targets.spirit_bomb
 actions+=/variable,name=aoe,value=1,op=setif,condition=variable.num_targets>1,value_else=0
 
 # Check if a sigil has already been placed and waiting for activation.
-actions+=/variable,name=sigil_of_spite_placed,value=1,op=setif,condition=prev_gcd.sigil_of_spite|(!talent.quickened_sigils.enabled&prev_gcd.2.sigil_of_spite),value_else=0
+actions+=/variable,name=sigil_of_doom_placed,value=1,op=setif,condition=prev_gcd.sigil_of_doom|(!talent.quickened_sigils.enabled&prev_gcd.2.sigil_of_doom),value_else=0
 actions+=/variable,name=sigil_of_flame_placed,value=1,op=setif,condition=prev_gcd.sigil_of_flame|(!talent.quickened_sigils.enabled&prev_gcd.2.sigil_of_flame),value_else=0
+actions+=/variable,name=sigil_of_spite_placed,value=1,op=setif,condition=prev_gcd.sigil_of_spite|(!talent.quickened_sigils.enabled&prev_gcd.2.sigil_of_spite),value_else=0
 
 # Try to synchronize Fiery Brand with major fire spells if Fiery Demise is talented.
 # fiery_demise_sync is 1 if Sigil of Flame, Soul Carver, or Fel Devastation is almost ready.
@@ -122,18 +128,25 @@ actions.standard+=/metamorphosis,if=buff.metamorphosis.remains<4.5&(!talent.viol
 actions.standard+=/the_hunt,if=talent.art_of_the_glaive.enabled
 actions.standard+=/reavers_glaive
 actions.standard+=/infernal_strike,use_off_gcd=1,if=full_recharge_time<gcd
+actions.standard+=/soul_sunder,if=buff.glaive_flurry.up&((variable.aoe=0&buff.rending_strike.down)|(variable.aoe>0&buff.rending_strike.up))
 actions.standard+=/soul_cleave,if=buff.glaive_flurry.up&((variable.aoe=0&buff.rending_strike.down)|(variable.aoe>0&buff.rending_strike.up))
 actions.standard+=/fracture,if=buff.rending_strike.up
 actions.standard+=/shear,if=buff.rending_strike.up
+actions.standard+=/fel_desolation,if=!talent.fiery_demise.enabled&variable.frailty_ready>0
 actions.standard+=/fel_devastation,if=!talent.fiery_demise.enabled&variable.frailty_ready>0
 actions.standard+=/fiery_brand,if=(!talent.fiery_demise.enabled|(fury>=variable.fiery_demise_pool_amount&variable.fiery_demise_sync>0))&active_dot.fiery_brand_dot=0
+actions.standard+=/sigil_of_doom,if=variable.sigil_of_doom_placed=0&(!talent.illuminated_sigils.enabled|active_dot.sigil_of_doom=0)
 actions.standard+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0&(!talent.illuminated_sigils.enabled|active_dot.sigil_of_flame=0)
+actions.standard+=/fel_desolation,if=talent.fiery_demise.enabled&variable.frailty_ready>0
 actions.standard+=/fel_devastation,if=talent.fiery_demise.enabled&variable.frailty_ready>0
 actions.standard+=/the_hunt,if=!talent.art_of_the_glaive.enabled&variable.frailty_ready>0
 actions.standard+=/sigil_of_spite,if=variable.sigil_of_spite_placed=0&variable.frailty_ready>0
 actions.standard+=/soul_carver,if=(variable.soul_fragments_deficit>=variable.soul_fragments_gain_soul_carver)&variable.frailty_ready=1&(debuff.fiery_brand_dot.remains>3|cooldown.fiery_brand.remains>15)
+actions.standard+=/spirit_burst,if=(variable.aoe=0&talent.fiery_demise.enabled&active_dot.fiery_brand_dot>0&variable.soul_fragments_deficit<1)|(variable.aoe>0&(variable.soul_fragments_deficit<2|(buff.metamorphosis.up&variable.soul_fragments_deficit<3)))
 actions.standard+=/spirit_bomb,if=(variable.aoe=0&talent.fiery_demise.enabled&active_dot.fiery_brand_dot>0&variable.soul_fragments_deficit<1)|(variable.aoe>0&(variable.soul_fragments_deficit<2|(buff.metamorphosis.up&variable.soul_fragments_deficit<3)))
+actions.standard+=/soul_sunder,if=variable.should_pool_fury=0&(variable.aoe=0|!talent.spirit_bomb.enabled|(variable.aoe>0&variable.should_dump_fury>0))
 actions.standard+=/soul_cleave,if=variable.should_pool_fury=0&(variable.aoe=0|!talent.spirit_bomb.enabled|(variable.aoe>0&variable.should_dump_fury>0))
+actions.standard+=/consuming_fire
 actions.standard+=/immolation_aura
 actions.standard+=/felblade,if=fury.deficit>variable.fury_gain_felblade
 actions.standard+=/fracture,if=variable.soul_fragments_deficit>=variable.soul_fragments_gain_fracture&fury.deficit>variable.fury_gain_fracture
