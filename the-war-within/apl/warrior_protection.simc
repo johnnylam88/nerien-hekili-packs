@@ -105,6 +105,7 @@ actions.mitigation+=/ignore_pain,if=variable.should_ignore_pain>0|(buff.seeing_r
 actions.outburst+=/thunder_blast,if=buff.violent_outburst.up&spell_targets.thunder_clap>=2
 actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&spell_targets.thunder_clap>=8
 actions.outburst+=/shield_slam,if=buff.violent_outburst.up
+actions.outburst+=/thunder_blast,if=buff.violent_outburst.up&cooldown.shield_slam.remains>2
 actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&cooldown.shield_slam.remains>2
 actions.outburst+=/revenge,if=variable.should_ignore_pain=0&(buff.seeing_red.stack=7&cooldown.shield_slam.remains>(gcd.remains+gcd.max))&spell_targets.revenge>1
 actions.outburst+=/execute,if=variable.should_ignore_pain=0&(buff.seeing_red.stack=7&cooldown.shield_slam.remains>(gcd.remains+gcd.max))
@@ -139,7 +140,7 @@ actions.standard+=/call_action_list,name=ravager_up,if=talent.ravager.enabled&bu
 actions.standard+=/shield_charge
 actions.standard+=/shield_slam,if=buff.thunder_blast.stack<2
 actions.standard+=/thunder_blast,if=buff.burst_of_power.stack<2
-actions.standard+=/thunder_clap
+actions.standard+=/thunder_clap,if=buff.thunder_blast.down
 actions.standard+=/revenge,if=buff.revenge.up|debuff.deep_wounds.down
 actions.standard+=/execute,if=talent.sudden_death.enabled&buff.sudden_death.up&spell_targets.revenge<=4
 actions.standard+=/call_action_list,name=spend_rage,if=variable.should_ignore_pain=0&variable.should_spend_rage>0
