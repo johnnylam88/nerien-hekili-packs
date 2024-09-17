@@ -33,7 +33,7 @@ actions+=/variable,name=energy_at_next_keg_smash,value=energy+energy.regen*coold
 actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.celestial_brew.up|buff.dampen_harm.up|buff.fortifying_brew.up,value_else=0
 
 # Play defensively if major damage-reduction cooldowns are on cooldown and either health is too low or Stagger is too high.
-actions+=/variable,name=should_be_defensive,value=1,op=setif,condition=(!talent.fortifying_brew.enabled|cooldown.fortifying_brew.remains>0)&(!talent.dampen_harm.enabled|cooldown.dampen_harm.remains>0)&(health.pct<variable.defensive_health_pct|stagger.pct>variable.defensive_stagger_pct),value_else=0
+actions+=/variable,name=should_be_defensive,value=1,op=setif,condition=(!talent.fortifying_brew|cooldown.fortifying_brew.remains>0)&(!talent.dampen_harm|cooldown.dampen_harm.remains>0)&(health.pct<variable.defensive_health_pct|stagger.pct>variable.defensive_stagger_pct),value_else=0
 actions+=/variable,name=high_incoming_damage_amount,value=health.max*variable.high_incoming_damage_pct%100
 
 actions+=/spear_hand_strike
@@ -48,7 +48,7 @@ actions+=/run_action_list,name=st
 actions.defensives+=/fortifying_brew,use_off_gcd=1,if=incoming_damage_3s>variable.high_incoming_damage_amount
 actions.defensives+=/diffuse_magic,use_off_gcd=1,if=incoming_magic_damage_3s>variable.high_incoming_damage_amount
 actions.defensives+=/dampen_harm,use_off_gcd=1,if=incoming_damage_3s>variable.high_incoming_damage_amount
-actions.defensives+=/celestial_brew,if=talent.endless_draught.enabled&full_recharge_time<gcd.max
+actions.defensives+=/celestial_brew,if=talent.endless_draught&full_recharge_time<gcd.max
 actions.defensives+=/celestial_brew,if=buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold
 
 actions.heal+=/vivify,if=health.pct<=settings.vivify_percent&buff.vivacious_vivification.up
@@ -72,41 +72,41 @@ actions.racials+=/bag_of_tricks
 actions.opener+=/rushing_jade_wind
 actions.opener+=/keg_smash
 actions.opener+=/blackout_kick
-actions.opener+=/breath_of_fire,if=talent.dragonfire_brew.enabled|talent.charred_passions.enabled
+actions.opener+=/breath_of_fire,if=talent.dragonfire_brew|talent.charred_passions
 actions.opener+=/weapons_of_order
 actions.opener+=/variable,name=opener,value=0,op=set
 
 actions.aoe+=/touch_of_death
 actions.aoe+=/rising_sun_kick,if=buff.press_the_advantage.stack=10
 actions.aoe+=/blackout_kick
-actions.aoe+=/breath_of_fire,if=buff.blackout_combo.up&(active_enemies>=3|variable.should_be_defensive>0|!talent.press_the_advantage.enabled)
-actions.aoe+=/tiger_palm,if=buff.blackout_combo.up&!talent.press_the_advantage.enabled
-actions.aoe+=/breath_of_fire,if=!talent.charred_passions.enabled
-actions.aoe+=/keg_smash,if=(!talent.stormstouts_last_keg.enabled|charges_fractional>=1.8)&(!talent.press_the_advantage.enabled|(buff.press_the_advantage.stack<10|variable.should_be_defensive>0|active_enemies>=4))
+actions.aoe+=/breath_of_fire,if=buff.blackout_combo.up&(active_enemies>=3|variable.should_be_defensive>0|!talent.press_the_advantage)
+actions.aoe+=/tiger_palm,if=buff.blackout_combo.up&!talent.press_the_advantage
+actions.aoe+=/breath_of_fire,if=!talent.charred_passions
+actions.aoe+=/keg_smash,if=(!talent.stormstouts_last_keg|charges_fractional>=1.8)&(!talent.press_the_advantage|(buff.press_the_advantage.stack<10|variable.should_be_defensive>0|active_enemies>=4))
 actions.aoe+=/chi_burst
-actions.aoe+=/breath_of_fire,if=talent.charred_passions.enabled
+actions.aoe+=/breath_of_fire,if=talent.charred_passions
 actions.aoe+=/blackout_kick,if=buff.charred_passions.up
 actions.aoe+=/exploding_keg
 actions.aoe+=/weapons_of_order
 actions.aoe+=/rising_sun_kick
 actions.aoe+=/spinning_crane_kick,if=buff.charred_passions.up&!prev_gcd.spinning_crane_kick
 actions.aoe+=/rushing_jade_wind
-actions.aoe+=/keg_smash,if=talent.stormstouts_last_keg.enabled
-actions.aoe+=/tiger_palm,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm)&(!talent.press_the_advantage.enabled&variable.should_be_defensive>0)
-actions.aoe+=/spinning_crane_kick,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)&(!talent.press_the_advantage.enabled|!prev_gcd.spinning_crane_kick)
+actions.aoe+=/keg_smash,if=talent.stormstouts_last_keg
+actions.aoe+=/tiger_palm,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm)&(!talent.press_the_advantage&variable.should_be_defensive>0)
+actions.aoe+=/spinning_crane_kick,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)&(!talent.press_the_advantage|!prev_gcd.spinning_crane_kick)
 
 actions.st+=/touch_of_death
 actions.st+=/blackout_kick
 actions.st+=/breath_of_fire,if=buff.blackout_combo.up&variable.should_be_defensive>0
-actions.st+=/tiger_palm,if=buff.blackout_combo.up&!talent.press_the_advantage.enabled
+actions.st+=/tiger_palm,if=buff.blackout_combo.up&!talent.press_the_advantage
 actions.st+=/rising_sun_kick,if=buff.press_the_advantage.stack=10
-actions.st+=/keg_smash,if=(!talent.stormstouts_last_keg.enabled|charges_fractional>=1.8)&(!talent.press_the_advantage.enabled|(buff.press_the_advantage.stack<10|variable.should_be_defensive>0))
+actions.st+=/keg_smash,if=(!talent.stormstouts_last_keg|charges_fractional>=1.8)&(!talent.press_the_advantage|(buff.press_the_advantage.stack<10|variable.should_be_defensive>0))
 actions.st+=/breath_of_fire
 actions.st+=/weapons_of_order
 actions.st+=/rising_sun_kick
 actions.st+=/chi_burst
 actions.st+=/exploding_keg
 actions.st+=/rushing_jade_wind
-actions.st+=/keg_smash,if=talent.stormstouts_last_keg.enabled
-actions.st+=/tiger_palm,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm)&!talent.press_the_advantage.enabled
-actions.st+=/spinning_crane_kick,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)&(talent.press_the_advantage.enabled&!prev_gcd.spinning_crane_kick)
+actions.st+=/keg_smash,if=talent.stormstouts_last_keg
+actions.st+=/tiger_palm,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm)&!talent.press_the_advantage
+actions.st+=/spinning_crane_kick,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)&(talent.press_the_advantage&!prev_gcd.spinning_crane_kick)
