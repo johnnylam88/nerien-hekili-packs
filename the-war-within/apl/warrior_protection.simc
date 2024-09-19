@@ -104,7 +104,7 @@ actions.defensives+=/demoralizing_shout,if=!talent.booming_voice&incoming_damage
 actions.defensives+=/shield_wall,use_off_gcd=1,if=(!talent.immovable_object|!cooldown.avatar.ready)&incoming_damage_5s>variable.shield_wall_damage_taken
 actions.defensives+=/spell_block,if=incoming_magic_damage_5s>variable.spell_block_damage_taken
 actions.defensives+=/last_stand,use_off_gcd=1,if=!talent.bolster&(incoming_damage_5s>variable.last_stand_damage_taken&health.pct<variable.last_stand_health_pct)
-actions.defensives+=/rallying_cry,use_off_gcd=1&(incoming_damage_5s>variable.rallying_cry_damage_taken&health.pct<variable.rallying_cry_health_pct)
+actions.defensives+=/rallying_cry,use_off_gcd=1,if=incoming_damage_5s>variable.rallying_cry_damage_taken&health.pct<variable.rallying_cry_health_pct
 
 actions.heal+=/victory_rush,if=buff.victorious.up&health.pct<70
 actions.heal+=/impending_victory,if=health.pct<70
