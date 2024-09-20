@@ -1,11 +1,6 @@
 # Brewmaster Monk Priority List
 # Based on *Brewmaster Monk Tank Guide* by Sinzhu
 # [https://www.wowhead.com/guide/classes/monk/brewmaster/overview-pve-tank]
-#
-# NOTE: Using this profile with Hekili requires using the actual cooldown of
-#       *cooldown* spells. This may be set in `/hekili` > *Abilities* and
-#       checking the option:
-#       *[GLOBAL] When Cooldowns Show Separately, Use Actual Cooldown*
 
 actions.precombat+=/variable,name=opener,value=1,op=set
 actions.precombat+=/rushing_jade_wind
