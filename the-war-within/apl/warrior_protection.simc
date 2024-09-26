@@ -2,10 +2,22 @@
 # Based on *Protection Warrior Tank Guide* by Nomeratur
 # [https://www.wowhead.com/guide/classes/warrior/protection/overview-pve-tank]
 #
-# NOTE: It is recommended to adjust the settings in `/hekili` > *Protection*
-#       so that the *Damage Required* sliders are set to *20%* and the
-#       *Health Percentage* sliders are set to *80%*.
+# Recommended Settings in `/hekili` > *Protection*:
+#
+# - Only Shockwave as Interrupt : **unused**
+# - Overlap Ignore Pain : checked
+# - Overlap Shield Block : checked
+# - Allow Stance Changes : unchecked
+# - Reserve Rage for Mitigation : 0
+# - Shield Wall Damage Required : 20
+# - Shield Wall Health Percentage : 80
+# - Rallying Cry Damage Required : 20
+# - Rallying Cry Health Percentage : 80
+# - Last Stand Damage Required : 20
+# - Last Stand Health Percentage : 80
+# - Victory Rush Health Threshold : 75
 
+actions.precombat+=/variable,name=opener,value=1,op=set
 actions.precombat+=/defensive_stance,if=!buff.defensive_stance.up
 actions.precombat+=/battle_shout
 
@@ -39,6 +51,8 @@ actions+=/variable,name=rallying_cry_health_pct,value=rallying_cry_health_pct
 actions+=/variable,name=shield_wall_damage_taken,value=shield_wall_damage_taken
 # Spell Block tunable for incoming damage.
 actions+=/variable,name=spell_block_damage_taken,value=0.2*health.max
+# Victory Rush tunable for minimum health percent (see /hekili > Protection).
+actions+=/variable,name=victory_rush_health_pct,value=victory_rush_health_pct
 
 ################
 
@@ -81,14 +95,10 @@ actions+=/variable,name=should_ignore_pain,value=1,op=setif,condition=(buff.igno
 
 actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=active_dot.demoralizing_shout>0|buff.shield_wall.up|buff.spell_block.up|buff.last_stand.up|buff.rallying_cry.up
 
-actions+=/ravager,if=time=0
-actions+=/charge,if=time=0
-actions+=/thunder_blast,if=prev.charge&spell_targets.thunder_clap>2
-actions+=/thunder_clap,if=prev.charge&spell_targets.thunder_clap>2
-actions+=/shield_slam,if=prev.charge
 actions+=/pummel
-actions+=/defensive_stance,if=!buff.defensive_stance.up&health.pct<70&incoming_damage_3s>0.2*health.max
 actions+=/spell_reflection
+actions+=/defensive_stance,if=!buff.defensive_stance.up&health.pct<70&incoming_damage_3s>0.2*health.max
+actions+=/run_action_list,name=opener,if=time<5*gcd.max&variable.opener>0
 actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0
 actions+=/call_action_list,name=heal
 actions+=/battle_stance,if=!buff.battle_stance.up&health.pct>70
@@ -101,12 +111,30 @@ actions.defensives+=/spell_block,if=incoming_magic_damage_5s>variable.spell_bloc
 actions.defensives+=/last_stand,use_off_gcd=1,if=!talent.bolster&(incoming_damage_5s>variable.last_stand_damage_taken&health.pct<variable.last_stand_health_pct)
 actions.defensives+=/rallying_cry,use_off_gcd=1,if=incoming_damage_5s>variable.rallying_cry_damage_taken&health.pct<variable.rallying_cry_health_pct
 
-actions.heal+=/victory_rush,if=buff.victorious.up&health.pct<70
-actions.heal+=/impending_victory,if=health.pct<70
+actions.heal+=/victory_rush,if=buff.victorious.up&health.pct<variable.victory_rush_health_pct
+actions.heal+=/impending_victory,if=health.pct<variable.victory_rush_health_pct
 
 actions.mitigation+=/shield_block,if=buff.shield_block.down|buff.shield_block.remains<4
 actions.mitigation+=/last_stand,if=talent.bolster&buff.shield_block.down
 actions.mitigation+=/ignore_pain,if=variable.should_ignore_pain>0|(buff.seeing_red.stack=7&cooldown.shield_slam.ready)
+
+actions.opener+=/ravager
+actions.opener+=/charge,if=movement.distance>8
+actions.opener+=/avatar
+actions.opener+=/shield_block,if=buff.shield_block.down|buff.shield_block.remains<4
+actions.opener+=/last_stand,if=talent.bolster&buff.shield_block.down
+actions.opener+=/ignore_pain,if=variable.should_dump_rage>0|(buff.seeing_red.stack=7&cooldown.shield_slam.ready)
+actions.opener+=/demoralizing_shout,if=talent.booming_voice
+actions.opener+=/champions_spear
+actions.opener+=/thunderous_roar
+actions.opener+=/shield_charge
+actions.opener+=/call_action_list,name=outburst,if=talent.violent_outburst
+actions.opener+=/thunder_blast,if=talent.unstoppable_force&buff.avatar.up
+actions.opener+=/thunder_clap,if=talent.unstoppable_force&buff.avatar.up
+actions.opener+=/shield_slam,if=buff.thunder_blast.stack<2
+actions.opener+=/thunder_blast,if=buff.burst_of_power.stack<2
+actions.opener+=/thunder_clap,if=buff.thunder_blast.down
+actions.opener+=/variable,name=opener,value=0,op=set
 
 actions.outburst+=/thunder_blast,if=buff.violent_outburst.up&spell_targets.thunder_clap>=2
 actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&spell_targets.thunder_clap>=8
@@ -131,6 +159,7 @@ actions.ravager_up+=/revenge
 actions.spend_rage+=/revenge,if=variable.rage_at_next_shield_block-variable.rage_cost_revenge>=variable.rage_pool_value&spell_targets.revenge>1
 actions.spend_rage+=/execute,if=variable.rage_at_next_shield_block-variable.rage_cost_execute>=variable.rage_pool_value&spell_targets.revenge<=4
 
+actions.standard+=/charge,if=movement.distance>8
 actions.standard+=/thunder_blast,if=talent.unstoppable_force&buff.avatar.up
 actions.standard+=/thunder_clap,if=talent.unstoppable_force&buff.avatar.up
 actions.standard+=/ravager
