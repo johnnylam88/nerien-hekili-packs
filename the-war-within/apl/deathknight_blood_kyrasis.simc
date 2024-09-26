@@ -2,8 +2,13 @@
 # Based on *Advanced Blood Death Knight Guide for M+*
 # [https://docs.google.com/document/d/1FJlB1T8ijaQLjY_cihyoyhLoi6lYRnT-N-ipVFCLidE]
 #
-# NOTE: It is recommended to adjust the settings in `/hekili` > *Blood*
-#       so that the *Damage Threshold* sliders are set to *20%*.
+# Recommended Settings for `/hekili` > *Blood*:
+#
+# - Save Blood Shield : **unused**
+# - Death Strike Runic Power : **unused**
+# - Icebound Fortitude Damage Threshold : 20
+# - Rune Tap Damage Threshold : 20
+# - Vampiric Blood Damage Threshold : 20
 
 actions.precombat+=/abomination_limb
 actions.precombat+=/raise_dead

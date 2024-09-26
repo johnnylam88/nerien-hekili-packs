@@ -1,6 +1,12 @@
 # Vengeance Demon Hunter Priority List
 # Based on *Vengeance Demon Hunter Tank Guide* by Itamae
 # [https://www.wowhead.com/guide/classes/demon-hunter/vengeance/overview-pve-tank]
+#
+# Recommended Settings for `/hekili` > *Vengeance*:
+#
+# - Reserve Infernal Strike Charges: **unused**
+# - Reserve Fiery Brand Charges: 1
+# - Require Frailty Stacks: **unused**
 
 actions.precombat+=/sigil_of_doom,if=variable.sigil_of_doom=0
 actions.precombat+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0
