@@ -20,4 +20,5 @@ the-war-within/deathknight_blood.lua
 the-war-within/deathknight_blood_kyrasis.lua
 the-war-within/demonhunter_vengeance.lua
 the-war-within/monk_brewmaster.lua
+the-war-within/monk_brewmaster_equinox.lua
 the-war-within/warrior_protection.lua
