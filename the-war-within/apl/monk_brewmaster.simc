@@ -132,7 +132,7 @@ actions.weapons+=/exploding_keg,if=debuff.weapons_of_order_debuff.stack>=4
 actions.weapons+=/tiger_palm,if=!talent.press_the_advantage&buff.blackout_combo.up
 actions.weapons+=/black_ox_brew,if=cooldown.keg_smash.ready&energy<variable.energy_cost_keg_smash
 actions.weapons+=/keg_smash
-actions.weapons+=/rising_sun_kick
+actions.weapons+=/rising_sun_kick,if=debuff.weapons_of_order_debuff.stack<4|debuff.weapons_of_order_debuff.remains<gcd
 actions.weapons+=/blackout_kick
 actions.weapons+=/tiger_palm,if=!talent.press_the_advantage&(cooldown.black_ox_brew.remains<gcd|(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm))
 actions.weapons+=/breath_of_fire
