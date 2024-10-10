@@ -98,8 +98,10 @@ actions.aoe+=/black_ox_brew,if=cooldown.keg_smash.ready&energy<variable.energy_c
 actions.aoe+=/keg_smash,if=!talent.stormstouts_last_keg|full_recharge_time<gcd
 actions.aoe+=/blackout_kick
 actions.aoe+=/keg_smash
+actions.aoe+=/chi_burst,if=talent.manifestation
 actions.aoe+=/exploding_keg
 actions.aoe+=/chi_burst
+actions.aoe+=/rising_sun_kick,if=talent.overwhelming_force
 actions.aoe+=/tiger_palm,if=!talent.press_the_advantage&(cooldown.black_ox_brew.remains<gcd|(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm))&(!talent.blackout_combo|buff.blackout_combo.up)
 actions.aoe+=/rising_sun_kick
 actions.aoe+=/spinning_crane_kick,if=!talent.flurry_strikes&talent.press_the_advantage&!prev_gcd.spinning_crane_kick&(cooldown.black_ox_brew.remains<gcd|(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick))
@@ -112,6 +114,7 @@ actions.st+=/rising_sun_kick,if=buff.press_the_advantage.stack>=10
 actions.st+=/black_ox_brew,if=cooldown.keg_smash.ready&energy<variable.energy_cost_keg_smash
 actions.st+=/keg_smash,if=!talent.stormstouts_last_keg|full_recharge_time<gcd
 actions.st+=/blackout_kick
+actions.st+=/chi_burst,if=talent.manifestation
 actions.st+=/exploding_keg
 actions.st+=/chi_burst
 actions.st+=/rising_sun_kick
