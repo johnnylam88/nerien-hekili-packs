@@ -102,7 +102,7 @@ actions.aoe+=/exploding_keg
 actions.aoe+=/chi_burst
 actions.aoe+=/tiger_palm,if=!talent.press_the_advantage&(cooldown.black_ox_brew.remains<gcd|(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm))&(!talent.blackout_combo|buff.blackout_combo.up)
 actions.aoe+=/rising_sun_kick
-actions.aoe+=/spinning_crane_kick,if=!talent.flurry_strikes&talent.press_the_advantage&(cooldown.black_ox_brew.remains<gcd|(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick))
+actions.aoe+=/spinning_crane_kick,if=!talent.flurry_strikes&talent.press_the_advantage&!prev_gcd.spinning_crane_kick&(cooldown.black_ox_brew.remains<gcd|(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick))
 actions.aoe+=/breath_of_fire,if=variable.can_breath_of_fire>0
 
 actions.st+=/tiger_palm,if=!talent.press_the_advantage&buff.blackout_combo.up
@@ -117,7 +117,7 @@ actions.st+=/chi_burst
 actions.st+=/rising_sun_kick
 actions.st+=/tiger_palm,if=!talent.press_the_advantage&(cooldown.black_ox_brew.remains<gcd|(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm))
 actions.st+=/keg_smash
-actions.st+=/spinning_crane_kick,if=!talent.flurry_strikes&talent.press_the_advantage&(cooldown.black_ox_brew.remains<gcd|(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick))
+actions.st+=/spinning_crane_kick,if=!talent.flurry_strikes&talent.press_the_advantage&!prev_gcd.spinning_crane_kick&(cooldown.black_ox_brew.remains<gcd|(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick))
 
 actions.weapons+=/rushing_jade_wind
 actions.weapons+=/potion,if=debuff.weapons_of_order_debuff.stack>=4
