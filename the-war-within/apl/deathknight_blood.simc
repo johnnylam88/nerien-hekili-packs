@@ -81,7 +81,7 @@ actions.drw_up_sanlayn+=/consumption,if=buff.dancing_rune_weapon.remains<3
 actions.drw_up_sanlayn+=/death_and_decay,if=!death_and_decay.ticking
 actions.drw_up_sanlayn+=/soul_reaper,if=active_enemies=1&target.time_to_pct_35<5&target.time_to_die>(dot.soul_reaper.remains+5)
 actions.drw_up_sanlayn+=/soul_reaper,cycle_targets=1,if=target.time_to_pct_35<5&active_enemies>=2&target.time_to_die>(dot.soul_reaper.remains+5)
-actions.drw_up_sanlayn+=/marrowrend,if=buff.bone_shield.down|buff.bone_shield.remains<buff.dancing_rune_weapon.remains
+actions.drw_up_sanlayn+=/marrowrend,if=buff.bone_shield.stack<2
 actions.drw_up_sanlayn+=/blood_boil,if=full_recharge_time<gcd
 actions.drw_up_sanlayn+=/heart_strike,if=buff.essence_of_the_blood_queen.stack<7|rune.time_to_3<gcd
 
