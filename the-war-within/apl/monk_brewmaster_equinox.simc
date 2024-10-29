@@ -23,7 +23,7 @@ actions.precombat+=/keg_smash,if=!talent.stormstouts_last_keg|full_recharge_time
 # Minimum percent of mobs that must have Keg Smash before suggesting Breath of Fire.
 actions+=/variable,name=breath_of_fire_pct_threshold,value=settings.bof_percent
 # Minimum number of Purified Chi stacks before using Celestial Brew.
-actions+=/variable,name=celestial_brew_purified_chi_threshold,value=3
+actions+=/variable,name=celestial_brew_purified_chi_threshold,value=6
 # Stagger percent of current health at which you should use Purifying Brew in an emergency.
 actions+=/variable,name=purify_stagger_pct,value=settings.purify_stagger_currhp
 # Stagger percent of maximum health at which you should use Purifying Brew in an emergency.
