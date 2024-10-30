@@ -48,8 +48,8 @@ actions+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold&
 actions+=/sacrificial_pact,if=buff.dancing_rune_weapon.down&(pet.ghoul.remains<2|boss&fight_remains<gcd)
 actions+=/blood_tap,if=(rune<=2&rune.time_to_3>gcd&full_recharge_time<2*gcd)|(rune<=1&rune.time_to_3>gcd)
 actions+=/raise_dead
-actions+=/run_action_list,name=drw_up_sanlayn,strict=1,if=buff.dancing_rune_weapon.up&talent.gift_of_the_sanlayn
-actions+=/run_action_list,name=drw_up,strict=1,if=buff.dancing_rune_weapon.up
+actions+=/run_action_list,name=drw_up_sanlayn,if=buff.dancing_rune_weapon.up&talent.gift_of_the_sanlayn
+actions+=/run_action_list,name=drw_up,if=buff.dancing_rune_weapon.up
 actions+=/run_action_list,name=standard
 
 #actions.defensives+=/antimagic_shell,if=incoming_magic_damage_5s>=0.2*health.max
