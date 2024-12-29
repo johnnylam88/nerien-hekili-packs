@@ -23,6 +23,7 @@ The following classes and specializations are supported:
 
 - Death Knight: Blood, Blood (Kyrasis)
 - Demon Hunter: Vengeance
+- Druid: Guardian
 - Monk: Brewmaster, Brewmaster (Equinox)
 - Warrior: Protection
 

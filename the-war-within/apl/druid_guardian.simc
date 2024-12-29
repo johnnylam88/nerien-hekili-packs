@@ -1,0 +1,135 @@
+# Guardian Druid Action Priority List
+# Based on *Guardian Druid Tank Guide* by Pumps
+# [https://www.icy-veins.com/wow/guardian-druid-pve-tank-guide]
+#
+# Recommended Settings for `/hekili` > *Guardian*:
+#
+# - Weave Cat Form and Bear Form : **unused**
+# - Use Maul and Raze in Ironfur Build : **unused**
+# - Maul (or Raze) Rage Threshold : **unused**
+# - Nature's Vigil Damage Threshold : 70
+# - Ironfur Damage Threshold : 5
+# - Ironfur Maximum Stacks : 14
+
+#actions.precombat+=/variable,name=opener,value=1,op=set
+actions.precombat+=/mark_of_the_wild
+actions.precombat+=/heart_of_the_wild
+actions.precombat+=/bear_form
+
+### Constants ###
+
+actions+=/variable,name=rage_cost_frenzied_regeneration,value=10
+actions+=/variable,name=rage_cost_ironfur,value=40
+actions+=/variable,name=rage_cost_maul,value=40
+actions+=/variable,name=rage_cost_raze,value=40
+
+actions+=/variable,name=rage_gain_mangle,value=(12+5*talent.soul_of_the_forest)
+actions+=/variable,name=rage_gain_thrash_bear,value=5
+
+actions+=/variable,name=cooldown_mangle_duration,value=6*spell_haste
+actions+=/variable,name=cooldown_thrash_bear_duration,value=6*spell_haste
+
+### Tunables ###
+
+# Pool enough Rage to cast Ironfur, Maul, or Raze.
+actions+=/variable,name=rage_pool_value,value=((variable.rage_cost_ironfur<?variable.rage_cost_maul)<?variable.rage_cost_raze)
+# Barkskin tunable for incoming damage.
+actions+=/variable,name=barkskin_damage_taken,value=0.2*health.max
+# Frenzied Regeneration tunable for minimum health percent.
+actions+=/variable,name=frenzied_regeneration_health_pct,value=80
+# Ironfur tunable for incoming damage per suggested application (see /hekili > Guardian).
+actions+=/variable,name=ironfur_damage_taken,value=ironfur_damage_threshold
+# Nature's Vigil tunable for minimum health percent (see /hekili > Guardian).
+actions+=/variable,name=natures_vigil_health_pct,value=vigil_damage
+# Renewal tunable for minimum health percent.
+actions+=/variable,name=renewal_health_pct,value=65
+# Regrowth tunable for minimum health percent.
+actions+=/variable,name=regrowth_health_pct,value=85
+# Survival Instincts tunable for incoming damage.
+actions+=/variable,name=survival_instincts_damage_taken,value=0.2*health.max
+
+################
+
+# 4 Rage per auto-attack.
+actions+=/variable,name=rage_per_second_auto_attack,value=4%(2*attack_haste)
+# 3 Rage per incoming auto-attack, and incoming auto-attack every 2s with 1 mob.
+# Assume at 5+ mobs that we gain 3 Rage per second.
+actions+=/variable,name=rage_per_second_incoming_auto_attack,value=(3%2)+((3%2)%(5-1))*(active_enemies-1),op=setif,condition=active_enemies<5,value_else=3
+# Blood Frenzy causes the Thrash DoT to generate 3 Rage per tick on up to 5 targets.
+actions+=/variable,name=rage_per_second_blood_frenzy,value=talent.blood_frenzy*(3%dot.thrash_bear.tick_time)*(active_dot.thrash_bear>?5)
+# Moon Guardian causes the free Moonfires from Galactic Guardian to generate 5 Rage.
+# Galactic Guardian causes damage to have a 5% chance to trigger a free Moonfire on that target.
+# This underestimates the Rage generated because we only factor in Thrash ticks.
+actions+=/variable,name=rage_per_second_moon_guardian,value=talent.moon_guardian*talent.galactic_guardian*5*0.05*(active_dot.thrash_bear%dot.thrash_bear.tick_time)
+# This underestimates the Rage from Mangle because we don't account for the Gore talent.
+actions+=/variable,name=rage_per_second_mangle,value=variable.rage_gain_mangle%variable.cooldown_mangle_duration
+actions+=/variable,name=rage_per_second_thrash_bear,value=variable.rage_gain_thrash_bear%variable.cooldown_thrash_bear_duration
+actions+=/variable,name=rage_per_second,value=(variable.rage_per_second_blood_frenzy+variable.rage_per_second_mangle+variable.rage_per_second_thrash_bear)
+actions+=/variable,name=rage_at_next_gcd,value=(rage+gcd*variable.rage_per_second)
+# should_spend_rage is 1 if Rage will exceed the pool value by the next GCD.
+actions+=/variable,name=should_spend_rage,value=1,op=setif,condition=variable.rage_at_next_gcd>variable.rage_pool_value
+
+actions+=/variable,name=rage_check,value=1,op=setif,condition=rage+variable.rage_per_second*gcd>rage.max,value_else=0
+# Mangle with Gore generates 4 additional Rage.
+actions+=/variable,name=rage_check_mangle,value=1,op=setif,condition=cooldown.mangle.remains<gcd&rage+variable.rage_gain_mangle+4*buff.gore.up>rage.max,value_else=0
+# Moonfire with Galactic Guardian generates 8 Rage.
+actions+=/variable,name=rage_check_moonfire,value=1,op=setif,condition=rage+8*buff.galactic_guardian.up>rage.max,value_else=0
+actions+=/variable,name=rage_check_thrash_bear,value=1,op=setif,condition=cooldown.thrash_bear.remains<gcd&rage+variable.rage_gain_thrash_bear+4*buff.gore.up>rage.max,value_else=0
+# should_dump_rage is 1 if an ability is coming off cooldown and will overcap on Rage.
+actions+=/variable,name=should_dump_rage,value=1,op=setif,condition=variable.rage_check>0|variable.rage_check_moonfire>0|variable.rage_check_mangle>0|variable.rage_check_thrash_bear>0,value_else=0
+
+# Ironfur if not already up, we need more stacks of Ironfur and there is Rage available, or we will cap on Rage.
+actions+=/variable,name=ironfur_threshold,value=1+(incoming_physical_damage_5s%variable.ironfur_damage_taken)
+actions+=/variable,name=should_ironfur,value=1,op=setif,condition=buff.ironfur.down|(buff.ironfur.stack<variable.ironfur_threshold&variable.should_spend_rage>0)|variable.should_dump_rage>0,value_else=0
+
+actions+=/variable,name=buff_berserk_up,value=1,op=setif,condition=buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up,value_else=0
+
+# Several of the offensive cooldowns give a defensive benefit.
+actions+=/variable,name=has_offensive_defensive_buff,value=1,op=setif,condition=buff.lunar_beam.up|buff.rage_of_the_sleeper.up|variable.buff_berserk_up>0,value_else=0
+actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.barkskin.up|buff.survival_instincts.up|variable.has_offensive_defensive_buff>0,value_else=0
+
+################
+
+actions+=/skull_bash
+actions+=/soothe
+actions+=/bear_form
+#actions+=/run_action_list,name=opener,if=time<5*gcd.max&variable.opener>0
+actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0
+actions+=/call_action_list,name=heal
+actions+=/call_action_list,name=mitigation
+actions+=/run_action_list,name=bear,if=buff.bear_form.up
+
+actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken
+actions.defensives+=/survival_instincts,use_off_gcd=1,if=incoming_damage_5s>=variable.survival_instincts_damage_taken
+
+actions.heal+=/natures_vigil,if=health.pct<variable.natures_vigil_health_pct
+actions.heal+=/regrowth,if=buff.dream_of_cenarius.up&health.pct<variable.regrowth_health_pct
+actions.heal+=/frenzied_regeneration,if=buff.frenzied_regeneration.down&health.pct<variable.frenzied_regeneration_health_pct
+actions.heal+=/renewal,if=health.pct<variable.renewal_health_pct
+
+actions.mitigation+=/ironfur,use_off_gcd=1,if=variable.should_ironfur>0
+
+actions.racials+=/berserking
+
+actions.spend_rage+=/maul,if=variable.rage_at_next_gcd-variable.rage_cost_maul*(talent.berserk_unchecked_aggresssion*variable.buff_berserk_up*0.5)>=variable.rage_pool_value&active_enemies=1
+actions.spend_rage+=/raze,if=variable.rage_at_next_gcd-variable.rage_cost_raze>=variable.rage_pool_value&active_enemies
+actions.spend_rage+=/ironfur,if=variable.rage_at_next_gcd-variable.rage_cost_ironfur*(talent.berserk_persistence*variable.buff_berserk_up*0.5)>=variable.rage_pool_value
+
+actions.bear+=/heart_of_the_wild
+actions.bear+=/moonfire,if=(!ticking|refreshable)&target.time_to_die>12
+actions.bear+=/maul,if=buff.ravage.up&active_enemies>1
+actions.bear+=/thrash_bear
+actions.bear+=/mangle
+actions.bear+=/convoke_the_spirits
+actions.bear+=/berserk_bear
+actions.bear+=/incarnation
+actions.bear+=/call_action_list,name=racials,if=variable.buff_berserk_up>0
+actions.bear+=/potion,if=variable.buff_berserk_up>0
+actions.bear+=/lunar_beam
+actions.bear+=/rage_of_the_sleeper
+actions.bear+=/maul,if=buff.tooth_and_claw.up&active_enemies=1
+actions.bear+=/raze,if=buff.tooth_and_claw.up
+actions.bear+=/call_action_list,name=spend_rage,if=variable.should_ironfur=0&variable.should_spend_rage>0
+actions.bear+=/moonfire,if=buff.galactic_guardian.up&(buff.galactic_guardian.remains<1+gcd|active_enemies<4)
+actions.bear+=/moonfire,cycle_targets=1,if=talent.lunar_insight|talent.twin_moonfire
+actions.bear+=/swipe_bear
