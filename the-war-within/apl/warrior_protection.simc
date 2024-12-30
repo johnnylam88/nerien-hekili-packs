@@ -159,8 +159,8 @@ actions.ravager_up+=/revenge,if=debuff.deep_wounds.down
 actions.ravager_up+=/shield_slam,if=talent.heavy_repercussions
 actions.ravager_up+=/revenge
 
-actions.spend_rage+=/revenge,if=variable.rage_at_next_shield_block-variable.rage_cost_revenge>=variable.rage_pool_value&spell_targets.revenge>1
 actions.spend_rage+=/execute,if=variable.rage_at_next_shield_block-variable.rage_cost_execute>=variable.rage_pool_value&spell_targets.revenge<=4
+actions.spend_rage+=/revenge,if=variable.rage_at_next_shield_block-variable.rage_cost_revenge>=variable.rage_pool_value
 
 actions.standard+=/charge,if=movement.distance>8
 actions.standard+=/thunder_blast,if=talent.unstoppable_force&buff.avatar.up
