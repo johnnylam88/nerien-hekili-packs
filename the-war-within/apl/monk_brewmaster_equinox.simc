@@ -50,6 +50,8 @@ actions+=/variable,name=energy_cost_spinning_crane_kick,value=25
 actions+=/variable,name=energy_cost_tiger_palm,value=25
 actions+=/variable,name=energy_at_next_keg_smash,value=energy+energy.regen*cooldown.keg_smash.remains
 
+actions+=/variable,name=cooldown_rising_sun_kick_duration,value=10*spell_haste
+
 actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.celestial_brew.up|buff.dampen_harm.up|buff.fortifying_brew.up,value_else=0
 actions+=/variable,name=can_breath_of_fire,value=1,op=setif,condition=active_dot.keg_smash%active_enemies*100>=variable.breath_of_fire_pct_threshold,value_else=0
 
@@ -127,7 +129,7 @@ actions.weapons+=/rising_sun_kick,if=buff.press_the_advantage.stack>=10&(!talent
 actions.weapons+=/tiger_palm,if=buff.blackout_combo.up
 actions.weapons+=/black_ox_brew,if=cooldown.keg_smash.ready&energy<variable.energy_cost_keg_smash
 actions.weapons+=/keg_smash
-actions.weapons+=/rising_sun_kick,if=cooldown.rising_sun_kick.duration<buff.weapons_of_order.remains|buff.weapons_of_order.remains<gcd
+actions.weapons+=/rising_sun_kick,if=variable.cooldown_rising_sun_kick_duration<buff.weapons_of_order.remains|buff.weapons_of_order.remains<gcd
 actions.weapons+=/blackout_kick
 actions.weapons+=/tiger_palm,if=(talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd)|variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm
 actions.weapons+=/spinning_crane_kick,if=talent.press_the_advantage&!prev_gcd.spinning_crane_kick&((talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd)|variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)

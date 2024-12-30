@@ -39,6 +39,11 @@ actions+=/variable,name=fury_gain_shear_base,value=10+(10*talent.shear_fury)
 actions+=/variable,name=fury_gain_shear,value=variable.fury_gain_shear_base+20,op=setif,condition=buff.metamorphosis.up,value_else=variable.fury_gain_shear_base
 actions+=/variable,name=fury_gain_sigil_of_flame,value=30
 
+actions+=/variable,name=cooldown_felblade_duration,value=15*spell_haste
+actions+=/variable,name=cooldown_fracture_duration,value=4.5*spell_haste
+actions+=/variable,name=cooldown_immolation_aura_duration,value=15*spell_haste
+actions+=/variable,name=cooldown_sigil_of_flame_duration,value=30-5*talent.illuminated_sigils
+
 # Pool enough Fury so that the Fury bar is not empty when exiting Fel Devastation.
 actions+=/variable,name=fel_devastation_pool_amount,value=variable.fury_cost_fel_devastation,op=setif,condition=talent.darkglare_boon,value_else=variable.fury_cost_fel_devastation+variable.fury_cost_soul_cleave
 
@@ -46,12 +51,12 @@ actions+=/variable,name=fel_devastation_pool_amount,value=variable.fury_cost_fel
 actions+=/variable,name=immolation_aura_crit,value=stat.crit+0.06,op=setif,condition=talent.aura_of_pain,value_else=stat.crit
 
 # fury_per_second is the expected amount of Fury gained per second hitting abilities on cooldown.
-actions+=/variable,name=fury_per_second_felblade,value=variable.fury_gain_felblade%cooldown.felblade.duration,op=setif,condition=talent.felblade,value_else=0
-actions+=/variable,name=fury_per_second_fracture,value=variable.fury_gain_fracture%(4.5*gcd),op=setif,condition=talent.fracture,value_else=0
+actions+=/variable,name=fury_per_second_felblade,value=variable.fury_gain_felblade%variable.cooldown_felblade_duration,op=setif,condition=talent.felblade,value_else=0
+actions+=/variable,name=fury_per_second_fracture,value=variable.fury_gain_fracture%variable.cooldown_fracture_duration,op=setif,condition=talent.fracture,value_else=0
 actions+=/variable,name=fury_per_second_volatile_flameblood,value=7.5*variable.immolation_aura_crit,op=setif,condition=talent.volatile_flamebood,value_else=0
-actions+=/variable,name=fury_per_second_immolation_aura,value=variable.fury_gain_immolation_aura%cooldown.immolation_aura.duration+variable.fury_per_second_volatile_flameblood
+actions+=/variable,name=fury_per_second_immolation_aura,value=variable.fury_gain_immolation_aura%variable.cooldown_immolation_aura_duration+variable.fury_per_second_volatile_flameblood
 actions+=/variable,name=fury_per_second_shear,value=variable.fury_gain_shear%gcd.max,op=setif,condition=!talent.fracture,value_else=0
-actions+=/variable,name=fury_per_second_sigil_of_flame,value=variable.fury_gain_sigil_of_flame%cooldown.sigil_of_flame.duration,value_else=0
+actions+=/variable,name=fury_per_second_sigil_of_flame,value=variable.fury_gain_sigil_of_flame%variable.cooldown_sigil_of_flame_duration,value_else=0
 actions+=/variable,name=fury_per_second,value=variable.fury_per_second_felblade+variable.fury_per_second_fracture+variable.fury_per_second_immolation_aura+variable.fury_per_second_shear+variable.fury_per_second_sigil_of_flame
 
 # fury_at_next_fel_devastation is the expected Fury when Fel Devastation is ready.

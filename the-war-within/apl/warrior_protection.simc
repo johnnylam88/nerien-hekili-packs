@@ -31,6 +31,9 @@ actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercuss
 actions+=/variable,name=rage_gain_thunder_blast,value=10*variable.rage_gen_multiplier_outburst
 actions+=/variable,name=rage_gain_thunder_clap,value=5*variable.rage_gen_multiplier_outburst
 
+actions+=/variable,name=cooldown_shield_slam_duration,value=9*spell_haste
+actions+=/variable,name=cooldown_thunder_clap_duration,value=6*spell_haste
+
 ### Tunables ###
 
 # Pool enough Rage to cast both Shield Block and Ignore Pain.
@@ -67,9 +70,9 @@ actions+=/variable,name=rage_per_second_incoming_damage,value=variable.rage_per_
 actions+=/variable,name=rage_per_second_bloodsurge,value=talent.bloodsurge*((0.1*5%3)*active_dot.deep_wounds+(0.1*5%3)*active_dot.rend+(0.1*5%2)*active_dot.thunderous_roar)
 actions+=/variable,name=rage_per_second_ravager,value=buff.ravager.up*5
 # This underestimates the rage from Shield Slam because we don't account for Shield Slam resets.
-actions+=/variable,name=rage_per_second_shield_slam,value=variable.rage_gain_shield_slam%cooldown.shield_slam.duration
+actions+=/variable,name=rage_per_second_shield_slam,value=variable.rage_gain_shield_slam%variable.cooldown_shield_slam_duration
 # This underestimates the rage from Thunder Clap because we don't account for Thunder Blast.
-actions+=/variable,name=rage_per_second_thunder_clap,value=variable.rage_gain_thunder_clap%cooldown.thunder_clap.duration
+actions+=/variable,name=rage_per_second_thunder_clap,value=variable.rage_gain_thunder_clap%variable.cooldown_thunder_clap_duration
 actions+=/variable,name=rage_per_second,value=(variable.rage_per_second_auto_attack+variable.rage_per_second_incoming_damage+variable.rage_per_second_bloodsurge+variable.rage_per_second_ravager+variable.rage_per_second_shield_slam+variable.rage_per_second_thunder_clap)*variable.rage_gen_multiplier
 actions+=/variable,name=rage_at_next_shield_block,value=rage,op=setif,condition=cooldown.shield_block.charges>0,value_else=rage+cooldown.shield_block.remains*variable.rage_per_second
 # should_spend_rage is 1 if the expected Rage by the next Shield Block exceeds the pool value.
