@@ -36,8 +36,8 @@ actions+=/variable,name=cooldown_thunder_clap_duration,value=6*spell_haste
 
 ### Tunables ###
 
-# Pool enough Rage to cast both Shield Block and Ignore Pain.
-actions+=/variable,name=rage_pool_value,value=variable.rage_cost_shield_block+variable.rage_cost_ignore_pain
+# Pool enough Rage to cast Shield Block with some cushion in case our Rage estimate is wrong.
+actions+=/variable,name=rage_pool_value,value=variable.rage_cost_shield_block+20
 # Don't cast Ignore Pain if we will waste more than 70% of the casted absorb.
 actions+=/variable,name=ignore_pain_wasted_pct,value=70
 # Demoralizing Shout tunable for incoming damage.
