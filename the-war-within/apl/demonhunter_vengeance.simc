@@ -76,7 +76,7 @@ actions+=/variable,name=should_pool_fury,value=0,op=setif,condition=(variable.fu
 actions+=/variable,name=fury_check,value=1,op=setif,condition=fury+variable.fury_per_second*gcd>fury.max,value_else=0
 actions+=/variable,name=fury_check_felblade,value=1,op=setif,condition=talent.felblade&cooldown.felblade.remains<gcd&fury+variable.fury_gain_felblade>fury.max,value_else=0
 actions+=/variable,name=fury_check_fracture,value=1,op=setif,condition=talent.fracture&cooldown.fracture.remains<gcd&fury+variable.fury_gain_fracture>fury.max,value_else=0
-# Immolation Aura (and Cosuming Fire) generates 8 Fury on use, then 2 Fury per second afterwards.
+# Immolation Aura (and Consuming Fire) generates 8 Fury on use, then 2 Fury per second afterwards.
 actions+=/variable,name=fury_check_immolation_aura,value=1,op=setif,condition=(!talent.demonic_intensity|buff.metamorphosis.down)&cooldown.immolation_aura.remains<gcd&fury+8>fury.max,value_else=0
 actions+=/variable,name=fury_check_consuming_fire,value=1,op=setif,condition=(talent.demonic_intensity&buff.metamorphosis.up)&cooldown.consuming_fire.remains<gcd&fury+8>fury.max,value_else=0
 actions+=/variable,name=fury_check_shear,value=1,op=setif,condition=!talent.fracture&fury+variable.fury_gain_shear>fury.max,value_else=0
