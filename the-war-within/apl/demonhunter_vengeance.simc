@@ -62,6 +62,8 @@ actions+=/variable,name=fury_per_second_volatile_flameblood,value=7.5*variable.i
 actions+=/variable,name=fury_per_second_immolation_aura,value=variable.fury_gain_immolation_aura%variable.cooldown_immolation_aura_duration+variable.fury_per_second_volatile_flameblood
 actions+=/variable,name=fury_per_second_shear,value=variable.fury_gain_shear%gcd.max,op=setif,condition=!talent.fracture,value_else=0
 actions+=/variable,name=fury_per_second_sigil_of_flame,value=variable.fury_gain_sigil_of_flame%variable.cooldown_sigil_of_flame_duration,value_else=0
+# Student of Suffering triggers 5 Fury every 2 seconds for 8 seconds after Sigil of Flame.
+actions+=/variable,name=fury_per_second_student_of_suffering,value=5*(8%2)%(8+variable.sigil_of_flame_cooldown+1+talent.quickened_sigil),op=setif,condition=talent.student_of_suffering,value_else=0
 actions+=/variable,name=fury_per_second,value=variable.fury_per_second_felblade+variable.fury_per_second_fracture+variable.fury_per_second_immolation_aura+variable.fury_per_second_shear+variable.fury_per_second_sigil_of_flame
 
 # fury_at_next_fel_devastation is the expected Fury when Fel Devastation is ready.
