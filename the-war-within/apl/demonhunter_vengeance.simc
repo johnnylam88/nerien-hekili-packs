@@ -29,6 +29,10 @@ actions+=/variable,name=fiery_demise_pool_amount,value=100
 
 ################
 
+# Check whether you are in a multi-target situation.
+actions+=/variable,name=num_targets,value=active_enemies,op=setif,condition=!talent.spirit_bomb,value_else=spell_targets.spirit_bomb
+actions+=/variable,name=aoe,value=1,op=setif,condition=variable.num_targets>1,value_else=0
+
 actions+=/variable,name=fury_cost_fel_devastation,value=50
 actions+=/variable,name=fury_cost_soul_cleave,value=30
 actions+=/variable,name=fury_cost_spirit_bomb,value=40
@@ -37,7 +41,8 @@ actions+=/variable,name=fury_gain_fracture,value=45,op=setif,condition=buff.meta
 actions+=/variable,name=fury_gain_immolation_aura,value=26,op=setif,condition=talent.agonizing_flames,value_else=20
 actions+=/variable,name=fury_gain_shear_base,value=10+(10*talent.shear_fury)
 actions+=/variable,name=fury_gain_shear,value=variable.fury_gain_shear_base+20,op=setif,condition=buff.metamorphosis.up,value_else=variable.fury_gain_shear_base
-actions+=/variable,name=fury_gain_sigil_of_flame,value=30
+# Flames of Fury causes Sigil of Flame to generate 2 additional Fury per target hit.
+actions+=/variable,name=fury_gain_sigil_of_flame,value=30+2*variable.num_targets*talent.flames_of_fury
 
 actions+=/variable,name=cooldown_felblade_duration,value=15*spell_haste
 actions+=/variable,name=cooldown_fracture_duration,value=4.5*spell_haste
@@ -95,10 +100,6 @@ actions+=/variable,name=soul_cleave_heal_amount_base,value=0.4*stat.attack_power
 actions+=/variable,name=soul_cleave_heal_amount,value=variable.soul_cleave_heal_amount_base+((variable.soul_cleave_heal_amount_base+variable.shattered_souls_heal_amount)*(soul_fragments<?2))
 actions+=/variable,name=soul_sunder_heal_amount_base,value=0.5*stat.attack_power
 actions+=/variable,name=soul_sunder_heal_amount,value=variable.soul_sunder_heal_amount_base+((variable.soul_sunder_heal_amount_base+variable.shattered_souls_heal_amount)*(soul_fragments<?2))
-
-# Check whether you are in a multi-target situation.
-actions+=/variable,name=num_targets,value=active_enemies,op=setif,condition=!talent.spirit_bomb,value_else=spell_targets.spirit_bomb
-actions+=/variable,name=aoe,value=1,op=setif,condition=variable.num_targets>1,value_else=0
 
 # Check if a sigil has already been placed and waiting for activation.
 actions+=/variable,name=sigil_of_doom_placed,value=1,op=setif,condition=prev_gcd.sigil_of_doom|(!talent.quickened_sigils&prev_gcd.2.sigil_of_doom),value_else=0
