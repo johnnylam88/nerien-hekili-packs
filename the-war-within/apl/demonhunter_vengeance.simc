@@ -119,7 +119,7 @@ actions+=/variable,name=should_dump_soul_fragments,value=1,op=setif,condition=va
 
 # Calculate amount of healing done through Shattered Souls.
 actions+=/variable,name=shattered_souls_heal_amount_base,value=(0.06*incoming_damage_5s)<?(0.01*health.max)
-actions+=/variable,name=shattered_souls_heal_amount,value=variable.shattered_souls_healing_amount_base*1.1,op=setif,condition=talent.shattered_restoration,value_else=variable.shattered_souls_healing_amount_base
+actions+=/variable,name=shattered_souls_heal_amount,value=variable.shattered_souls_heal_amount_base*1.1,op=setif,condition=talent.shattered_restoration,value_else=variable.shattered_souls_heal_amount_base
 actions+=/variable,name=spirit_bomb_heal_amount,value=variable.shattered_souls_heal_amount*soul_fragments
 actions+=/variable,name=soul_cleave_heal_amount_base,value=0.4*stat.attack_power
 actions+=/variable,name=soul_cleave_heal_amount,value=variable.soul_cleave_heal_amount_base+((variable.soul_cleave_heal_amount_base+variable.shattered_souls_heal_amount)*(soul_fragments<?2))
