@@ -138,15 +138,24 @@ actions+=/variable,name=sigil_of_spite_placed,value=1,op=setif,condition=prev_gc
 # fiery_demise_sync is 1 if Sigil of Flame, Soul Carver, or Fel Devastation is almost ready.
 actions+=/variable,name=fiery_demise_sync,value=1,op=setif,condition=cooldown.sigil_of_flame.remains<=(execute_time+gcd.remains)|(talent.soul_carver&cooldown.soul_carver.remains<=(execute_time+gcd.remains))|cooldown.fel_devastation.remains<=(execute_time+gcd.remains),value_else=0
 
+### Frailty ####
+
 # Try to synchronize major offensive cooldowns with Frailty on targets.
 # frailty_sync is 1 if The Hunt, Sigil of Spite, or Soul Carver is almost ready.
 actions+=/variable,name=frailty_sync,value=1,op=setif,condition=(talent.the_hunt&cooldown.the_hunt.remains<=(execute_time+gcd.remains))|(talent.sigil_of_spite&cooldown.sigil_of_spite.remains<=(execute_time+gcd.remains))|(talent.soul_carver&cooldown.soul_carver.remains<=(execute_time+gcd.remains)),value_else=0
 
-# frailty_ready is 1 if there are sufficient Frailty stacks on the target(s).
-actions+=/variable,name=frailty_ready,value=1,op=setif,condition=!talent.vulnerability|(active_dot.frailty>=variable.num_targets&(!talent.soulcrush|(variable.aoe=1&debuff.frailty.stack>=3)|debuff.frailty.stack>=6)),value_else=0
+# fel_devastation_ready is 1 if Fury is greater than the pool amount and
+# there are at least 3 Frailty stacks on the primary target.
+actions+=/variable,name=fel_devastation_ready,value=1,op=setif,condition=fury>variable.fel_devastation_pool_amount&(!talent.vulnerability|(active_dot.frailty>=variable.num_targets&(!talent.soulcrush|debuff.frailty.stack>=3))),value_else=0
 
-# fel_devastation_ready is 1 if Fury is greater than the pool amount and there are sufficient Frailty stacks.
-actions+=/variable,name=fel_devastation_ready,value=1,op=setif,condition=fury>variable.fel_devastation_pool_amount&variable.frailty_ready>0,value_else=0
+# the_hunt_ready is 1 if there are at least 5 Frailty stacks on the primary target.
+actions+=/variable,name=the_hunt_ready,value=1,op=setif,condition=!talent.vulnerability|(active_dot.frailty>=variable.num_targets&(!talent.soulcrush|debuff.frailty.stack>=5)),value_else=0
+
+# sigil_of_spite_ready is 1 if there are at least 5 Frailty stacks on the primary target.
+actions+=/variable,name=sigil_of_spite_ready,value=1,op=setif,condition=!talent.vulnerability|(active_dot.frailty>=variable.num_targets&(!talent.soulcrush|debuff.frailty.stack>=5)),value_else=0
+
+# soul_carver_ready is 1 if there are at least 5 Frailty stacks on the target.
+actions+=/variable,name=soul_carver_ready,value=1,op=setif,condition=!talent.vulnerability|!talent.soulcrush|debuff.frailty.stack>=5,value_else=0
 
 # should_demon_spikes is 1 if Demon Spikes is down and no demon form is present or imminent.
 actions+=/variable,name=should_demon_spikes,value=1,op=setif,condition=buff.demon_spikes.down&buff.metamorphosis.down&(!talent.demonic|cooldown.fel_devastation.remains>gcd.remains|variable.fel_devastation_ready=0)
@@ -190,9 +199,9 @@ actions.standard+=/sigil_of_doom,if=variable.sigil_of_doom_placed=0&buff.demonsu
 actions.standard+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0&(!talent.illuminated_sigils|active_dot.sigil_of_flame=0)
 actions.standard+=/fel_desolation,if=talent.fiery_demise&variable.fel_devastation_ready>0&variable.demonsurge_empowered>0&!prev_gcd.fel_devastation
 actions.standard+=/fel_devastation,if=talent.fiery_demise&variable.fel_devastation_ready>0&variable.demonsurge_empowered=0
-actions.standard+=/the_hunt,if=!talent.art_of_the_glaive&variable.frailty_ready>0
-actions.standard+=/sigil_of_spite,if=variable.sigil_of_spite_placed=0&variable.frailty_ready>0
-actions.standard+=/soul_carver,if=(variable.soul_fragments_deficit>=variable.soul_fragments_gain_soul_carver)&variable.frailty_ready=1&(debuff.fiery_brand_dot.remains>3|cooldown.fiery_brand.remains>15)
+actions.standard+=/the_hunt,if=!talent.art_of_the_glaive&variable.the_hunt_ready>0
+actions.standard+=/sigil_of_spite,if=variable.sigil_of_spite_placed=0&variable.sigil_of_spite_ready>0
+actions.standard+=/soul_carver,if=(variable.soul_fragments_deficit>=variable.soul_fragments_gain_soul_carver)&variable.soul_carver_ready>0&(debuff.fiery_brand_dot.remains>3|cooldown.fiery_brand.remains>15)
 actions.standard+=/call_action_list,name=dump_fury,if=variable.should_dump_fury>0
 actions.standard+=/call_action_list,name=spend_fury,if=variable.should_spend_fury>0
 actions.standard+=/consuming_fire,if=variable.demonsurge_empowered>0
