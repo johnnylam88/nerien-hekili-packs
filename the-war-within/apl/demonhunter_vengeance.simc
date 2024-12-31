@@ -164,13 +164,7 @@ actions.heal+=/bulk_extraction,if=talent.bulk_extraction&(health.pct<variable.bu
 actions.mitigation+=/demon_spikes,use_off_gcd=1,if=variable.should_demon_spikes>0
 actions.mitigation+=/soul_barrier,if=variable.soul_fragments_deficit<2&variable.should_demon_spikes>0
 
-actions.racials=blood_fury
-actions.racials+=/berserking
 #actions.racials+=/arcane_torrent
-actions.racials+=/lights_judgment
-actions.racials+=/ancestral_call
-#actions.racials+=/fireblood
-actions.racials+=/bag_of_tricks
 
 actions.dump_fury+=/spirit_burst,if=variable.can_spirit_bomb>0&(variable.aoe=1|buff.demonsurge_spirit_burst.up)
 actions.dump_fury+=/spirit_bomb,if=variable.can_spirit_bomb>0&(variable.aoe=1|!talent.demonsurge|dot.fiery_brand_dot.ticking)&variable.demonsurge_empowered=0
