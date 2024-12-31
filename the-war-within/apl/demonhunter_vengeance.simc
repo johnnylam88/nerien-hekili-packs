@@ -176,7 +176,7 @@ actions.mitigation+=/soul_barrier,if=variable.soul_fragments_deficit<2&variable.
 #actions.racials+=/arcane_torrent
 
 actions.dump_fury+=/spirit_burst,if=variable.can_spirit_bomb>0&(variable.aoe=1|buff.demonsurge_spirit_burst.up)
-actions.dump_fury+=/spirit_bomb,if=variable.can_spirit_bomb>0&(variable.aoe=1|!talent.demonsurge|dot.fiery_brand_dot.ticking)&variable.demonsurge_empowered=0
+actions.dump_fury+=/spirit_bomb,if=variable.can_spirit_bomb>0&(variable.aoe=1|!talent.demonsurge|(talent.fiery_demise&dot.fiery_brand_dot.ticking))&variable.demonsurge_empowered=0
 actions.dump_fury+=/soul_sunder,if=variable.demonsurge_empowered>0
 actions.dump_fury+=/soul_cleave,if=variable.demonsurge_empowered=0
 
