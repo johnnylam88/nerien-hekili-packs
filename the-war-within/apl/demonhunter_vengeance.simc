@@ -119,6 +119,8 @@ actions+=/variable,name=frailty_sync,value=1,op=setif,condition=(talent.the_hunt
 # frailty_ready is 1 if there are sufficient Frailty stacks on the target(s).
 actions+=/variable,name=frailty_ready,value=1,op=setif,condition=!talent.vulnerability|(variable.aoe=1&(talent.soulcrush&debuff.frailty.stack>=3)&active_dot.frailty>=variable.num_targets),value_else=0
 
+################
+
 actions+=/disrupt
 actions+=/consume_magic
 actions+=/call_action_list,name=heal
@@ -146,13 +148,13 @@ actions.standard+=/soul_sunder,if=buff.glaive_flurry.up&((variable.aoe=0&buff.re
 actions.standard+=/soul_cleave,if=buff.glaive_flurry.up&((variable.aoe=0&buff.rending_strike.down)|(variable.aoe>0&buff.rending_strike.up))
 actions.standard+=/fracture,if=buff.rending_strike.up
 actions.standard+=/shear,if=buff.rending_strike.up
-actions.standard+=/fel_desolation,if=!talent.fiery_demise&variable.frailty_ready>0
-actions.standard+=/fel_devastation,if=!talent.fiery_demise&variable.frailty_ready>0
+actions.standard+=/fel_desolation,if=!talent.fiery_demise&fury>variable.fel_devastation_pool_amount&variable.frailty_ready>0
+actions.standard+=/fel_devastation,if=!talent.fiery_demise&fury>variable.fel_devastation_pool_amount&variable.frailty_ready>0
 actions.standard+=/fiery_brand,if=(!talent.fiery_demise|(fury>=variable.fiery_demise_pool_amount&variable.fiery_demise_sync>0))&active_dot.fiery_brand_dot=0
 actions.standard+=/sigil_of_doom,if=variable.sigil_of_doom_placed=0&(!talent.illuminated_sigils|active_dot.sigil_of_doom=0)
 actions.standard+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0&(!talent.illuminated_sigils|active_dot.sigil_of_flame=0)
-actions.standard+=/fel_desolation,if=talent.fiery_demise&variable.frailty_ready>0
-actions.standard+=/fel_devastation,if=talent.fiery_demise&variable.frailty_ready>0
+actions.standard+=/fel_desolation,if=talent.fiery_demise&fury>variable.fel_devastation_pool_amount&variable.frailty_ready>0
+actions.standard+=/fel_devastation,if=talent.fiery_demise&fury>variable.fel_devastation_pool_amount&variable.frailty_ready>0
 actions.standard+=/the_hunt,if=!talent.art_of_the_glaive&variable.frailty_ready>0
 actions.standard+=/sigil_of_spite,if=variable.sigil_of_spite_placed=0&variable.frailty_ready>0
 actions.standard+=/soul_carver,if=(variable.soul_fragments_deficit>=variable.soul_fragments_gain_soul_carver)&variable.frailty_ready=1&(debuff.fiery_brand_dot.remains>3|cooldown.fiery_brand.remains>15)
