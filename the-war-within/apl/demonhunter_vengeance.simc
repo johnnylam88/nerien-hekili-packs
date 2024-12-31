@@ -143,7 +143,7 @@ actions+=/variable,name=fiery_demise_sync,value=1,op=setif,condition=cooldown.si
 actions+=/variable,name=frailty_sync,value=1,op=setif,condition=(talent.the_hunt&cooldown.the_hunt.remains<=(execute_time+gcd.remains))|(talent.sigil_of_spite&cooldown.sigil_of_spite.remains<=(execute_time+gcd.remains))|(talent.soul_carver&cooldown.soul_carver.remains<=(execute_time+gcd.remains)),value_else=0
 
 # frailty_ready is 1 if there are sufficient Frailty stacks on the target(s).
-actions+=/variable,name=frailty_ready,value=1,op=setif,condition=!talent.vulnerability|(variable.aoe=1&(talent.soulcrush&debuff.frailty.stack>=3)&active_dot.frailty>=variable.num_targets),value_else=0
+actions+=/variable,name=frailty_ready,value=1,op=setif,condition=!talent.vulnerability|(active_dot.frailty>=variable.num_targets&(!talent.soulcrush|(variable.aoe=1&debuff.frailty.stack>=3)|debuff.frailty.stack>=6)),value_else=0
 
 # fel_devastation_ready is 1 if Fury is greater than the pool amount and there are sufficient Frailty stacks.
 actions+=/variable,name=fel_devastation_ready,value=1,op=setif,condition=fury>variable.fel_devastation_pool_amount&variable.frailty_ready>0,value_else=0
