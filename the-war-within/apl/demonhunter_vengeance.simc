@@ -199,12 +199,12 @@ actions.standard+=/infernal_strike,use_off_gcd=1,if=full_recharge_time<gcd
 actions.standard+=/soul_cleave,if=buff.glaive_flurry.up&((variable.aoe=0&buff.rending_strike.down)|(variable.aoe>0&buff.rending_strike.up))
 actions.standard+=/fracture,if=buff.rending_strike.up
 actions.standard+=/shear,if=buff.rending_strike.up
-actions.standard+=/fel_desolation,if=!talent.fiery_demise&variable.fel_devastation_ready>0&variable.demonsurge_empowered>0&!prev_gcd.fel_devastation
+actions.standard+=/fel_desolation,if=!talent.fiery_demise&variable.fel_devastation_ready>0&buff.demonsurge_fel_desolation.up&!prev_gcd.fel_devastation
 actions.standard+=/fel_devastation,if=!talent.fiery_demise&variable.fel_devastation_ready>0&variable.demonsurge_empowered=0
 actions.standard+=/fiery_brand,if=(!talent.fiery_demise|(fury>=variable.fiery_demise_pool_amount&variable.fiery_demise_sync>0))&active_dot.fiery_brand_dot=0
 actions.standard+=/sigil_of_doom,if=variable.sigil_of_doom_placed=0&buff.demonsurge_sigil_of_doom.up
 actions.standard+=/sigil_of_flame,if=!talent.illuminated_sigils|(variable.sigil_of_flame_placed=0&active_dot.sigil_of_flame=0&variable.demon_form_ready=0)
-actions.standard+=/fel_desolation,if=talent.fiery_demise&variable.fel_devastation_ready>0&variable.demonsurge_empowered>0&!prev_gcd.fel_devastation
+actions.standard+=/fel_desolation,if=talent.fiery_demise&variable.fel_devastation_ready>0&buff.demonsurge_fel_desolation.up&!prev_gcd.fel_devastation
 actions.standard+=/fel_devastation,if=talent.fiery_demise&variable.fel_devastation_ready>0&variable.demonsurge_empowered=0
 actions.standard+=/the_hunt,if=!talent.art_of_the_glaive&variable.the_hunt_ready>0
 actions.standard+=/sigil_of_spite,if=variable.sigil_of_spite_placed=0&variable.sigil_of_spite_ready>0
