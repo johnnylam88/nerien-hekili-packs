@@ -8,12 +8,12 @@
 # - Reserve Fiery Brand Charges: 1
 # - Require Frailty Stacks: **unused**
 
-actions.precombat+=/sigil_of_doom,if=variable.sigil_of_doom=0
-actions.precombat+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0
+actions.precombat+=/sigil_of_doom
+actions.precombat+=/sigil_of_flame
 actions.precombat+=/metamorphosis,if=buff.metamorphosis.down
 actions.precombat+=/demon_spikes,use_off_gcd=1,if=buff.demon_spikes.down&buff.metamorphosis.down
 actions.precombat+=/infernal_strike,use_off_gcd=1
-actions.precombat+=/fiery_brand,if=active_dot.fiery_brand_dot=0
+actions.precombat+=/fiery_brand
 actions.precombat+=/the_hunt
 
 ### Tunables ###
