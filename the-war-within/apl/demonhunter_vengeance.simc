@@ -58,7 +58,7 @@ actions+=/variable,name=immolation_aura_crit,value=stat.crit+0.06,op=setif,condi
 # fury_per_second is the expected amount of Fury gained per second hitting abilities on cooldown.
 actions+=/variable,name=fury_per_second_felblade,value=variable.fury_gain_felblade%variable.cooldown_felblade_duration,op=setif,condition=talent.felblade,value_else=0
 actions+=/variable,name=fury_per_second_fracture,value=variable.fury_gain_fracture%variable.cooldown_fracture_duration,op=setif,condition=talent.fracture,value_else=0
-actions+=/variable,name=fury_per_second_volatile_flameblood,value=7.5*variable.immolation_aura_crit,op=setif,condition=talent.volatile_flamebood,value_else=0
+actions+=/variable,name=fury_per_second_volatile_flameblood,value=7.5*variable.immolation_aura_crit,op=setif,condition=talent.volatile_flameblood,value_else=0
 actions+=/variable,name=fury_per_second_immolation_aura,value=variable.fury_gain_immolation_aura%variable.cooldown_immolation_aura_duration+variable.fury_per_second_volatile_flameblood
 actions+=/variable,name=fury_per_second_shear,value=variable.fury_gain_shear%gcd.max,op=setif,condition=!talent.fracture,value_else=0
 actions+=/variable,name=fury_per_second_sigil_of_flame,value=variable.fury_gain_sigil_of_flame%variable.cooldown_sigil_of_flame_duration,value_else=0
