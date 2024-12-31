@@ -71,8 +71,8 @@ actions+=/variable,name=fury_per_second,value=variable.fury_per_second_felblade+
 actions+=/variable,name=fury_at_next_fel_devastation,value=fury+cooldown.fel_devastation.remains*variable.fury_per_second,op=setif,condition=!talent.demonic_intensity|buff.metamorphosis.down,value_else=fury+cooldown.fel_desolation.remains*variable.fury_per_second
 # fury_at_next_fiery_brand is the expected Fury when Fiery Brand is ready.
 actions+=/variable,name=fury_at_next_fiery_brand,value=fury+cooldown.fiery_brand.remains*variable.fury_per_second
-# should_pool_fury is 1 if we should pool Fury for Fel Devastation and Fiery Demise windows.
-actions+=/variable,name=should_pool_fury,value=0,op=setif,condition=(variable.fury_at_next_fel_devastation>=variable.fel_devastation_pool_amount)&(!talent.fiery_demise|variable.fury_at_next_fiery_brand>=variable.fiery_demise_pool_amount),value_else=1
+# should_spend_fury is 1 if the expected Fury by the next Fel Devastation and Fiery Demise exceed the pool values.
+actions+=/variable,name=should_spend_fury,value=1,op=setif,condition=(variable.fury_at_next_fel_devastation>=variable.fel_devastation_pool_amount)&(!talent.fiery_demise|variable.fury_at_next_fiery_brand>=variable.fiery_demise_pool_amount),value_else=0
 
 actions+=/variable,name=fury_check,value=1,op=setif,condition=fury+variable.fury_per_second*gcd>fury.max,value_else=0
 actions+=/variable,name=fury_check_felblade,value=1,op=setif,condition=talent.felblade&cooldown.felblade.remains<gcd&fury+variable.fury_gain_felblade>fury.max,value_else=0
@@ -95,6 +95,9 @@ actions+=/variable,name=soul_fragments_gain_fracture,value=3,op=setif,condition=
 actions+=/variable,name=soul_fragments_gain_immolation_aura,value=0.7*spell_targets.immolation_aura,op=setif,condition=talent.fallout,value_else=0
 actions+=/variable,name=soul_fragments_gain_shear,value=2,op=setif,condition=buff.metamorphosis.up,value_else=1
 actions+=/variable,name=soul_fragments_gain_soul_carver,value=3
+
+# Only use Spirit Bomb at "good" soul counts, meaning 5 in ST, 4 in AOE, and 3 in AOE with Metamorphosis.
+actions+=/variable,name=can_spirit_bomb,value=1,op=setif,condition=(variable.soul_fragments_deficit<1)|(variable.aoe>0&(variable.soul_fragments_deficit<2|(buff.metamorphosis.up&variable.soul_fragments_deficit<3))),value_else=0
 
 # Calculate amount of healing done through Shattered Souls.
 actions+=/variable,name=shattered_souls_heal_amount_base,value=(0.06*incoming_damage_5s)<?(0.01*health.max)
@@ -142,6 +145,11 @@ actions.racials+=/ancestral_call
 #actions.racials+=/fireblood
 actions.racials+=/bag_of_tricks
 
+actions.spend_fury+=/spirit_burst,if=variable.can_spirit_bomb>0&(variable.aoe=1|(variable.should_dump_fury>0&(!talent.demonsurge|dot.fiery_brand_dot.ticking|buff.demonsurge_spirit_burst.up)))
+actions.spend_fury+=/spirit_bomb,if=variable.can_spirit_bomb>0&(variable.aoe=1|(variable.should_dump_fury>0&(!talent.demonsurge|dot.fiery_brand_dot.ticking|buff.demonsurge_spirit_burst.up)))
+actions.spend_fury+=/soul_sunder,if=(variable.aoe=1&!talent.spirit_bomb)|variable.should_dump_fury>0
+actions.spend_fury+=/soul_cleave,if=(variable.aoe=1&!talent.spirit_bomb)|variable.should_dump_fury>0
+
 actions.standard+=/metamorphosis,if=buff.metamorphosis.remains<4.5&(!talent.violent_transformation|(!cooldown.sigil_of_flame.ready&!cooldown.fel_devastation.ready))
 actions.standard+=/the_hunt,if=talent.art_of_the_glaive
 actions.standard+=/reavers_glaive
@@ -160,10 +168,7 @@ actions.standard+=/fel_devastation,if=talent.fiery_demise&fury>variable.fel_deva
 actions.standard+=/the_hunt,if=!talent.art_of_the_glaive&variable.frailty_ready>0
 actions.standard+=/sigil_of_spite,if=variable.sigil_of_spite_placed=0&variable.frailty_ready>0
 actions.standard+=/soul_carver,if=(variable.soul_fragments_deficit>=variable.soul_fragments_gain_soul_carver)&variable.frailty_ready=1&(debuff.fiery_brand_dot.remains>3|cooldown.fiery_brand.remains>15)
-actions.standard+=/spirit_burst,if=(variable.aoe=0&talent.fiery_demise&active_dot.fiery_brand_dot>0&variable.soul_fragments_deficit<1)|(variable.aoe>0&(variable.soul_fragments_deficit<2|(buff.metamorphosis.up&variable.soul_fragments_deficit<3)))
-actions.standard+=/spirit_bomb,if=(variable.aoe=0&talent.fiery_demise&active_dot.fiery_brand_dot>0&variable.soul_fragments_deficit<1)|(variable.aoe>0&(variable.soul_fragments_deficit<2|(buff.metamorphosis.up&variable.soul_fragments_deficit<3)))
-actions.standard+=/soul_sunder,if=variable.should_pool_fury=0&(variable.aoe=0|!talent.spirit_bomb|(variable.aoe>0&variable.should_dump_fury>0))
-actions.standard+=/soul_cleave,if=variable.should_pool_fury=0&(variable.aoe=0|!talent.spirit_bomb|(variable.aoe>0&variable.should_dump_fury>0))
+actions.standard+=/call_action_list,name=spend_fury,if=variable.should_spend_fury>0
 actions.standard+=/consuming_fire
 actions.standard+=/immolation_aura
 actions.standard+=/felblade,if=fury.deficit>variable.fury_gain_felblade
