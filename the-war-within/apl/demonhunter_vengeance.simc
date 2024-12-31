@@ -176,6 +176,9 @@ actions.mitigation+=/soul_barrier,if=variable.soul_fragments_deficit<2&variable.
 
 #actions.racials+=/arcane_torrent
 
+actions.dump_soul_fragments+=/spirit_burst,if=variable.can_spirit_bomb>0&(variable.aoe=1|buff.demonsurge_spirit_burst.up)
+actions.dump_soul_fragments+=/spirit_bomb,if=variable.can_spirit_bomb>0&(variable.aoe=1|!talent.demonsurge|(talent.fiery_demise&dot.fiery_brand_dot.ticking))&variable.demonsurge_empowered=0
+
 actions.dump_fury+=/spirit_burst,if=variable.can_spirit_bomb>0&(variable.aoe=1|buff.demonsurge_spirit_burst.up)
 actions.dump_fury+=/spirit_bomb,if=variable.can_spirit_bomb>0&(variable.aoe=1|!talent.demonsurge|(talent.fiery_demise&dot.fiery_brand_dot.ticking))&variable.demonsurge_empowered=0
 actions.dump_fury+=/soul_sunder,if=variable.demonsurge_empowered>0
@@ -203,6 +206,7 @@ actions.standard+=/fel_devastation,if=talent.fiery_demise&variable.fel_devastati
 actions.standard+=/the_hunt,if=!talent.art_of_the_glaive&variable.the_hunt_ready>0
 actions.standard+=/sigil_of_spite,if=variable.sigil_of_spite_placed=0&variable.sigil_of_spite_ready>0
 actions.standard+=/soul_carver,if=(variable.soul_fragments_deficit>=variable.soul_fragments_gain_soul_carver)&variable.soul_carver_ready>0&(debuff.fiery_brand_dot.remains>3|cooldown.fiery_brand.remains>15)
+actions.standard+=/call_action_list,name=dump_soul_fragments,if=variable.should_dump_soul_fragments>0
 actions.standard+=/call_action_list,name=dump_fury,if=variable.should_dump_fury>0
 actions.standard+=/call_action_list,name=spend_fury,if=variable.should_spend_fury>0
 actions.standard+=/consuming_fire,if=variable.demonsurge_empowered>0
