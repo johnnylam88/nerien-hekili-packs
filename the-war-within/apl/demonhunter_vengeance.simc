@@ -137,7 +137,7 @@ actions+=/variable,name=soul_sunder_heal_amount,value=variable.soul_sunder_heal_
 
 # Try to synchronize Fiery Brand with major fire spells if Fiery Demise is talented.
 # fiery_demise_sync is 1 if Sigil of Flame, Soul Carver, or Fel Devastation is almost ready.
-actions+=/variable,name=fiery_demise_sync,value=1,op=setif,condition=cooldown.sigil_of_flame.remains<=(execute_time+gcd.remains)|(talent.soul_carver&cooldown.soul_carver.remains<=(execute_time+gcd.remains))|cooldown.fel_devastation.remains<=(execute_time+gcd.remains),value_else=0
+actions+=/variable,name=fiery_demise_sync,value=1,op=setif,condition=(!talent.illuminated_sigils&cooldown.sigil_of_flame.remains<=(execute_time+gcd.remains))|(talent.illuminated_sigils&cooldown.sigil_of_flame.charges_fractional>=0.95)|(talent.soul_carver&cooldown.soul_carver.remains<=(execute_time+gcd.remains))|cooldown.fel_devastation.remains<=(execute_time+gcd.remains),value_else=0
 
 ### Frailty ####
 
