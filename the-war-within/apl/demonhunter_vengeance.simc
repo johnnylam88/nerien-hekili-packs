@@ -11,7 +11,7 @@
 actions.precombat+=/sigil_of_doom
 actions.precombat+=/sigil_of_flame
 actions.precombat+=/metamorphosis,if=buff.metamorphosis.down
-actions.precombat+=/demon_spikes,use_off_gcd=1,if=variable.should_demon_spikes>0
+actions.precombat+=/demon_spikes,use_off_gcd=1,if=buff.demon_spikes.down
 actions.precombat+=/infernal_strike,use_off_gcd=1
 actions.precombat+=/fiery_brand
 actions.precombat+=/the_hunt
@@ -158,8 +158,11 @@ actions+=/variable,name=sigil_of_spite_ready,value=1,op=setif,condition=!talent.
 # soul_carver_ready is 1 if there are at least 5 Frailty stacks on the target.
 actions+=/variable,name=soul_carver_ready,value=1,op=setif,condition=!talent.vulnerability|!talent.soulcrush|debuff.frailty.stack>=5,value_else=0
 
-# should_demon_spikes is 1 if Demon Spikes is down and no demon form is present or imminent.
-actions+=/variable,name=should_demon_spikes,value=1,op=setif,condition=buff.demon_spikes.down&buff.metamorphosis.down&(!talent.demonic|cooldown.fel_devastation.remains>gcd.remains|variable.fel_devastation_ready=0)
+# demon_form_ready is 1 if demon form from Metamorphosis or Fel Devastation (from Demonic) is present or imminent.
+actions+=/variable,name=demon_form_ready,value=1,op=setif,condition=buff.metamorphosis.up|(talent.demonic&cooldown.fel_devastation.remains<gcd.remains&variable.fel_devastation_ready>0),value_else=0
+
+# should_demon_spikes is 1 if Demon Spikes is down and demon form is not ready.
+actions+=/variable,name=should_demon_spikes,value=1,op=setif,condition=buff.demon_spikes.down&variable.demon_form_ready=0,value_else=0
 
 ################
 
@@ -200,7 +203,7 @@ actions.standard+=/fel_desolation,if=!talent.fiery_demise&variable.fel_devastati
 actions.standard+=/fel_devastation,if=!talent.fiery_demise&variable.fel_devastation_ready>0&variable.demonsurge_empowered=0
 actions.standard+=/fiery_brand,if=(!talent.fiery_demise|(fury>=variable.fiery_demise_pool_amount&variable.fiery_demise_sync>0))&active_dot.fiery_brand_dot=0
 actions.standard+=/sigil_of_doom,if=variable.sigil_of_doom_placed=0&buff.demonsurge_sigil_of_doom.up
-actions.standard+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0&(!talent.illuminated_sigils|active_dot.sigil_of_flame=0)
+actions.standard+=/sigil_of_flame,if=!talent.illuminated_sigils|(variable.sigil_of_flame_placed=0&active_dot.sigil_of_flame=0&variable.demon_form_ready=0)
 actions.standard+=/fel_desolation,if=talent.fiery_demise&variable.fel_devastation_ready>0&variable.demonsurge_empowered>0&!prev_gcd.fel_devastation
 actions.standard+=/fel_devastation,if=talent.fiery_demise&variable.fel_devastation_ready>0&variable.demonsurge_empowered=0
 actions.standard+=/the_hunt,if=!talent.art_of_the_glaive&variable.the_hunt_ready>0
