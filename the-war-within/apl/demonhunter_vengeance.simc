@@ -87,7 +87,7 @@ actions+=/variable,name=fury_check_consuming_fire,value=1,op=setif,condition=(ta
 actions+=/variable,name=fury_check_shear,value=1,op=setif,condition=!talent.fracture&fury+variable.fury_gain_shear>fury.max,value_else=0
 # Sigil of Flame (and Sigil of Doom) is only cast if it's ready and there's no active DoT.
 actions+=/variable,name=fury_check_sigil_of_flame,value=1,op=setif,condition=(!talent.demonic_intensity|buff.metamorphosis.down)&active_dot.sigil_of_flame=0&cooldown.sigil_of_flame.charges>0&fury+variable.fury_gain_sigil_of_flame>fury.max,value_else=0
-actions+=/variable,name=fury_check_sigil_of_flame,value=1,op=setif,condition=(talent.demonic_intensity&buff.metamorphosis.up)&active_dot.sigil_of_doom=0&cooldown.sigil_of_doom.charges>0&fury+variable.fury_gain_sigil_of_flame>fury.max,value_else=0
+actions+=/variable,name=fury_check_sigil_of_doom,value=1,op=setif,condition=(talent.demonic_intensity&buff.metamorphosis.up)&active_dot.sigil_of_doom=0&cooldown.sigil_of_doom.charges>0&fury+variable.fury_gain_sigil_of_flame>fury.max,value_else=0
 # should_dump_fury is 1 if Fury will cap with the next ability.
 actions+=/variable,name=should_dump_fury,value=1,op=setif,condition=variable.fury_check>0|variable.fury_check_felblade>0|variable.fury_check_fracture>0|variable.fury_check_immolation_aura>0|variable.fury_check_consuming_fire>0|variable.fury_check_shear>0|variable.fury_check_sigil_of_flame>0|variable.fury_check_sigil_of_doom>0
 
