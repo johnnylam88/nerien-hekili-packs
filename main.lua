@@ -2,7 +2,7 @@ local ADDON_NAME, Private = ...
 
 Private.name = "Nerien's Hekili Packs"
 Private.shortName = "nerien"
-Private.class = UnitClassBase("player")
+Private.class = UnitClassBase( "player" )
 Private.lowerClass = string.lower( Private.class )
 
 Private.hekili = _G.Hekili
@@ -14,9 +14,9 @@ if Private.hekili then
 	local hookedFunc = Hekili.RunOneTimeFixes
 	if hookedFunc then
 		local oneTimeFixes = {
-			nerienCanonicalizePackNames_20240117 = function(p)
+			nerienCanonicalizePackNames_20240117 = function( p )
 				-- Canonicalize package names to "nerien_<class>_<spec>_<keyword(s)>".
-				for id, spec in pairs(p.specs) do
+				for id, spec in pairs( p.specs ) do
 					if id == 250 and spec.package == "Blood nerien,kyrasis" then
 						spec.package = "nerien_deathknight_blood_kyrasis"
 					elseif id == 250 and spec.package == "Blood nerien_kyrasis" then
@@ -28,44 +28,44 @@ if Private.hekili then
 					end
 				end
 				local newPacks = {}
-				for name, pack in pairs(p.packs) do
+				for name, pack in pairs( p.packs ) do
 					if name == "Blood nerien,kyrasis" or name == "Blood nerien_kyrasis" then
-						if not newPacks["nerien_deathknight_blood_kyrasis"] then
-							newPacks["nerien_deathknight_blood_kyrasis"] = pack
+						if not newPacks[ "nerien_deathknight_blood_kyrasis" ] then
+							newPacks[ "nerien_deathknight_blood_kyrasis" ] = pack
 						end
 					elseif name == "Blood nerien" then
-						if not newPacks["nerien_deathknight_blood"] then
-							newPacks["nerien_deathknight_blood"] = pack
+						if not newPacks[ "nerien_deathknight_blood" ] then
+							newPacks[ "nerien_deathknight_blood" ] = pack
 						end
 					elseif name == "Brewmaster nerien" then
-						if not newPacks["nerien_monk_brewmaster"] then
-							newPacks["nerien_monk_brewmaster"] = pack
+						if not newPacks[ "nerien_monk_brewmaster" ] then
+							newPacks[ "nerien_monk_brewmaster" ] = pack
 						end
 					else
-						newPacks[name] = pack
+						newPacks[ name ] = pack
 					end
 				end
 				p.packs = newPacks
 			end,
 		}
 
-		Hekili.RunOneTimeFixes = function(self)
+		Hekili.RunOneTimeFixes = function( self )
 			local profile = Hekili.DB.profile
 			if profile then
 				profile.runOnce = profile.runOnce or {}
 
-				for k, v in pairs(oneTimeFixes) do
-					if not profile.runOnce[k] then
-						profile.runOnce[k] = true
-						local ok, err = pcall(v, profile)
+				for k, v in pairs( oneTimeFixes ) do
+					if not profile.runOnce[ k ] then
+						profile.runOnce[ k ] = true
+						local ok, err = pcall( v, profile )
 						if err then
-							Hekili:Error("One-time update failed: " .. k .. ": " .. err)
-							profile.runOnce[k] = nil
+							Hekili:Error( "One-time update failed: " .. k .. ": " .. err )
+							profile.runOnce[ k ] = nil
 						end
 					end
 				end
 
-				hookedFunc(self)
+				hookedFunc( self )
 			end
 		end
 	end
