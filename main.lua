@@ -3,6 +3,7 @@ local ADDON_NAME, Private = ...
 Private.name = "Nerien's Hekili Packs"
 Private.shortName = "nerien"
 Private.class = UnitClassBase("player")
+Private.lowerClass = string.lower( Private.class )
 
 Private.hekili = _G.Hekili
 
