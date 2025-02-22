@@ -77,12 +77,12 @@ actions+=/variable,name=souls_gain_soul_carver,value=3
 actions+=/variable,name=should_dump_souls,value=1,value_else=0,op=setif,condition=(variable.aoe>0&variable.souls_deficit<=1)|variable.souls_deficit=0
 
 # demonsurge_remaining is the number of abilities remaining that can trigger Demonsurge.
-actions.fs+=/variable,name=demonsurge_remaining,op=reset,default=0
-actions.fs+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonsurge&buff.metamorphosis.up&buff.demonsurge_soul_sunder.up
-actions.fs+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonsurge&buff.metamorphosis.up&buff.demonsurge_spirit_burst.up
-actions.fs+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonic_intensity&buff.demonsurge_hardcast.up&buff.demonsurge_fel_desolation.up
-actions.fs+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonic_intensity&buff.demonsurge_hardcast.up&buff.demonsurge_consuming_fire.up
-actions.fs+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonic_intensity&buff.demonsurge_hardcast.up&buff.demonsurge_sigil_of_doom.up
+actions+=/variable,name=demonsurge_remaining,op=reset,default=0
+actions+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonsurge&buff.demonsurge_soul_sunder.up
+actions+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonsurge&buff.demonsurge_spirit_burst.up
+actions+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonic_intensity&buff.demonsurge_fel_desolation.up
+actions+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonic_intensity&buff.demonsurge_consuming_fire.up
+actions+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonic_intensity&buff.demonsurge_sigil_of_doom.up
 
 actions+=/variable,name=ar_fel_devastation_ready,value=1,value_else=0,op=setif,condition=!talent.demonsurge&(variable.aoe>0|(talent.thrill_of_the_fight&buff.thrill_of_the_fight_damage.up&(!talent.fiery_demise|debuff.fiery_brand_dot.remains>2))|(talent.demonic&buff.demon_spikes.remains<gcd&cooldown.demon_spikes.charges_fractional<1&debuff.fiery_brand_dot.down)|(!talent.thrill_of_the_fight&!talent.demonic))
 
@@ -161,7 +161,7 @@ actions.ar_aoe+=/spirit_bomb,if=variable.should_dump_souls>0
 actions.ar_aoe+=/fracture,if=variable.souls_deficit+variable.souls_gain_fracture<=1
 # [1097742] :: Dump Fury with Soul Cleave if it won't delay Spirit Bomb.
 actions.ar_aoe+=/soul_cleave,if=soul_fragments=0&variable.should_dump_fury>0
-actions.ar_aoe+=/fracture,if=!prev_gcd.fracture
+actions.ar_aoe+=/fracture
 actions.ar_aoe+=/felblade
 actions.ar_aoe+=/shear,if=variable.souls_deficit>0
 actions.ar_aoe+=/throw_glaive
@@ -179,7 +179,7 @@ actions.ar_st+=/fracture,if=variable.souls_deficit=variable.souls_gain_fracture
 # fury :: Dump Fury with Soul Cleave.
 actions.ar_st+=/soul_cleave,if=variable.should_dump_fury>0
 actions.ar_st+=/felblade
-actions.ar_st+=/fracture,if=!prev_gcd.fracture
+actions.ar_st+=/fracture
 actions.ar_st+=/shear,if=variable.souls_deficit>0
 actions.ar_st+=/throw_glaive
 
@@ -201,24 +201,25 @@ actions.fs+=/call_action_list,name=demonsurge,if=buff.metamorphosis.up&buff.meta
 actions.fs+=/run_action_list,name=metamorphosis,if=(cooldown.metamorphosis.remains<=variable.prep_time_metamorphosis)&(!cooldown.fel_devastation.ready&cooldown.fel_devastation.remains>10)&variable.demonsurge_remaining=0
 # [1450143] :: Felblade to generate Fury for Fel Devastation.
 actions.fs+=/felblade,if=cooldown.fel_devastation.ready&fury<variable.fury_cost_fel_devastation
-actions.fs+=/call_action_list,name=fel_devastation,if=(cooldown.fel_devastation.remains<=variable.prep_time_fel_devastation)&(!talent.demonic|buff.metamorphosis.down)&variable.demonsurge_remaining=0
+actions.fs+=/call_action_list,name=fel_devastation,if=!talent.demonic|(buff.metamorphosis.down&(cooldown.fel_devastation.remains<=variable.prep_time_fel_devastation)&variable.demonsurge_remaining=0)
 actions.fs+=/the_hunt
 actions.fs+=/infernal_strike,use_off_gcd=1
 actions.fs+=/fiery_brand,if=!talent.fiery_demise&active_dot.fiery_brand_dot=0
 actions.fs+=/sigil_of_spite
 actions.fs+=/soul_carver
 # [5927628] :: Activate Demonsurge with Fel Desolation.
-actions.fs+=/fel_desolation,if=buff.demonsurge_hardcast.up&buff.demonsurge_fel_desolation.up
+actions.fs+=/fel_desolation,if=buff.demonsurge_fel_desolation.up
 actions.fs+=/sigil_of_flame,if=(variable.fury_gain_sigil_of_flame<=fury.deficit&(!talent.illuminated_sigils|full_recharge_time<gcd))|(variable.sigil_of_flame_placed=0&variable.has_illuminated_sigils_safety=0)
 actions.fs+=/run_action_list,name=fs_aoe,if=variable.aoe>0
 actions.fs+=/run_action_list,name=fs_st
 
+actions.demonsurge+=/spirit_burst,if=variable.should_dump_souls>0
 # [5927628] :: Activate Demonsurge with Sigil of Doom.
-actions.demonsurge+=/sigil_of_doom,if=buff.demonsurge_hardcast.up&buff.demonsurge_sigil_of_doom.up
+actions.demonsurge+=/sigil_of_doom,if=buff.demonsurge_sigil_of_doom.up
 # [5927628] :: Activate Demonsurge with Spirit Burst.
 actions.demonsurge+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&variable.should_dump_souls>0
 # [5927628] :: Activate Demonsurge with Consuming Fire.
-actions.demonsurge+=/consuming_fire,if=buff.demonsurge_hardcast.up&buff.demonsurge_consuming_fire.up
+actions.demonsurge+=/consuming_fire,if=buff.demonsurge_consuming_fire.up
 # [5927628] :: Activate Demonsurge with Spirit Burst.
 actions.demonsurge+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&soul_fragments>0
 # [5927628] :: Activate Demonsurge with Soul Sunder.
@@ -237,33 +238,43 @@ actions.metamorphosis+=/metamorphosis,if=cooldown.sigil_of_flame.charges<1
 actions.fs_opener+=/infernal_strike
 actions.fs_opener+=/fiery_brand,if=talent.fiery_demise
 actions.fs_opener+=/demon_spikes,use_off_gcd=1,if=variable.has_defensive_buff=0
+actions.fs_opener+=/consuming_fire
 actions.fs_opener+=/immolation_aura
 actions.fs_opener+=/felblade
 actions.fs_opener+=/fracture,if=!prev_gcd.fracture
 actions.fs_opener+=/shear,if=!prev_gcd.shear
 
-actions.fs_aoe+=/immolation_aura
-# [5927628] :: Activate Demonsurge with Spirit Burst.
-actions.fs_aoe+=/spirit_burst,if=buff.metamorphosis.up&(buff.demonsurge_spirit_burst.up|variable.should_dump_souls>0)
+actions.fs_aoe+=/spirit_burst,if=variable.should_dump_souls>0
 actions.fs_aoe+=/spirit_bomb,if=variable.should_dump_souls>0
+actions.fs_aoe+=/consuming_fire
+actions.fs_aoe+=/immolation_aura
 actions.fs_aoe+=/fracture,if=variable.souls_deficit+variable.souls_gain_fracture<=1&active_dot.fiery_brand_dot>0
+# [1097742] :: Dump Fury with Soul Sunder if it won't delay Spirit Burst.
+actions.fs_aoe+=/soul_sunder,if=soul_fragments=0&variable.should_dump_fury>0
 # [1097742] :: Dump Fury with Soul Cleave if it won't delay Spirit Bomb.
 actions.fs_aoe+=/soul_cleave,if=soul_fragments=0&variable.should_dump_fury>0
 actions.fs_aoe+=/felblade,if=variable.fury_gain_felblade<=fury.deficit
 actions.fs_aoe+=/fracture,if=variable.fury_gain_fracture<=fury.deficit|!prev_gcd.fracture
 actions.fs_aoe+=/shear,if=variable.souls_deficit>0&variable.fury_gain_shear<=fury.deficit
+# fury :: Dump Fury with Soul Sunder.
+actions.fs_aoe+=/soul_sunder,if=variable.should_dump_fury>0
 # fury :: Dump Fury with Soul Cleave.
 actions.fs_aoe+=/soul_cleave,if=variable.should_dump_fury>0
 actions.fs_aoe+=/throw_glaive
 
+actions.fs_st+=/spirit_burst,if=talent.fiery_demise&debuff.fiery_brand_dot.up&variable.should_dump_souls>0
+actions.fs_st+=/spirit_bomb,if=talent.fiery_demise&debuff.fiery_brand_dot.up&variable.should_dump_souls>0
+actions.fs_st+=/consuming_fire
 actions.fs_st+=/immolation_aura
-# [5927628] :: Activate Demonsurge with Spirit Burst.
-actions.fs_st+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&variable.should_dump_souls>0
+# fury :: Dump Fury with Soul Sunder
+actions.fs_st+=/soul_sunder,if=variable.should_dump_fury>0
 # fury :: Dump Fury with Soul Cleave.
 actions.fs_st+=/soul_cleave,if=variable.should_dump_fury>0
 actions.fs_st+=/felblade
+# souls :: Dump Souls with Soul Sunder.
+actions.fs_st+=/soul_sunder,if=variable.should_dump_souls>0
 # souls :: Dump Souls with Soul Cleave.
 actions.fs_st+=/soul_cleave,if=variable.should_dump_souls>0
-actions.fs_st+=/fracture,if=!prev_gcd.fracture
+actions.fs_st+=/fracture
 actions.fs_st+=/shear,if=variable.souls_deficit>0
 actions.fs_st+=/throw_glaive
