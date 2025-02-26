@@ -5,8 +5,7 @@
 # Recommended Settings for `/hekili` > *Vengeance*:
 #
 # - Reserve Infernal Strike Charges: 0.8
-# - Reserve Fiery Brand Charges: 1
-# - Require Frailty Stacks: **unused**
+# - Reserve Fiery Brand Charges: 0
 
 actions.precombat+=/sigil_of_flame
 
@@ -23,7 +22,6 @@ actions+=/variable,name=illuminated_sigils_pct_threshold,value=75
 
 # Check whether you are in a multi-target situation.
 actions+=/variable,name=num_targets,value=active_enemies,value_else=spell_targets.spirit_bomb,op=setif,condition=!talent.spirit_bomb
-actions+=/variable,name=aoe,value=1,value_else=0,op=setif,condition=variable.num_targets>1
 
 actions+=/variable,name=fury_cost_fel_devastation,value=50
 actions+=/variable,name=fury_cost_soul_cleave,value=30
@@ -37,20 +35,8 @@ actions+=/variable,name=fury_gain_shear,value=variable.fury_gain_shear_base+20,v
 # Flames of Fury causes Sigil of Flame to generate 2 additional Fury per target hit.
 actions+=/variable,name=fury_gain_sigil_of_flame,value=30+2*variable.num_targets*talent.flames_of_fury
 
-actions+=/variable,name=cooldown_felblade_duration,value=15*spell_haste
-actions+=/variable,name=cooldown_fracture_duration,value=4.5*spell_haste
-actions+=/variable,name=cooldown_immolation_aura_duration,value=15*spell_haste
-actions+=/variable,name=cooldown_sigil_of_flame_duration,value=30-5*talent.illuminated_sigils
-
 # immolation_aura_crit is the critical strike percentage for Immolation Aura.
 actions+=/variable,name=immolation_aura_crit,value=stat.crit+0.06,value_else=stat.crit,op=setif,condition=talent.aura_of_pain
-
-# Check if a sigil has already been placed and waiting for activation.
-actions+=/variable,name=sigil_of_flame_placed,value=1,value_else=0,op=setif,condition=prev_gcd.sigil_of_flame|(!talent.quickened_sigils&prev_gcd.2.sigil_of_flame)
-actions+=/variable,name=sigil_of_spite_placed,value=1,value_else=0,op=setif,condition=prev_gcd.sigil_of_spite|(!talent.quickened_sigils&prev_gcd.2.sigil_of_spite)
-
-# sigil_activation_duration is the number of seconds before a placed sigil becomes active
-#actions+=/variable,name=sigil_activation_duration,value=1+talent.quickened_sigil
 
 actions+=/variable,name=fury_check_felblade,value=1,value_else=0,op=setif,condition=talent.felblade&cooldown.felblade.remains<gcd&fury+variable.fury_gain_felblade>fury.max
 actions+=/variable,name=fury_check_fracture,value=1,value_else=0,op=setif,condition=talent.fracture&cooldown.fracture.remains<gcd&fury+variable.fury_gain_fracture>fury.max
@@ -74,7 +60,7 @@ actions+=/variable,name=souls_gain_sigil_of_flame,value=1*talent.soul_sigils
 actions+=/variable,name=souls_gain_sigil_of_spite,value=3+1*talent.soul_sigils
 actions+=/variable,name=souls_gain_soul_carver,value=3
 # should_dump_souls is 1 if Soul Fragments are capped.
-actions+=/variable,name=should_dump_souls,value=1,value_else=0,op=setif,condition=(variable.aoe>0&variable.souls_deficit<=1)|variable.souls_deficit=0
+actions+=/variable,name=should_dump_souls,value=1,value_else=0,op=setif,condition=(variable.num_targets>1&variable.souls_deficit<=1)|variable.souls_deficit=0
 
 # demonsurge_remaining is the number of abilities remaining that can trigger Demonsurge.
 actions+=/variable,name=demonsurge_remaining,op=reset,default=0
@@ -84,21 +70,23 @@ actions+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonic_in
 actions+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonic_intensity&buff.demonsurge_consuming_fire.up
 actions+=/variable,name=demonsurge_remaining,op=add,value=1,if=talent.demonic_intensity&buff.demonsurge_sigil_of_doom.up
 
-actions+=/variable,name=ar_fel_devastation_ready,value=1,value_else=0,op=setif,condition=!talent.demonsurge&(variable.aoe>0|(talent.thrill_of_the_fight&buff.thrill_of_the_fight_damage.up&(!talent.fiery_demise|debuff.fiery_brand_dot.remains>2))|(talent.demonic&buff.demon_spikes.remains<gcd&cooldown.demon_spikes.charges_fractional<1&debuff.fiery_brand_dot.down)|(!talent.thrill_of_the_fight&!talent.demonic))
+# has_fiery_brand_safety is 1 if Fiery Brand is on the current target and a sufficient percentage of the enemies.
+actions+=/variable,name=has_fiery_brand_safety,value=1,value_else=0,op=setif,condition=debuff.fiery_brand_dot.up&(active_dot.fiery_brand_dot%variable.num_targets*100>=variable.fiery_brand_pct_threshold)
 
-actions+=/variable,name=fel_devastation_ready,value=1,value_else=0,op=setif,condition=talent.demonsurge&(!talent.demonic|variable.demonsurge_remaining=0)
+# has_illuminated_sigils_safety is 1 if Sigil of Flame is on the current target and a sufficient percentage of the enemies.
+actions+=/variable,name=has_illuminated_sigils_safety,value=1,value_else=0,op=setif,condition=talent.illuminated_sigils&(debuff.sigil_of_flame.up|debuff.casting.down)&(active_dot.sigil_of_flame%variable.num_targets*100>=variable.illuminated_sigils_pct_threshold)
+
+# ar_fel_devastation_ready is 1 if conditions for casting Fel Devastation are met for Aldrachi Reaver (or no Hero Talents).
+actions+=/variable,name=ar_fel_devastation_ready,value=1,value_else=0,op=setif,condition=!talent.demonsurge&cooldown.fel_devastation.ready&((!talent.thrill_of_the_fight&!talent.demonic)|(buff.thrill_of_the_fight_damage.up&(!talent.fiery_demise|debuff.fiery_brand_dot.remains>2))|(talent.demonic&buff.demon_spikes.remains<gcd&variable.has_fiery_brand_safety=0))
+
+# fs_fel_devastation_ready is 1 if conditions for casting Fel Devastation are met for Fel-Scarred.
+actions+=/variable,name=fs_fel_devastation_ready,value=1,value_else=0,op=setif,condition=talent.demonsurge&cooldown.fel_devastation.ready&(!talent.demonic|(variable.demonsurge_remaining=0&buff.demon_spikes.remains<gcd))
 
 # fel_devastation_ready is 1 if Fel Devastation is immiment.
-actions+=/variable,name=fel_devastation_ready,value=1,value_else=0,op=setif,condition=cooldown.fel_devastation.ready&(!talent.demonic|buff.metamorphosis.remains<gcd)&(variable.ar_fel_devastation_ready>0|variable.fel_devastation_ready>0)
+actions+=/variable,name=fel_devastation_ready,value=1,value_else=0,op=setif,condition=(!talent.demonic|buff.metamorphosis.remains<gcd)&(variable.ar_fel_devastation_ready>0|variable.fs_fel_devastation_ready>0)
 
 # demon_form_ready is 1 if demon form from Metamorphosis or Fel Devastation (from Demonic) is present or imminent.
 actions+=/variable,name=demon_form_ready,value=1,value_else=0,op=setif,condition=buff.metamorphosis.up|cooldown.metamorphosis.ready|(talent.demonic&variable.fel_devastation_ready>0)
-
-# has_fiery_brand_safety is 1 if Fiery Brand is on the current target and a sufficient percentage of the enemies.
-actions+=/variable,name=has_fiery_brand_safety,value=1,op=setif,condition=debuff.fiery_brand_dot.up&(active_dot.fiery_brand_dot%variable.num_targets*100>=variable.fiery_brand_pct_threshold)
-
-# has_illuminated_sigils_safety is 1 if Sigil of Flame is on the current target and a sufficient percentage of the enemies.
-actions+=/variable,name=has_illuminated_sigils_safety,value=1,op=setif,condition=talent.illuminated_sigils&(debuff.sigil_of_flame.up&debuff.casting.down)&(active_dot.sigil_of_flame%variable.num_targets*100>=variable.illuminated_sigils_pct_threshold)
 
 # should_demon_spikes is 1 if Demon Spikes is down and demon form is not ready and no Fiery Brand safety.
 actions+=/variable,name=should_demon_spikes,value=1,value_else=0,op=setif,condition=buff.demon_spikes.down&variable.demon_form_ready=0&variable.has_fiery_brand_safety=0
@@ -110,7 +98,7 @@ actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,conditi
 
 actions+=/disrupt
 actions+=/consume_magic
-actions+=/run_action_list,name=fs,strict=1,if=hero_tree.felscarred
+actions+=/run_action_list,name=fs,if=hero_tree.felscarred
 actions+=/run_action_list,name=ar
 
 actions.heal+=/bulk_extraction,if=talent.bulk_extraction&(health.pct<variable.bulk_extraction_health_pct_threshold)&(variable.souls_deficit<=variable.num_targets)&(soul_fragments<=2)
@@ -123,42 +111,47 @@ actions.mitigation+=/soul_barrier,if=variable.souls_deficit<2&variable.should_de
 
 ### Aldrachi Reaver ###
 
-actions.ar+=/call_action_list,name=ar_opener,if=time<3*gcd.max
-actions.ar+=/call_action_list,name=heal
-actions.ar+=/call_action_list,name=mitigation,if=tanking&variable.has_defensive_buff=0
-actions.ar+=/call_action_list,name=glaive
-actions.ar+=/the_hunt
-actions.ar+=/infernal_strike,use_off_gcd=1
-actions.ar+=/run_action_list,name=ar_aoe,if=variable.aoe>0
-actions.ar+=/run_action_list,name=ar_st
-
-actions.glaive+=/reavers_glaive,if=(buff.glaive_flurry.down&buff.rending_strike.down)&(buff.thrill_of_the_fight.down|buff.thrill_of_the_fight.remains<4)
-# [5927616] :: Empowered Soul Cleave from Art of the Glaive (single-target)
-actions.glaive+=/soul_cleave,if=buff.glaive_flurry.up&(variable.aoe=0&(debuff.reavers_mark.down|debuff.reavers_mark.stack<2|debuff.reavers_mark.remains<gcd*2))
-# [5927616] :: Empowered Fracture from Art of the Glaive
-actions.glaive+=/fracture,if=buff.rending_strike.up
-# [5927616] :: Empowered Shear from Art of the Glaive
-actions.glaive+=/shear,if=buff.rending_strike.up
-# [5927616] :: Empowered Soul Cleave from Art of the Glaive
-actions.glaive+=/soul_cleave,if=buff.glaive_flurry.up&(variable.aoe=1|(debuff.reavers_mark.up&debuff.reavers_mark.remains>8))
-
 actions.ar_opener+=/metamorphosis,if=buff.metamorphosis.down
 actions.ar_opener+=/demon_spikes,use_off_gcd=1,if=variable.has_defensive_buff=0
 actions.ar_opener+=/infernal_strike
 actions.ar_opener+=/immolation_aura
 actions.ar_opener+=/fiery_brand,if=talent.fiery_deminse
 
+# fs_opener_duration is the approximate length of the Aldrachi Reaver opener used on pull.
+actions.ar+=/variable,name=ar_opener_duration,value=3*gcd.max
+
+actions.ar+=/call_action_list,name=ar_opener,if=time<variable.ar_opener_duration
+actions.ar+=/call_action_list,name=heal
+actions.ar+=/call_action_list,name=mitigation,if=tanking&variable.has_defensive_buff=0
+actions.ar+=/call_action_list,name=glaive
+actions.ar+=/the_hunt,if=buff.reavers_glaive.down
+actions.ar+=/infernal_strike,use_off_gcd=1
+actions.ar+=/run_action_list,name=ar_aoe,if=variable.num_targets>1
+actions.ar+=/run_action_list,name=ar_st
+
+actions.glaive+=/reavers_glaive,if=(buff.glaive_flurry.down&buff.rending_strike.down)&(buff.thrill_of_the_fight.down|buff.thrill_of_the_fight.remains<4)
+# [5927616] :: Empowered Soul Cleave from Art of the Glaive (single-target)
+actions.glaive+=/soul_cleave,if=buff.glaive_flurry.up&(variable.num_targets=1&(debuff.reavers_mark.down|debuff.reavers_mark.stack<2|debuff.reavers_mark.remains<gcd*2))
+# [5927616] :: Empowered Fracture from Art of the Glaive
+actions.glaive+=/fracture,if=buff.rending_strike.up
+# [5927616] :: Empowered Shear from Art of the Glaive
+actions.glaive+=/shear,if=buff.rending_strike.up
+# [5927616] :: Empowered Soul Cleave from Art of the Glaive
+actions.glaive+=/soul_cleave,if=buff.glaive_flurry.up&(variable.num_targets>1|(debuff.reavers_mark.up&debuff.reavers_mark.remains>8))
+
 actions.ar_aoe+=/fiery_brand,if=active_dot.fiery_brand_dot=0
 actions.ar_aoe+=/soul_carver,if=active_dot.fiery_brand_dot=0
 actions.ar_aoe+=/soul_carver,cycle_targets=1,if=debuff.fiery_brand_dot.up
-actions.ar_aoe+=/sigil_of_spite,if=variable.sigil_of_spite_placed=0
-actions.ar_aoe+=/sigil_of_flame,if=(!talent.illuminated_sigils|full_recharge_time<gcd)|(variable.sigil_of_flame_placed=0&variable.has_illuminated_sigils_safety=0)
+actions.ar_aoe+=/sigil_of_spite
+actions.ar_aoe+=/sigil_of_flame,line_cd=1,if=talent.quickened_sigils&buff.metamorphosis.remains<1&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)
+actions.ar_aoe+=/sigil_of_flame,line_cd=2,if=!talent.quickened_sigils&buff.metamorphosis.remains<2&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)
 actions.ar_aoe+=/fel_devastation,if=variable.fel_devastation_ready>0
 actions.ar_aoe+=/immolation_aura
 # [1097742] :: Felblade to generate Fury for Spirit Bomb.
 actions.ar_aoe+=/felblade,if=variable.souls_deficit<=1&fury<variable.fury_cost_spirit_bomb
 actions.ar_aoe+=/spirit_bomb,if=variable.should_dump_souls>0
-actions.ar_aoe+=/fracture,if=variable.souls_deficit+variable.souls_gain_fracture<=1
+# [1097742] :: Fracture to generate Souls for Spirit Bomb.
+actions.ar_aoe+=/fracture,if=variable.souls_gain_fracture>=variable.souls_deficit-1
 # [1097742] :: Dump Fury with Soul Cleave if it won't delay Spirit Bomb.
 actions.ar_aoe+=/soul_cleave,if=soul_fragments=0&variable.should_dump_fury>0
 actions.ar_aoe+=/fracture
@@ -166,16 +159,18 @@ actions.ar_aoe+=/felblade
 actions.ar_aoe+=/shear,if=variable.souls_deficit>0
 actions.ar_aoe+=/throw_glaive
 
-actions.ar_st+=/sigil_of_spite,if=variable.sigil_of_spite_placed=0
+actions.ar_st+=/sigil_of_spite
 actions.ar_st+=/fiery_brand,if=active_dot.fiery_brand_dot=0
 actions.ar_st+=/soul_carver
 actions.ar_st+=/fel_devastation,if=variable.fel_devastation_ready>0
-actions.ar_st+=/sigil_of_flame,if=(!talent.illuminated_sigils|full_recharge_time<gcd)|(variable.sigil_of_flame_placed=0&variable.has_illuminated_sigils_safety=0)
+actions.ar_st+=/sigil_of_flame,line_cd=1,if=talent.quickened_sigils&buff.metamorphosis.remains<1&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)&variable.fury_gain_sigil_of_flame<=fury.deficit
+actions.ar_st+=/sigil_of_flame,line_cd=2,if=!talent.quickened_sigils&buff.metamorphosis.remains<2&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)&variable.fury_gain_sigil_of_flame<=fury.deficit
 actions.ar_st+=/immolation_aura
 # [1097742] :: Felblade to generate Fury for Spirit Bomb.
 actions.ar_st+=/felblade,if=variable.souls_deficit=0&fury<variable.fury_cost_spirit_bomb
 actions.ar_st+=/spirit_bomb,if=variable.should_dump_souls>0
-actions.ar_st+=/fracture,if=variable.souls_deficit=variable.souls_gain_fracture
+# [1097742] :: Fracture to generate Souls for Spirit Bomb.
+actions.ar_st+=/fracture,if=variable.souls_gain_fracture=variable.souls_deficit
 # fury :: Dump Fury with Soul Cleave.
 actions.ar_st+=/soul_cleave,if=variable.should_dump_fury>0
 actions.ar_st+=/felblade
@@ -184,6 +179,23 @@ actions.ar_st+=/shear,if=variable.souls_deficit>0
 actions.ar_st+=/throw_glaive
 
 ### Fel-Scarred ###
+
+actions.fs_opener+=/infernal_strike
+actions.fs_opener+=/fiery_brand,if=talent.fiery_demise
+actions.fs_opener+=/demon_spikes,use_off_gcd=1,if=variable.has_defensive_buff=0
+actions.fs_opener+=/immolation_aura
+actions.fs_opener+=/felblade
+actions.fs_opener+=/fracture,if=!prev_gcd.fracture
+actions.fs_opener+=/shear,if=!prev_gcd.shear
+
+# fs_opener_duration is the approximate length of the Fel-Scarred opener used on pull.
+actions.fs+=/variable,name=fs_opener_duration,value=4*gcd.max
+
+# sigil_of_flame_placed is 1 if a Sigil of Flame/Doom has already been placed and is waiting for activation.
+# This is only approximate as it relies on counting GCDs, but this expression will at least work in SimC.
+actions.fs+=/variable,name=sigil_of_flame_placed,value=1,value_else=0,op=setif,condition=prev_gcd.sigil_of_flame|prev_gcd.sigil_of_doom|(!talent.quickened_sigils&(prev_gcd.2.sigil_of_flame|prev_gcd.2.sigil_of_doom))
+# sigil_activation_duration is the number of seconds before a placed sigil will activate.
+actions.fs+=/variable,name=sigil_activation_duration,value=1+talent.quickened_sigils
 
 # prep_time_fel_devastation is the amount of time needed to cast all spells before Fel Devastation.
 actions.fs+=/variable,name=prep_time_fel_devastation,op=reset,default=0
@@ -194,14 +206,14 @@ actions.fs+=/variable,name=prep_time_metamorphosis,op=reset,default=0
 actions.fs+=/variable,name=prep_time_metamorphosis,op=add,value=variable.prep_time_fel_devastation
 actions.fs+=/variable,name=prep_time_metamorphosis,op=add,value=action.sigil_of_flame.execute_time*cooldown.sigil_of_flame.charges,if=talent.violent_transformation
 
-actions.fs+=/call_action_list,name=fs_opener,if=time<4*gcd.max
+actions.fs+=/call_action_list,name=fs_opener,if=buff.metamorphosis.down&time<variable.fs_opener_duration
 actions.fs+=/call_action_list,name=heal
 actions.fs+=/call_action_list,name=mitigation,if=tanking&variable.has_defensive_buff=0
 actions.fs+=/call_action_list,name=demonsurge,if=buff.metamorphosis.up&buff.metamorphosis.remains<gcd*(variable.demonsurge_remaining+1)
 actions.fs+=/run_action_list,name=metamorphosis,if=(cooldown.metamorphosis.remains<=variable.prep_time_metamorphosis)&(!cooldown.fel_devastation.ready&cooldown.fel_devastation.remains>10)&variable.demonsurge_remaining=0
 # [1450143] :: Felblade to generate Fury for Fel Devastation.
 actions.fs+=/felblade,if=cooldown.fel_devastation.ready&fury<variable.fury_cost_fel_devastation
-actions.fs+=/call_action_list,name=fel_devastation,if=!talent.demonic|(buff.metamorphosis.down&(cooldown.fel_devastation.remains<=variable.prep_time_fel_devastation)&variable.demonsurge_remaining=0)
+actions.fs+=/call_action_list,name=fel_devastation,if=(!talent.demonic|time<(variable.fs_opener_duration+variable.prep_time_fel_devastation+action.fel_devastation.execute_time)|buff.demon_spikes.remains<gcd)&(cooldown.fel_devastation.remains<=variable.prep_time_fel_devastation)
 actions.fs+=/the_hunt
 actions.fs+=/infernal_strike,use_off_gcd=1
 actions.fs+=/fiery_brand,if=!talent.fiery_demise&active_dot.fiery_brand_dot=0
@@ -209,21 +221,24 @@ actions.fs+=/sigil_of_spite
 actions.fs+=/soul_carver
 # [5927628] :: Activate Demonsurge with Fel Desolation.
 actions.fs+=/fel_desolation,if=buff.demonsurge_fel_desolation.up
-actions.fs+=/sigil_of_flame,if=(variable.fury_gain_sigil_of_flame<=fury.deficit&(!talent.illuminated_sigils|full_recharge_time<gcd))|(variable.sigil_of_flame_placed=0&variable.has_illuminated_sigils_safety=0)
-actions.fs+=/run_action_list,name=fs_aoe,if=variable.aoe>0
+# [5927628] :: Activate Demonsurge with Sigil of Doom.
+actions.fs+=/sigil_of_doom,if=variable.sigil_of_flame_placed=0&buff.demonsurge_sigil_of_doom.up&(variable.fury_gain_sigil_of_flame<=fury.deficit|variable.num_targets>1)
+actions.fs+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0&buff.metamorphosis.remains<variable.sigil_activation_duration&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)&(variable.fury_gain_sigil_of_flame<=fury.deficit|variable.num_targets>1)
+actions.fs+=/run_action_list,name=fs_aoe,if=variable.num_targets>1
 actions.fs+=/run_action_list,name=fs_st
 
-actions.demonsurge+=/spirit_burst,if=variable.should_dump_souls>0
-# [5927628] :: Activate Demonsurge with Sigil of Doom.
-actions.demonsurge+=/sigil_of_doom,if=buff.demonsurge_sigil_of_doom.up
-# [5927628] :: Activate Demonsurge with Spirit Burst.
+# [5927628] :: Activate Demonsurge with Spirit Burst to dump Souls.
 actions.demonsurge+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&variable.should_dump_souls>0
+# [5927628] :: Activate Demonsurge with Soul Sunder.
+actions.demonsurge+=/soul_sunder,if=buff.demonsurge_soul_sunder.up&variable.should_dump_fury>0
 # [5927628] :: Activate Demonsurge with Consuming Fire.
 actions.demonsurge+=/consuming_fire,if=buff.demonsurge_consuming_fire.up
 # [5927628] :: Activate Demonsurge with Spirit Burst.
 actions.demonsurge+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&soul_fragments>0
 # [5927628] :: Activate Demonsurge with Soul Sunder.
 actions.demonsurge+=/soul_sunder,if=buff.demonsurge_soul_sunder.up
+# [5927628] :: Activate Demonsurge with Sigil of Doom.
+actions.demonsurge+=/sigil_of_doom,if=buff.demonsurge_sigil_of_doom.up
 
 # [1450143] :: Fiery Brand in preparation for Fel Devastation.
 actions.fel_devastation+=/fiery_brand,if=talent.fiery_demise&((talent.down_in_flames&charges>=max_charges)|active_dot.fiery_brand=0)
@@ -235,20 +250,11 @@ actions.metamorphosis+=/fiery_brand,if=talent.fiery_demise&((talent.down_in_flam
 actions.metamorphosis+=/sigil_of_flame
 actions.metamorphosis+=/metamorphosis,if=cooldown.sigil_of_flame.charges<1
 
-actions.fs_opener+=/infernal_strike
-actions.fs_opener+=/fiery_brand,if=talent.fiery_demise
-actions.fs_opener+=/demon_spikes,use_off_gcd=1,if=variable.has_defensive_buff=0
-actions.fs_opener+=/consuming_fire
-actions.fs_opener+=/immolation_aura
-actions.fs_opener+=/felblade
-actions.fs_opener+=/fracture,if=!prev_gcd.fracture
-actions.fs_opener+=/shear,if=!prev_gcd.shear
-
 actions.fs_aoe+=/spirit_burst,if=variable.should_dump_souls>0
 actions.fs_aoe+=/spirit_bomb,if=variable.should_dump_souls>0
 actions.fs_aoe+=/consuming_fire
 actions.fs_aoe+=/immolation_aura
-actions.fs_aoe+=/fracture,if=variable.souls_deficit+variable.souls_gain_fracture<=1&active_dot.fiery_brand_dot>0
+actions.fs_aoe+=/fracture,if=variable.souls_deficit<=1+variable.souls_gain_fracture&active_dot.fiery_brand_dot>0
 # [1097742] :: Dump Fury with Soul Sunder if it won't delay Spirit Burst.
 actions.fs_aoe+=/soul_sunder,if=soul_fragments=0&variable.should_dump_fury>0
 # [1097742] :: Dump Fury with Soul Cleave if it won't delay Spirit Bomb.
@@ -256,6 +262,8 @@ actions.fs_aoe+=/soul_cleave,if=soul_fragments=0&variable.should_dump_fury>0
 actions.fs_aoe+=/felblade,if=variable.fury_gain_felblade<=fury.deficit
 actions.fs_aoe+=/fracture,if=variable.fury_gain_fracture<=fury.deficit|!prev_gcd.fracture
 actions.fs_aoe+=/shear,if=variable.souls_deficit>0&variable.fury_gain_shear<=fury.deficit
+# [5927628] :: Activate Demonsurge with Spirit Burst to dump Fury.
+actions.fs_aoe+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&soul_fragments>0&variable.should_dump_fury>0
 # fury :: Dump Fury with Soul Sunder.
 actions.fs_aoe+=/soul_sunder,if=variable.should_dump_fury>0
 # fury :: Dump Fury with Soul Cleave.
@@ -266,11 +274,15 @@ actions.fs_st+=/spirit_burst,if=talent.fiery_demise&debuff.fiery_brand_dot.up&va
 actions.fs_st+=/spirit_bomb,if=talent.fiery_demise&debuff.fiery_brand_dot.up&variable.should_dump_souls>0
 actions.fs_st+=/consuming_fire
 actions.fs_st+=/immolation_aura
-# fury :: Dump Fury with Soul Sunder
+# [5927628] :: Activate Demonsurge with Spirit Burst to dump Fury.
+actions.fs_st+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&soul_fragments>0&variable.should_dump_fury>0
+# fury :: Dump Fury with Soul Sunder.
 actions.fs_st+=/soul_sunder,if=variable.should_dump_fury>0
 # fury :: Dump Fury with Soul Cleave.
 actions.fs_st+=/soul_cleave,if=variable.should_dump_fury>0
 actions.fs_st+=/felblade
+# [5927628] :: Activate Demonsurge with Spirit Burst to dump Souls.
+actions.fs_st+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&variable.should_dump_souls>0
 # souls :: Dump Souls with Soul Sunder.
 actions.fs_st+=/soul_sunder,if=variable.should_dump_souls>0
 # souls :: Dump Souls with Soul Cleave.
