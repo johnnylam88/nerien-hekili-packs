@@ -22,70 +22,36 @@ actions.precombat+=/deaths_caress,if=buff.bone_shield.down|buff.bone_shield.rema
 actions+=/variable,name=death_strike_pool_value,value=75
 # Death Strike below 70% health.
 actions+=/variable,name=death_strike_health_pct_threshold,value=70
-# Death Strike only if the damage taken events exceed 28% of maximum health.
-actions+=/variable,name=death_strike_damage_taken_pct_threshold,value=28
 
 ################
 
-# Dump Runic Power with Death Strike to avoid capping.
-actions+=/variable,name=death_strike_dump_amount,value=variable.death_strike_pool_value,op=setif,condition=buff.dancing_rune_weapon.down&variable.death_strike_pool_value>=75,value_else=75
+# death_strike_dump_amount is the threshold for dumping Runic Power to prevent capping.
+actions+=/variable,name=death_strike_dump_amount,value=variable.death_strike_pool_value
+# death_strike_minimum_heal is 1 if the healing from Death Strike is the minimum amount possible.
+actions+=/variable,name=death_strike_minimum_heal,value=1,value_else=0,op=setif,condition=buff.coagulating_blood.stack*(25%100)<7
 
-actions+=/variable,name=death_strike_heal_multiplier,value=(1+0.05*talent.improved_death_strike)*(1+0.15*talent.voracious)*(1+0.08*buff.hemostasis.stack)
-# Minimum Death Strike heal is 7% of maximum health.
-actions+=/variable,name=death_strike_heal_pct,value=(7<?25*(buff.coagulating_blood.stack%100))*variable.death_strike_heal_multiplier
-actions+=/variable,name=death_strike_heal_amount,value=health.max*variable.death_strike_heal_pct
+# has_absorb_buff is 1 if Umbilicus Eternus is up.
+actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.umbilicus_eternus.up
 
 # has_defensive_buff is 1 if Vampiric Blood, Dancing Rune Weapon, Icebound Fortitude, Rune Tap, or Lichborne are active.
-actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.vampiric_blood.up|buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.rune_tap.up|(talent.unholy_endurance&buff.lichborne.up),value_else=0
+actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=buff.vampiric_blood.up|buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.rune_tap.up|(talent.unholy_endurance&buff.lichborne.up)
 
 actions+=/mind_freeze
 actions+=/strangulate
 actions+=/gorefiends_grasp,if=talent.tightening_grasp
-actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0
+actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 actions+=/potion,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.up
-actions+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold&buff.coagulating_blood.stack>variable.death_strike_damage_taken_pct_threshold
+# heal :: Death Strike to heal only if it exceeds the minimum heal.
+actions+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold&variable.death_strike_minimum_heal=0
 actions+=/sacrificial_pact,if=buff.dancing_rune_weapon.down&(pet.ghoul.remains<2|boss&fight_remains<gcd)
 actions+=/blood_tap,if=(rune<=2&rune.time_to_3>gcd&full_recharge_time<2*gcd)|(rune<=1&rune.time_to_3>gcd)
 actions+=/raise_dead
-actions+=/run_action_list,name=drw_up_sanlayn,if=buff.dancing_rune_weapon.up&talent.gift_of_the_sanlayn
+actions+=/run_action_list,name=drw_up_sanlayn,if=buff.dancing_rune_weapon.up&hero_tree.sanlayn
 actions+=/run_action_list,name=drw_up,if=buff.dancing_rune_weapon.up
 actions+=/run_action_list,name=standard
 
-#actions.defensives+=/antimagic_shell,if=incoming_magic_damage_5s>=0.2*health.max
-actions.defensives+=/vampiric_blood,if=buff.vampiric_blood.down&incoming_damage_5s>=vb_damage
-actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage
-actions.defensives+=/rune_tap,if=buff.rune_tap.down&incoming_damage_5s>=rt_damage
-#actions.defensives+=/antimagic_zone,if=incoming_magic_damage_5s>=0.2*health.max
-actions.defensives+=/lichborne,if=talent.unholy_endurance&incoming_damage_5s>=0.2*health.max
-
-# There is more nuance than just consuming all of the Exterminate procs.
-actions.drw_up+=/marrowrend,if=buff.exterminate.up
-actions.drw_up+=/reapers_mark,if=debuff.reapers_mark.down
-actions.drw_up+=/marrowrend,if=buff.exterminate.up&debuff.reapers_mark.down
-actions.drw_up+=/soul_reaper,if=buff.reaper_of_souls.up&(!talent.coagulopathy|buff.coagulopathy.remains>2)
-# Cast Marrowrend as one of the last three GCDs of Dancing Rune Weapon.
-actions.drw_up+=/marrowrend,if=buff.dancing_rune_weapon.remains<(3*gcd.max)&buff.bone_shield.remains<(buff.bone_shield.duration-3*gcd.max)&buff.bonestorm.down
-actions.drw_up+=/consumption
-actions.drw_up+=/death_and_decay,if=!death_and_decay.ticking
-actions.drw_up+=/soul_reaper,if=active_enemies=1&target.time_to_pct_35<5&target.time_to_die>(dot.soul_reaper.remains+5)
-actions.drw_up+=/soul_reaper,cycle_targets=1,if=target.time_to_pct_35<5&active_enemies>=2&target.time_to_die>(dot.soul_reaper.remains+5)
-actions.drw_up+=/marrowrend,if=buff.bone_shield.down
-actions.drw_up+=/blood_boil,if=full_recharge_time<gcd
-actions.drw_up+=/bonestorm,if=buff.bone_shield.stack>5&(!talent.shattering_bone|death_and_decay.ticking)&(!talent.dancing_rune_weapon|!talent.insatiable_blade|cooldown.dancing_rune_weapon.remains>10)
-actions.drw_up+=/tombstone,if=buff.bone_shield.stack>5&(!talent.shattering_bone|death_and_decay.ticking)&(!talent.dancing_rune_weapon|!talent.insatiable_blade|cooldown.dancing_rune_weapon.remains>20)
-actions.drw_up+=/death_strike,if=runic_power>variable.death_strike_dump_amount|(talent.coagulopathy&buff.coagulopathy.remains<2)
-actions.drw_up+=/heart_strike,if=rune.time_to_3<gcd
-
-actions.drw_up_sanlayn+=/consumption,if=buff.dancing_rune_weapon.remains<3
-actions.drw_up_sanlayn+=/death_and_decay,if=!death_and_decay.ticking
-actions.drw_up_sanlayn+=/soul_reaper,if=active_enemies=1&target.time_to_pct_35<5&target.time_to_die>(dot.soul_reaper.remains+5)
-actions.drw_up_sanlayn+=/soul_reaper,cycle_targets=1,if=target.time_to_pct_35<5&active_enemies>=2&target.time_to_die>(dot.soul_reaper.remains+5)
-actions.drw_up_sanlayn+=/marrowrend,if=buff.bone_shield.stack<2
-actions.drw_up_sanlayn+=/blood_boil,if=full_recharge_time<gcd
-actions.drw_up_sanlayn+=/heart_strike,if=buff.essence_of_the_blood_queen.stack<7|rune.time_to_3<gcd
-
-actions.racials=blood_fury,if=cooldown.dancing_rune_weapon.ready&(!talent.blooddrinker|!cooldown.blooddrinker.ready)
+actions.racials+=/blood_fury,if=cooldown.dancing_rune_weapon.ready&(!talent.blooddrinker|!cooldown.blooddrinker.ready)
 actions.racials+=/berserking
 actions.racials+=/arcane_pulse,if=active_enemies>=2|rune<1&runic_power.deficit>60
 actions.racials+=/lights_judgment,if=buff.unholy_strength.up
@@ -94,27 +60,68 @@ actions.racials+=/ancestral_call
 actions.racials+=/bag_of_tricks
 #actions.racials+=/arcane_torrent,if=runic_power.deficit>20
 
-actions.standard+=/dancing_rune_weapon,if=buff.dancing_rune_weapon.down&talent.gift_of_the_sanlayn
-actions.standard+=/heart_strike,if=buff.vampiric_strike.up&(buff.essence_of_the_blood_queen.down|buff.essence_of_the_blood_queen.remains<2)
-actions.standard+=/heart_strike,if=buff.infliction_of_sorrow.up
-actions.standard+=/blood_boil,if=talent.infliction_of_sorrow&prev_gcd.heart_strike&debuff.blood_plague.down
-actions.standard+=/marrowrend,if=buff.bone_shield.remains<3
-# There is more nuance than just consuming all of the Exterminate procs.
-actions.standard+=/marrowrend,if=buff.exterminate.up
-actions.standard+=/reapers_mark,if=debuff.reapers_mark.down
-actions.standard+=/marrowrend,if=buff.exterminate.up&debuff.reapers_mark.down
-actions.standard+=/soul_reaper,if=buff.reaper_of_souls.up&(!talent.coagulopathy|buff.coagulopathy.remains>2)
+#actions.defensives+=/antimagic_shell,if=incoming_magic_damage_5s>=0.2*health.max
+actions.defensives+=/vampiric_blood,if=buff.vampiric_blood.down&incoming_damage_5s>=vb_damage
+actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage
+actions.defensives+=/rune_tap,if=buff.rune_tap.down&incoming_damage_5s>=rt_damage
+#actions.defensives+=/antimagic_zone,if=incoming_magic_damage_5s>=0.2*health.max
+actions.defensives+=/lichborne,if=talent.unholy_endurance&incoming_damage_5s>=0.2*health.max
+
+actions.drw_up+=/call_action_list,name=deathbringer,strict=1,if=hero_tree.deathbringer
+# [135277] :: Cast Marrowrend as one of the last three GCDs of Dancing Rune Weapon.
+actions.drw_up+=/marrowrend,if=buff.dancing_rune_weapon.remains<(3*gcd.max)&buff.bone_shield.remains<(buff.bone_shield.duration-3*gcd.max)&buff.bonestorm.down
+actions.drw_up+=/consumption
+actions.drw_up+=/death_and_decay,if=!death_and_decay.ticking
+actions.drw_up+=/soul_reaper,cycle_targets=1,if=target.time_to_pct_35<5&target.time_to_die>(dot.soul_reaper.remains+5)
+actions.drw_up+=/marrowrend,if=(buff.bone_shield.down|buff.bone_shield.stack<2)&buff.bonestorm.down
+actions.drw_up+=/blood_boil,if=full_recharge_time<gcd
+actions.drw_up+=/bonestorm,if=buff.bone_shield.stack>5&(!talent.shattering_bone|death_and_decay.ticking)&(!talent.insatiable_blade|(talent.dancing_rune_weapon&cooldown.dancing_rune_weapon.remains>10))
+actions.drw_up+=/tombstone,if=buff.bone_shield.stack>5&(!talent.shattering_bone|death_and_decay.ticking)&(!talent.insatiable_blade|(talent.dancing_rune_weapon&cooldown.dancing_rune_weapon.remains>20))
+# buffs :: Death Strike to maintain Coagulopathy and Icy Talons.
+actions.drw_up+=/death_strike,if=(talent.coagulopathy&buff.coagulopathy.remains<2)|(talent.icy_talons&buff.icy_talons.remains<2)
+actions.drw_up+=/death_strike,if=runic_power>variable.death_strike_dump_amount
+actions.drw_up+=/heart_strike,if=rune.time_to_3<gcd
+
+actions.drw_up_sanlayn+=/consumption,if=buff.dancing_rune_weapon.remains<3
+actions.drw_up_sanlayn+=/death_and_decay,if=!death_and_decay.ticking
+actions.drw_up_sanlayn+=/soul_reaper,cycle_targets=1,if=target.time_to_pct_35<5&target.time_to_die>(dot.soul_reaper.remains+5)
+actions.drw_up_sanlayn+=/marrowrend,if=(buff.bone_shield.down|buff.bone_shield.stack<2)&buff.bonestorm.down
+actions.drw_up_sanlayn+=/blood_boil,if=full_recharge_time<gcd
+# buffs :: Death Strike to maintain Coagulopathy and Icy Talons.
+actions.drw_up_sanlayn+=/death_strike,if=(talent.coagulopathy&buff.coagulopathy.remains<2)|(talent.icy_talons&buff.icy_talons.remains<2)
+actions.drw_up_sanlayn+=/death_strike,if=runic_power>variable.death_strike_dump_amount
+actions.drw_up_sanlayn+=/heart_strike,if=buff.essence_of_the_blood_queen.stack<7|rune.time_to_3<gcd
+
+# [1778227] :: Marrowrend to consume Exterminate procs; there is more nuance than just consuming all of the Exterminate procs.
+actions.deathbringer+=/marrowrend,if=buff.exterminate.up
+actions.deathbringer+=/reapers_mark,if=debuff.reapers_mark.down
+# [1778227] :: Marrowrend to consume Exterminate procs.
+actions.deathbringer+=/marrowrend,if=buff.exterminate.up&debuff.reapers_mark.down
+# [5927621] :: Soul Reaper is free with Reaper of Souls, and should be cast on a target with Reaper's Mark.
+actions.deathbringer+=/soul_reaper,if=buff.reaper_of_souls.up&(!talent.coagulopathy|buff.coagulopathy.remains>2)&debuff.reapers_mark.up
+
+actions.sanlayn+=/dancing_rune_weapon
+# [134222] :: Vampiric Strike to extend Essence of the Blood Queen.
+actions.sanlayn+=/heart_strike,if=buff.vampiric_strike.up&(buff.essence_of_the_blood_queen.down|buff.essence_of_the_blood_queen.remains<2)
+# [236304] :: Heart Strike to proc Infliction of Sorrow.
+actions.sanlayn+=/heart_strike,if=buff.infliction_of_sorrow.up
+# [236304] :: Blood Boil after Infliction of Sorrow consumes Blood Plague.
+actions.sanlayn+=/blood_boil,if=talent.infliction_of_sorrow&prev_gcd.heart_strike&debuff.blood_plague.down
+
+actions.standard+=/call_action_list,name=sanlayn,strict=1,if=hero_tree.sanlayn
+actions.standard+=/marrowrend,if=buff.bone_shield.remains<3&buff.bonestorm.down
+actions.standard+=/call_action_list,name=sanlayn,strict=1,if=hero_tree.deathbringer
 actions.standard+=/death_and_decay,if=!death_and_decay.ticking
-actions.standard+=/blooddrinker,if=buff.dancing_rune_weapon.down
+actions.standard+=/blooddrinker
 actions.standard+=/consumption,if=!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>5
-actions.standard+=/soul_reaper,if=active_enemies=1&target.time_to_pct_35<5&target.time_to_die>(dot.soul_reaper.remains+5)
-actions.standard+=/soul_reaper,cycle_targets=1,if=target.time_to_pct_35<5&active_enemies>=2&target.time_to_die>(dot.soul_reaper.remains+5)
+actions.standard+=/soul_reaper,cycle_targets=1,if=target.time_to_pct_35<5&target.time_to_die>(dot.soul_reaper.remains+5)
 actions.standard+=/abomination_limb
-actions.standard+=/marrowrend,if=buff.bone_shield.stack<=5&buff.bone_shield.remains>10&(!talent.dancing_rune_weapon|cooldown.dancing_rune_weapon.remains>5)
-actions.standard+=/heart_strike,if=buff.vampiric_strike.up&buff.essence_of_the_blood_queen.up
-actions.standard+=/dancing_rune_weapon,if=buff.dancing_rune_weapon.down
-actions.standard+=/tombstone,if=buff.bone_shield.stack>5&(!talent.shattering_bone|death_and_decay.ticking)&(talent.gift_of_the_sanlayn|!talent.dancing_rune_weapon|!talent.insatiable_blade|cooldown.dancing_rune_weapon.remains>20)
-actions.standard+=/bonestorm,if=buff.bone_shield.stack>5&(!talent.shattering_bone|death_and_decay.ticking)&(talent.gift_of_the_sanlayn|!talent.dancing_rune_weapon|!talent.insatiable_blade|cooldown.dancing_rune_weapon.remains>20)
-actions.standard+=/death_strike,if=runic_power>variable.death_strike_dump_amount|(talent.coagulopathy&buff.coagulopathy.remains<2)
+actions.standard+=/marrowrend,if=buff.bone_shield.stack<=5&buff.bonestorm.down&buff.bone_shield.remains>10&(!talent.insatiable_blade|(talent.dancing_rune_weapon&cooldown.dancing_rune_weapon.remains>3))
+actions.standard+=/dancing_rune_weapon
+actions.standard+=/tombstone,if=buff.bone_shield.stack>5&(!talent.shattering_bone|death_and_decay.ticking)&(!talent.insatiable_blade|(talent.dancing_rune_weapon&cooldown.dancing_rune_weapon.remains>20))
+actions.standard+=/bonestorm,if=buff.bone_shield.stack>5&(!talent.shattering_bone|death_and_decay.ticking)&(!talent.insatiable_blade|(talent.dancing_rune_weapon&cooldown.dancing_rune_weapon.remains>20))
+# buffs :: Death Strike to maintain Coagulopathy and Icy Talons.
+actions.standard+=/death_strike,if=(talent.coagulopathy&buff.coagulopathy.remains<2)|(talent.icy_talons&buff.icy_talons.remains<2)
+actions.standard+=/death_strike,if=runic_power>variable.death_strike_dump_amount
 actions.standard+=/blood_boil,if=full_recharge_time<gcd
 actions.standard+=/heart_strike,if=rune.time_to_3<gcd
