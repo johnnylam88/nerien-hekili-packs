@@ -5,7 +5,6 @@
 # Recommended Settings in `/hekili` > *Protection*:
 #
 # - Only Shockwave as Interrupt : **unused**
-# - Overlap Ignore Pain : checked
 # - Overlap Shield Block : checked
 # - Allow Stance Changes : unchecked
 # - Reserve Rage for Mitigation : 0
@@ -23,23 +22,20 @@ actions.precombat+=/battle_shout
 
 actions+=/variable,name=rage_cost_execute,value=40
 actions+=/variable,name=rage_cost_ignore_pain,value=35
-actions+=/variable,name=rage_cost_revenge,value=20+10*talent.barbaric_training
+actions+=/variable,name=rage_cost_revenge,value=20
 actions+=/variable,name=rage_cost_shield_block,value=30
 
 actions+=/variable,name=rage_gen_multiplier_outburst,value=2,op=setif,condition=buff.violent_outburst.up,value_else=1
-actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercussions+3*talent.impenetrable_wall)*variable.rage_gen_multiplier_outburst
+actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercussions+3*talent.impenetrable_wall+3*talent.practiced_strikes)*variable.rage_gen_multiplier_outburst
 actions+=/variable,name=rage_gain_thunder_blast,value=10*variable.rage_gen_multiplier_outburst
 actions+=/variable,name=rage_gain_thunder_clap,value=5*variable.rage_gen_multiplier_outburst
-
-actions+=/variable,name=cooldown_shield_slam_duration,value=9*spell_haste
-actions+=/variable,name=cooldown_thunder_clap_duration,value=6*spell_haste
 
 ### Tunables ###
 
 # Pool enough Rage to cast Shield Block with some cushion in case our Rage estimate is wrong.
 actions+=/variable,name=rage_pool_value,value=variable.rage_cost_shield_block+20
-# Don't cast Ignore Pain if we will waste more than 70% of the casted absorb.
-actions+=/variable,name=ignore_pain_wasted_pct,value=70
+# Don't cast Ignore Pain if we will waste more than 30% of the casted absorb.
+actions+=/variable,name=ignore_pain_wasted_pct,value=30
 # Demoralizing Shout tunable for incoming damage.
 actions+=/variable,name=demoralizing_shout_damage_taken,value=0.2*health.max
 # Last Stand tunable for incoming damage (see /hekili > Protection).
@@ -61,18 +57,18 @@ actions+=/variable,name=victory_rush_health_pct,value=victory_rush_health_pct
 
 
 actions+=/variable,name=rage_gen_multiplier,value=1+0.5*buff.unnerving_focus.remains%buff.unnerving_focus.duration
-actions+=/variable,name=rage_per_second_auto_attack,value=1*(1+0.5*talent.war_machine)+(2-talent.devastator)*talent.instigate
+actions+=/variable,name=rage_per_second_auto_attack,value=1*(1+0.5*talent.war_machine)+2*talent.instigate
 # 3 Rage per incoming auto-attack, and incoming auto-attack every 2s with 1 mob.
 # Assume at 5+ mobs, that we gain 3 Rage every second.
 actions+=/variable,name=rage_per_second_incoming_auto_attack,value=(3%2)+((3%2)%(5-1))*(active_enemies-1),op=setif,condition=active_enemies<5,value_else=3
 actions+=/variable,name=rage_per_second_incoming_damage,value=variable.rage_per_second_incoming_auto_attack,op=setif,condition=incoming_physical_damage_5s>0,value_else=0
 # Bloodsurge has a 10% chance to gain 5 rage per Bleed tick.
-actions+=/variable,name=rage_per_second_bloodsurge,value=talent.bloodsurge*((0.1*5%3)*active_dot.deep_wounds+(0.1*5%3)*active_dot.rend+(0.1*5%2)*active_dot.thunderous_roar)
+actions+=/variable,name=rage_per_second_bloodsurge,value=talent.bloodsurge*(0.1*5%3)*active_dot.deep_wounds
 actions+=/variable,name=rage_per_second_ravager,value=buff.ravager.up*5
 # This underestimates the rage from Shield Slam because we don't account for Shield Slam resets.
-actions+=/variable,name=rage_per_second_shield_slam,value=variable.rage_gain_shield_slam%variable.cooldown_shield_slam_duration
+actions+=/variable,name=rage_per_second_shield_slam,value=variable.rage_gain_shield_slam%cooldown.shield_slam.duration
 # This underestimates the rage from Thunder Clap because we don't account for Thunder Blast.
-actions+=/variable,name=rage_per_second_thunder_clap,value=variable.rage_gain_thunder_clap%variable.cooldown_thunder_clap_duration
+actions+=/variable,name=rage_per_second_thunder_clap,value=variable.rage_gain_thunder_clap%cooldown.thunder_clap.duration
 actions+=/variable,name=rage_per_second,value=(variable.rage_per_second_auto_attack+variable.rage_per_second_incoming_damage+variable.rage_per_second_bloodsurge+variable.rage_per_second_ravager+variable.rage_per_second_shield_slam+variable.rage_per_second_thunder_clap)*variable.rage_gen_multiplier
 actions+=/variable,name=rage_at_next_shield_block,value=rage,op=setif,condition=cooldown.shield_block.charges>0,value_else=rage+cooldown.shield_block.remains*variable.rage_per_second
 # should_spend_rage is 1 if the expected Rage by the next Shield Block exceeds the pool value.
@@ -119,7 +115,9 @@ actions.heal+=/impending_victory,if=health.pct<variable.victory_rush_health_pct
 
 actions.mitigation+=/shield_block,if=buff.shield_block.down|buff.shield_block.remains<4
 actions.mitigation+=/last_stand,if=talent.bolster&buff.shield_block.down
-actions.mitigation+=/ignore_pain,if=variable.should_ignore_pain>0|(buff.seeing_red.stack=7&cooldown.shield_slam.ready)
+# [236308] :: Ignore Pain to trigger Violent Outburst.
+actions.mitigation+=/ignore_pain,if=buff.seeing_red.stack=7&cooldown.shield_slam.ready
+actions.mitigation+=/ignore_pain,if=variable.should_ignore_pain>0
 
 actions.opener+=/ravager
 actions.opener+=/charge,if=movement.distance>8
@@ -139,12 +137,19 @@ actions.opener+=/thunder_blast,if=buff.burst_of_power.stack<2
 actions.opener+=/thunder_clap,if=buff.thunder_blast.down
 actions.opener+=/variable,name=opener,value=0,op=set
 
+# [236308] :: Thunder Blast to consume Violent Outburst.
 actions.outburst+=/thunder_blast,if=buff.violent_outburst.up&spell_targets.thunder_clap>=2
-actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&spell_targets.thunder_clap>=8
+# [236308] :: Thunder Clap to consume Violent Outburst.
+actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&(hero_tree.mountain_thane&spell_targets.thunder_clap>=4|spell_targets.thunder_clap>=10)
+# [236308] :: Shield Slam to consume Violent Outburst.
 actions.outburst+=/shield_slam,if=buff.violent_outburst.up
+# [236308] :: Thunder Blast to consume Violent Outburst.
 actions.outburst+=/thunder_blast,if=buff.violent_outburst.up&cooldown.shield_slam.remains>2
+# [236308] :: Thunder Clap to consume Violent Outburst.
 actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&cooldown.shield_slam.remains>2
+# [236308] :: Revenge to trigger Violent Outburst.
 actions.outburst+=/revenge,if=variable.should_ignore_pain=0&(buff.seeing_red.stack=7&cooldown.shield_slam.remains>(gcd.remains+gcd.max))&spell_targets.revenge>1
+# [236308] :: Execute to trigger Violent Outburst.
 actions.outburst+=/execute,if=variable.should_ignore_pain=0&(buff.seeing_red.stack=7&cooldown.shield_slam.remains>(gcd.remains+gcd.max))
 
 actions.racials+=/blood_fury
@@ -155,15 +160,20 @@ actions.racials+=/ancestral_call
 #actions.racials+=/fireblood
 actions.racials+=/bag_of_tricks
 
+# [132090] :: Revenge to apply Deep Wounds
 actions.ravager_up+=/revenge,if=debuff.deep_wounds.down
+# [970854] :: Shield Slam during Ravager.
 actions.ravager_up+=/shield_slam,if=talent.heavy_repercussions
+# [970854] :: Revenge during Ravager.
 actions.ravager_up+=/revenge
 
 actions.spend_rage+=/execute,if=variable.rage_at_next_shield_block-variable.rage_cost_execute>=variable.rage_pool_value&spell_targets.revenge<=4
 actions.spend_rage+=/revenge,if=variable.rage_at_next_shield_block-variable.rage_cost_revenge>=variable.rage_pool_value
 
 actions.standard+=/charge,if=movement.distance>8
+# [613534] :: Thunder Blast during Avatar.
 actions.standard+=/thunder_blast,if=talent.unstoppable_force&buff.avatar.up
+# [613534] :: Thunder Clap during Avatar.
 actions.standard+=/thunder_clap,if=talent.unstoppable_force&buff.avatar.up
 actions.standard+=/ravager
 actions.standard+=/avatar
@@ -179,7 +189,11 @@ actions.standard+=/shield_charge
 actions.standard+=/shield_slam,if=buff.thunder_blast.stack<2
 actions.standard+=/thunder_blast,if=buff.burst_of_power.stack<2
 actions.standard+=/thunder_clap,if=buff.thunder_blast.down
-actions.standard+=/revenge,if=buff.revenge.up|debuff.deep_wounds.down
+# [132090] :: Revenge to apply Deep Wounds.
+actions.standard+=/revenge,if=debuff.deep_wounds.down
+# free :: Revenge is free with Revenge!.
+actions.standard+=/revenge,if=buff.revenge.up
+# free :: Execute is free with Sudden Death.
 actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.up&spell_targets.revenge<=4
 actions.standard+=/call_action_list,name=spend_rage,if=variable.should_ignore_pain=0&variable.should_spend_rage>0
 actions.standard+=/devastate
