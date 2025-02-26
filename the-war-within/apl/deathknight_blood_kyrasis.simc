@@ -22,59 +22,71 @@ actions.precombat+=/deaths_caress,if=buff.bone_shield.down|buff.bone_shield.rema
 actions+=/variable,name=death_strike_pool_value,value=105
 # Death Strike below 70% health.
 actions+=/variable,name=death_strike_health_pct_threshold,value=70
-# Death Strike only if the damage taken events exceed 28% of maximum health.
-actions+=/variable,name=death_strike_damage_taken_pct_threshold,value=28
 
 ################
 
-# Dump Runic Power with Death Strike to avoid capping.
-actions+=/variable,name=death_strike_dump_amount,value=variable.death_strike_pool_value,op=setif,condition=buff.dancing_rune_weapon.down,value_else=variable.death_strike_pool_value-10
+# death_strike_dump_amount is the threshold for dumping Runic Power to prevent capping.
+actions+=/variable,name=death_strike_dump_amount,value=variable.death_strike_pool_value,value_else=variable.death_strike_pool_value-10,op=setif,condition=buff.dancing_rune_weapon.down
+# death_strike_minimum_heal is 1 if the healing from Death Strike is the minimum amount possible.
+actions+=/variable,name=death_strike_minimum_heal,value=1,value_else=0,op=setif,condition=buff.coagulating_blood.stack*(25%100)<7
 
-actions+=/variable,name=death_strike_heal_multiplier,value=(1+0.05*talent.improved_death_strike)*(1+0.15*talent.voracious)*(1+0.08*buff.hemostasis.stack)
-# Minimum Death Strike heal is 7% of maximum health.
-actions+=/variable,name=death_strike_heal_pct,value=(7<?25*(buff.coagulating_blood.stack%100))*variable.death_strike_heal_multiplier
-actions+=/variable,name=death_strike_heal_amount,value=health.max*variable.death_strike_heal_pct
+# has_absorb_buff is 1 if Umbilicus Eternus is up.
+actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.umbilicus_eternus.up
 
 # has_defensive_buff is 1 if Vampiric Blood, Dancing Rune Weapon, Icebound Fortitude, Rune Tap, or Lichborne are active.
-actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.vampiric_blood.up|buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.rune_tap.up|(talent.unholy_endurance&buff.lichborne.up),value_else=0
+actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=buff.vampiric_blood.up|buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.rune_tap.up|(talent.unholy_endurance&buff.lichborne.up)
 
 actions+=/mind_freeze
 actions+=/strangulate
 actions+=/gorefiends_grasp,if=talent.tightening_grasp
-actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0
+actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 actions+=/potion,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.up
 actions+=/run_action_list,name=core
 
 actions.core+=/raise_dead
 actions.core+=/blood_tap,if=(rune<=2&rune.time_to_3>gcd&full_recharge_time<2*gcd)|(rune<=1&rune.time_to_3>gcd)
-actions.core+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold&buff.coagulating_blood.stack>variable.death_strike_damage_taken_pct_threshold
+# heal :: Death Strike to heal as long as it's not a minimum heal.
+actions.core+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold&variable.death_strike_minimum_heal=0
 actions.core+=/dancing_rune_weapon,if=buff.dancing_rune_weapon.down
-actions.core+=/marrowrend,if=buff.bone_shield.down|buff.bone_shield.remains<5|buff.bone_shield.stack<3|(talent.reapers_mark&buff.exterminate.up&cooldown.reapers_mark.remains<3)
+actions.core+=/marrowrend,if=buff.bone_shield.down|buff.bone_shield.remains<5|buff.bone_shield.stack<3
+# [1778227] :: Marrowrend to consume Exterminate before the next Reaper's Mark.
+actions.core+=/marrowrend,if=buff.exterminate.up&(cooldown.reapers_mark.remains<3|buff.exterminate.remains<5)
 actions.core+=/blood_boil,if=dot.blood_plague.remains<3
-# Vampiric Strike to extend Essence of the Blood Queen if it's about to expire.
-actions.core+=/heart_strike,if=(buff.vampiric_strike.up|buff.gift_of_the_sanlayn.up)&buff.essence_of_the_blood_queen.up&buff.essence_of_the_blood_queen.remains<2*gcd
-# Vampiric Strike as Gift of the San'layn is about to expire to extend Essence of the Blood Queen as late as possible.
+# [134222] :: Vampiric Strike to extend Essence of the Blood Queen if it's about to expire.
+actions.core+=/heart_strike,if=buff.vampiric_strike.up&buff.essence_of_the_blood_queen.up&buff.essence_of_the_blood_queen.remains<2*gcd
+# [134222] :: Vampiric Strike as Gift of the San'layn is about to expire to extend Essence of the Blood Queen as late as possible.
 actions.core+=/heart_strike,if=buff.gift_of_the_sanlayn.up&buff.gift_of_the_sanlayn.remains<2*gcd&!prev_gcd.heart_strike
+# dump :: Death Strike to dump Runic Power.
 actions.core+=/death_strike,if=runic_power>variable.death_strike_dump_amount
 actions.core+=/sacrificial_pact,if=buff.dancing_rune_weapon.down&(pet.ghoul.remains<3|boss&fight_remains<3)
 actions.core+=/reapers_mark
 actions.core+=/bonestorm,if=buff.bone_shield.stack>6&(!talent.shattering_bone|death_and_decay.ticking)&(!talent.dancing_rune_weapon|!talent.insatiable_blade|cooldown.dancing_rune_weapon.remains>25)
-actions.core+=/soul_reaper,cycle_targets=1,if=(buff.reaper_of_souls.up|target.time_to_pct_35<5)&active_enemies<=2&target.time_to_die>(dot.soul_reaper.remains+5)
-actions.core+=/marrowrend,if=(((talent.gift_of_the_sanlayn&buff.bone_shield.stack<7)|buff.bone_shield.stack<6)&buff.bonestorm.down)|(buff.exterminate.up&debuff.reapers_mark.up&(debuff.reapers_mark.remains<5|debuff.reapers_mark.stack>=20))
-actions.core+=/consumption,if=(talent.reapers_mark&buff.coagulopathy.stack>=4)|buff.infliction_of_sorrow.up
-actions.core+=/tombstone,if=buff.bone_shield.stack>8&(!talent.shattering_bone|death_and_decay.ticking)&(!talent.dancing_rune_weapon|!talent.insatiable_blade|cooldown.dancing_rune_weapon.remains>25)
+actions.core+=/soul_reaper,cycle_targets=1,if=target.time_to_pct_35<5&active_enemies<=2&target.time_to_die>(dot.soul_reaper.remains+5)
+# [5927621] :: Soul Reaper is free with Reaper of Souls, and should be cast on a target with Reaper's Mark.
+actions.core+=/soul_reaper,if=buff.reaper_of_souls.up&debuff.reapers_mark.up
+actions.core+=/marrowrend,if=((talent.gift_of_the_sanlayn&buff.bone_shield.stack<7)|buff.bone_shield.stack<6)&buff.bonestorm.down
+# [1778227] :: Marrowrend to consume Exterminate if Reaper's Mark will explode soon.
+actions.core+=/marrowrend,if=buff.exterminate.up&debuff.reapers_mark.up&(debuff.reapers_mark.remains<5|debuff.reapers_mark.stack>=20)
+actions.core+=/consumption,if=talent.reapers_mark&buff.coagulopathy.stack>=4
+actions.core+=/tombstone,if=buff.bone_shield.stack>=8&(!talent.shattering_bone|death_and_decay.ticking)&(!talent.dancing_rune_weapon|!talent.insatiable_blade|cooldown.dancing_rune_weapon.remains>25)
 actions.core+=/abomination_limb
 actions.core+=/death_and_decay,if=!death_and_decay.ticking
+# [1778227] :: Marrowrend to consume Exterminate.
 actions.core+=/marrowrend,if=buff.exterminate.up&buff.dancing_rune_weapon.down
 actions.core+=/blooddrinker,if=buff.dancing_rune_weapon.down&active_enemies<=2
-actions.core+=/blood_boil,if=talent.infliction_of_sorrow&dot.blood_plague.remains<15
+actions.core+=/blood_boil,if=talent.infliction_of_sorrow&dot.blood_plague.remains<15&buff.dancing_rune_weapon.down
+# [135277] :: Blood Boil if it's the first one cast during DRW.
+actions.core+=/blood_boil,line_cd=8,if=!talent.everlasting_bond&talent.infliction_of_sorrow&buff.dancing_rune_weapon.up
+# [135277] :: Blood Boil if it's the first one cast during DRW.
+actions.core+=/blood_boil,line_cd=14,if=talent.everlasting_bond&talent.infliction_of_sorrow&buff.dancing_rune_weapon.up
 actions.core+=/heart_strike,if=rune>=2
 actions.core+=/consumption
 actions.core+=/blood_boil
 actions.core+=/heart_strike
+# [5260437] :: Soul Reaper is free with Reaper of Souls.
 actions.core+=/soul_reaper,if=buff.reaper_of_souls.up
-actions.core+=/deaths_caress,if=buff.bone_shield.stack<9|(talent.reinforced_bones&buff.bone_shield.stack<11)
+actions.core+=/deaths_caress,if=(buff.bone_shield.stack<9|(talent.reinforced_bones&buff.bone_shield.stack<11))&buff.bonestorm.down
 
 #actions.defensives+=/antimagic_shell,if=incoming_magic_damage_5s>=0.2*health.max
 actions.defensives+=/vampiric_blood,if=buff.vampiric_blood.down&incoming_damage_5s>=vb_damage
