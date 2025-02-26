@@ -4,26 +4,24 @@
 #
 # Recommended Settings for `/hekili` > *Brewmaster*:
 #
-# - Use Spinning Crane Kick in Single-Target with Walk with the Ox : **unused**
 # - Celestial Brew: Maximize Shield : **unused**
-# - Purifying Brew: Maximize Invoke Niuzao, the Black Ox : **unused**
+# - Purifying Brew: Maximize Improved Invoke Niuzao, the Black Ox : **unused**
 # - Purifying Brew: Stagger Tick % Current Health : 100
 # - Purifying Brew: Stagger Tick % Maximum Health : 20
 # - Breath of Fire: Require Keg Smash % : 50
-# - Expel Harm: Health % : 70
-# - Vivify: Health % : 80
+# - Expel Harm: Health % : 50
+# - Vivify: Health % : 70
 # - Blackout Combo: Maximize Damage : **unused**
 
 actions.precombat+=/rushing_jade_wind
 actions.precombat+=/chi_burst
-actions.precombat+=/keg_smash,if=!talent.stormstouts_last_keg|full_recharge_time<gcd
 
 ### Tunables ###
 
 # Minimum percent of mobs that must have Keg Smash before suggesting Breath of Fire.
 actions+=/variable,name=breath_of_fire_pct_threshold,value=settings.bof_percent
 # Minimum number of Purified Chi stacks before using Celestial Brew.
-actions+=/variable,name=celestial_brew_purified_chi_threshold,value=6
+actions+=/variable,name=celestial_brew_purified_chi_threshold,value=4
 # Stagger percent of current health at which you should use Purifying Brew in an emergency.
 actions+=/variable,name=purify_stagger_pct,value=settings.purify_stagger_currhp
 # Stagger percent of maximum health at which you should use Purifying Brew in an emergency.
@@ -31,7 +29,7 @@ actions+=/variable,name=purify_stagger_max_pct,value=settings.purify_stagger_max
 # Stagger percent at which you should play defensively.
 actions+=/variable,name=defensive_stagger_pct,value=20
 # Health percent at which you should play defensively.
-actions+=/variable,name=defensive_health_pct,value=75
+actions+=/variable,name=defensive_health_pct,value=50
 # Incoming damage taken that's considered "high" as a percentage of maximum health.
 actions+=/variable,name=high_incoming_damage_pct,value=20
 # Minimum number of Gift of the Ox orbs before suggesting Expel Harm.
@@ -55,15 +53,24 @@ actions+=/variable,name=cooldown_rising_sun_kick_duration,value=10*spell_haste
 actions+=/variable,name=has_defensive_buff,value=1,op=setif,condition=buff.celestial_brew.up|buff.dampen_harm.up|buff.fortifying_brew.up,value_else=0
 actions+=/variable,name=can_breath_of_fire,value=1,op=setif,condition=active_dot.keg_smash%active_enemies*100>=variable.breath_of_fire_pct_threshold,value_else=0
 
-actions+=/variable,name=opener,value=1,op=setif,condition=time<2*gcd.max,value_else=0
-
 # Play defensively if major damage-reduction cooldowns are on cooldown and either health is too low or Stagger is too high.
 actions+=/variable,name=should_be_defensive,value=1,op=setif,condition=(!talent.fortifying_brew|cooldown.fortifying_brew.remains>0)&(!talent.dampen_harm|cooldown.dampen_harm.remains>0)&(health.pct<variable.defensive_health_pct|stagger.pct>variable.defensive_stagger_pct),value_else=0
 actions+=/variable,name=high_incoming_damage_amount,value=health.max*variable.high_incoming_damage_pct%100
 
+################
+
+actions.opener+=/keg_smash,if=!talent.stormstouts_last_keg|full_recharge_time<gcd
+actions.opener+=/breath_of_fire
+actions.opener+=/blackout_kick
+actions.opener+=/weapons_of_order
+
+# opener_duration is the approximate length of the opener used on pull.
+actions+=/variable,name=opener_duration,value=4,value_else=3,op=setif,condition=cooldown.weapons_of_order.ready
+
 actions+=/spear_hand_strike
+actions+=/call_action_list,name=opener,if=time<variable.opener_duration
 actions+=/call_action_list,name=heal
-actions+=/call_action_list,name=defensives,if=(variable.opener>0|incoming_damage_5s>0)&variable.has_defensive_buff=0
+actions+=/call_action_list,name=defensives,if=incoming_damage_5s>0&variable.has_defensive_buff=0
 actions+=/call_action_list,name=mitigation,if=buff.blackout_combo.down
 actions+=/call_action_list,name=racials
 actions+=/touch_of_death
@@ -71,20 +78,28 @@ actions+=/run_action_list,name=weapons,if=buff.weapons_of_order.up
 actions+=/run_action_list,name=aoe,if=active_enemies>1
 actions+=/run_action_list,name=st
 
-actions.defensives+=/fortifying_brew,use_off_gcd=1,if=variable.opener>0|incoming_damage_5s>variable.high_incoming_damage_amount
-actions.defensives+=/diffuse_magic,use_off_gcd=1,if=variable.opener>0|incoming_magic_damage_5s>variable.high_incoming_damage_amount
-actions.defensives+=/dampen_harm,use_off_gcd=1,if=variable.opener>0|incoming_damage_5s>variable.high_incoming_damage_amount
-actions.defensives+=/celestial_brew,if=buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold
+actions.defensives+=/fortifying_brew,use_off_gcd=1,if=incoming_damage_5s>variable.high_incoming_damage_amount
+actions.defensives+=/diffuse_magic,use_off_gcd=1,if=incoming_magic_damage_5s>variable.high_incoming_damage_amount
+actions.defensives+=/dampen_harm,use_off_gcd=1,if=incoming_damage_5s>variable.high_incoming_damage_amount
+actions.defensives+=/celestial_brew,if=!talent.endless_draught&buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold
+# dump :: Celestial Brew if Black Ox Brew is coming off cooldown.
+actions.defensives+=/celestial_brew,if=talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd&(!talent.endless_draught|charges_fractional>1)
+# cap :: Celestial Brew to avoid capping on charges.
+actions.defensives+=/celestial_brew,if=talent.endless_draught&full_recharge_time<gcd&buff.purified_chi.up&time>5
 
 actions.heal+=/vivify,if=health.pct<=variable.vivify_health_pct&buff.vivacious_vivification.up
 actions.heal+=/variable,name=expel_harm_heal_amount,value=(buff.gift_of_the_ox.stack*stat.attack_power)+(stat.spell_power*(1+stat.versatility_atk_mod%100))
 actions.heal+=/expel_harm,if=health.pct<variable.expel_harm_health_pct|(buff.gift_of_the_ox.stack>=variable.gift_of_the_ox_min_count&health+variable.expel_harm_heal_amount<=health.max*(1+variable.expel_harm_wasted_pct%100))
 
 actions.mitigation+=/invoke_niuzao_the_black_ox,if=stagger.pct>variable.defensive_stagger_pct
-actions.mitigation+=/black_ox_brew,if=cooldown.celestial_brew.remains>5&cooldown.purifying_brew.charges_fractional<0.75&(stagger.pct>variable.purify_stagger_pct|stagger.pct_max>variable.purify_stagger_max_pct)
-actions.mitigation+=/purifying_brew,if=full_recharge_time<gcd.max&(stagger.heavy|time>5)
-actions.mitigation+=/purifying_brew,if=buff.purified_chi.up&buff.purified_chi.remains<3
+actions.mitigation+=/black_ox_brew,if=((!talent.endless_draught&!cooldown.celestial_brew.ready)|cooldown.celestial_brew.charges_fractional<0.75)&cooldown.purifying_brew.charges_fractional<0.75
 actions.mitigation+=/purifying_brew,if=stagger.pct>variable.purify_stagger_pct|stagger.pct_max>variable.purify_stagger_max_pct
+# [1360979] :: Purifying Brew to maintain Purified Chi to increase absorb of Celestial Brew.
+actions.mitigation+=/purifying_brew,if=buff.purified_chi.up&buff.purified_chi.remains<3
+# dump :: Purifying Brew if Black Ox Brew is coming off cooldown.
+actions.defensives+=/purifying_brew,if=talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd&charges_fractional>1
+# cap :: Purifying Brew to avoid capping charges.
+actions.mitigation+=/purifying_brew,if=full_recharge_time<gcd.max&(stagger.heavy|time>5)
 
 actions.racials=blood_fury
 actions.racials+=/berserking
@@ -95,30 +110,47 @@ actions.racials+=/ancestral_call
 actions.racials+=/bag_of_tricks
 
 actions.aoe+=/rising_sun_kick,if=buff.press_the_advantage.stack>=10&(buff.blackout_combo.up|(!talent.blackout_combo&spell_targets.spinning_crane_kick<=3))
+# [574568] :: Breath of Fire to consume Blackout Combo.
 actions.aoe+=/breath_of_fire,if=variable.can_breath_of_fire>0&buff.blackout_combo.up&(talent.press_the_advantage|active_enemies>=8|variable.should_be_defensive>0)
+# [574568] :: Tiger Palm to consume Blackout Combo.
 actions.aoe+=/tiger_palm,if=buff.blackout_combo.up
-actions.aoe+=/blackout_kick,if=talent.blackout_combo|buff.charred_passions.up
+actions.aoe+=/blackout_kick,if=talent.blackout_combo
+# [1381297] :: Blackout Kick during Charred Passions.
+actions.aoe+=/blackout_kick,if=buff.charred_passions.up
 actions.aoe+=/chi_burst
 actions.aoe+=/keg_smash,if=(!talent.stormstouts_last_keg|full_recharge_time<gcd)&(!talent.press_the_advantage|buff.press_the_advantage.stack<10|variable.should_be_defensive>0|active_enemies>=4)
-actions.aoe+=/celestial_brew,if=talent.endless_draught&(full_recharge_time<gcd|(!dot.aspect_of_harmony_damage&buff.aspect_of_harmony_accumulator.value>0.9*health.max))
+# [5927638] :: Celestial Brew to apply Aspect of Harmony DoT.
+actions.aoe+=/celestial_brew,if=talent.endless_draught&!dot.aspect_of_harmony_damage.ticking&buff.aspect_of_harmony_accumulator.value>0.9*health.max
 actions.aoe+=/breath_of_fire,if=variable.can_breath_of_fire>0&!talent.blackout_combo
 actions.aoe+=/weapons_of_order
 actions.aoe+=/breath_of_fire,if=variable.can_breath_of_fire>0&talent.blackout_combo&buff.blackout_combo.down
 actions.aoe+=/rushing_jade_wind,if=cooldown.exploding_keg.remains<gcd
 actions.aoe+=/exploding_keg,if=!talent.rushing_jade_wind|buff.rushing_jade_wind.up
 actions.aoe+=/rising_sun_kick
+# [1381297] :: Spinning Crane Kick during Charred Passions.
 actions.aoe+=/spinning_crane_kick,if=buff.charred_passions.up&!prev_gcd.spinning_crane_kick
 actions.aoe+=/rushing_jade_wind
+# [594274] :: Black Ox Brew to have energy for Keg Smash.
+actions.aoe+=/black_ox_brew,if=cooldown.keg_smash.ready&energy<variable.energy_cost_keg_smash
 actions.aoe+=/keg_smash,if=talent.stormstouts_last_keg
-actions.aoe+=/tiger_palm,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm&variable.should_be_defensive>0
-actions.aoe+=/spinning_crane_kick,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick&(!talent.press_the_advantage|!prev_gcd.spinning_crane_kick|spell_targets.spinning_crane_kick>=3)
+# dump :: Tiger Palm to dump Energy if Black Ox Brew is coming off cooldown.
+actions.aoe+=/tiger_palm,if=(talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd)&variable.should_be_defensive>0
+actions.aoe+=/tiger_palm,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm)&variable.should_be_defensive>0
+# dump :: Spinning Crane Kick to dump Energy if Black Ox Brew is coming off cooldown.
+actions.aoe+=/spinning_crane_kick,if=(talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd)&(!talent.press_the_advantage|!prev_gcd.spinning_crane_kick|spell_targets.spinning_crane_kick>=3)
+actions.aoe+=/spinning_crane_kick,if=(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)&(!talent.press_the_advantage|!prev_gcd.spinning_crane_kick|spell_targets.spinning_crane_kick>=3)
 
 actions.st+=/rising_sun_kick,if=buff.press_the_advantage.stack>=10&(!talent.blackout_combo|buff.blackout_combo.up)
+# [574568] :: Breath of Fire to consume Blackout Combo.
 actions.st+=/breath_of_fire,if=variable.can_breath_of_fire>0&buff.blackout_combo.up&(talent.press_the_advantage|variable.should_be_defensive>0)
+# [574568] :: Tiger Palm to consume Blackout Combo.
 actions.st+=/tiger_palm,if=buff.blackout_combo.up
-actions.st+=/blackout_kick,if=talent.blackout_combo|buff.charred_passions.up
+actions.st+=/blackout_kick,if=talent.blackout_combo
+# [1381297] :: Blackout Kick during Charred Passions.
+actions.st+=/blackout_kick,if=buff.charred_passions.up
 actions.st+=/keg_smash,if=(!talent.stormstouts_last_keg|full_recharge_time<gcd)&(!talent.press_the_advantage|buff.press_the_advantage.stack<10|variable.should_be_defensive>0)
-actions.st+=/celestial_brew,if=talent.endless_draught&(full_recharge_time<gcd|(!dot.aspect_of_harmony_damage&buff.aspect_of_harmony_accumulator.value>0.9*health.max))
+# [5927638] :: Celestial Brew to apply Aspect of Harmony DoT.
+actions.st+=/celestial_brew,if=talent.endless_draught&!dot.aspect_of_harmony_damage.ticking&buff.aspect_of_harmony_accumulator.value>0.9*health.max
 actions.st+=/breath_of_fire,if=variable.can_breath_of_fire>0&!talent.blackout_combo
 actions.st+=/weapons_of_order
 actions.st+=/breath_of_fire,if=variable.can_breath_of_fire>0&talent.blackout_combo&buff.blackout_combo.down
@@ -127,20 +159,39 @@ actions.st+=/rising_sun_kick
 actions.st+=/chi_burst
 actions.st+=/exploding_keg,if=!talent.rushing_jade_wind|buff.rushing_jade_wind.up
 actions.st+=/rushing_jade_wind
+# [594274] :: Black Ox Brew to have energy for Keg Smash.
+actions.st+=/black_ox_brew,if=cooldown.keg_smash.ready&energy<variable.energy_cost_keg_smash
 actions.st+=/keg_smash,if=talent.stormstouts_last_keg
+# dump :: Tiger Palm to dump Energy if Black Ox Brew is coming off cooldown.
+actions.st+=/tiger_palm,if=talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd
 actions.st+=/tiger_palm,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm
-actions.st+=/spinning_crane_kick,if=talent.press_the_advantage&!prev_gcd.spinning_crane_kick&variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick
+# dump :: Spinning Crane Kick to dump Energy if Black Ox Brew is coming off cooldown.
+actions.st+=/spinning_crane_kick,if=(talent.press_the_advantage&!prev_gcd.spinning_crane_kick)&(talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd)
+actions.st+=/spinning_crane_kick,if=(talent.press_the_advantage&!prev_gcd.spinning_crane_kick)&(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)
 
 actions.weapons+=/rushing_jade_wind
 actions.weapons+=/potion,if=debuff.weapons_of_order_debuff.stack>=4
+# [5927638] :: Celestial Brew to apply Aspect of Harmony DoT with high stacks of Weapons of Order debuff.
+actions.weapons+=/celestial_brew,if=talent.endless_draught&!dot.aspect_of_harmony_damage.ticking&debuff.weapons_of_order_debuff.stack>=4
+# [6035314] :: Chi Burst with high stacks of Weapons of Order debuff.
 actions.weapons+=/chi_burst,if=debuff.weapons_of_order_debuff.stack>=4
+# [6035314] :: Exploding Keg with high stacks of Weapons of Order debuff.
 actions.weapons+=/exploding_keg,if=debuff.weapons_of_order_debuff.stack>=4
+# [6035314] :: Rising Sun Kick to apply Weapons of Order debuff.
 actions.weapons+=/rising_sun_kick,if=buff.press_the_advantage.stack>=10&(!talent.blackout_combo|buff.blackout_combo.up)
+# [574568] :: Tiger Palm to consume Blackout Combo.
 actions.weapons+=/tiger_palm,if=buff.blackout_combo.up
+# [594274] :: Black Ox Brew to have energy for Keg Smash.
 actions.weapons+=/black_ox_brew,if=cooldown.keg_smash.ready&energy<variable.energy_cost_keg_smash
+# [6035314] :: Keg Smash to apply Weapons of Order debuff.
 actions.weapons+=/keg_smash
+# [6035314] :: Rising Sun Kick to apply Weapons of Order debuff.
 actions.weapons+=/rising_sun_kick,if=variable.cooldown_rising_sun_kick_duration<buff.weapons_of_order.remains|buff.weapons_of_order.remains<gcd
 actions.weapons+=/blackout_kick
-actions.weapons+=/tiger_palm,if=(talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd)|variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm
-actions.weapons+=/spinning_crane_kick,if=talent.press_the_advantage&!prev_gcd.spinning_crane_kick&((talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd)|variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)
+# dump :: Tiger Palm to dump Energy if Black Ox Brew is coming off cooldown.
+actions.weapons+=/tiger_palm,if=talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd
+actions.weapons+=/tiger_palm,if=variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_tiger_palm
+# dump :: Spinning Crane Kick to dump Energy if Black Ox Brew is coming off cooldown.
+actions.weapons+=/spinning_crane_kick,if=(talent.press_the_advantage&!prev_gcd.spinning_crane_kick)&(talent.black_ox_brew&cooldown.black_ox_brew.remains<gcd)
+actions.weapons+=/spinning_crane_kick,if=(talent.press_the_advantage&!prev_gcd.spinning_crane_kick)&(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)
 actions.weapons+=/breath_of_fire
