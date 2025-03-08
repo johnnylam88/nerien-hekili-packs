@@ -35,7 +35,7 @@ actions+=/variable,name=high_incoming_damage_pct,value=20
 # Minimum number of Gift of the Ox orbs before suggesting Expel Harm.
 actions+=/variable,name=gift_of_the_ox_min_count,value=3
 # Don't cast Expel Harm if we will waste more than 20% of the self-heal amount.
-actions+=/variable,expel_harm_wasted_pct,value=20
+actions+=/variable,name=expel_harm_wasted_pct,value=20
 # Expel Harm tunable for minimum health percent (see /hekili > Brewmaster).
 actions+=/variable,name=expel_harm_health_pct,value=settings.eh_percent
 # Vivify tunable for minimum health percent (see /hekili > Brewmaster).
