@@ -115,7 +115,7 @@ actions.ar_opener+=/metamorphosis,if=buff.metamorphosis.down
 actions.ar_opener+=/demon_spikes,use_off_gcd=1,if=variable.has_defensive_buff=0
 actions.ar_opener+=/infernal_strike
 actions.ar_opener+=/immolation_aura
-actions.ar_opener+=/fiery_brand,if=talent.fiery_deminse
+actions.ar_opener+=/fiery_brand,if=talent.fiery_demise
 
 # fs_opener_duration is the approximate length of the Aldrachi Reaver opener used on pull.
 actions.ar+=/variable,name=ar_opener_duration,value=3*gcd.max
