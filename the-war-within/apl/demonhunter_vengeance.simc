@@ -143,8 +143,7 @@ actions.ar_aoe+=/fiery_brand,if=active_dot.fiery_brand_dot=0
 actions.ar_aoe+=/soul_carver,if=active_dot.fiery_brand_dot=0
 actions.ar_aoe+=/soul_carver,cycle_targets=1,if=debuff.fiery_brand_dot.up
 actions.ar_aoe+=/sigil_of_spite
-actions.ar_aoe+=/sigil_of_flame,line_cd=1,if=talent.quickened_sigils&buff.metamorphosis.remains<1&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)
-actions.ar_aoe+=/sigil_of_flame,line_cd=2,if=!talent.quickened_sigils&buff.metamorphosis.remains<2&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)
+actions.ar_aoe+=/sigil_of_flame,if=!action.sigil_of_flame.placed&buff.metamorphosis.remains<1&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)
 actions.ar_aoe+=/fel_devastation,if=variable.fel_devastation_ready>0
 actions.ar_aoe+=/immolation_aura
 # [1097742] :: Felblade to generate Fury for Spirit Bomb.
@@ -163,8 +162,7 @@ actions.ar_st+=/sigil_of_spite
 actions.ar_st+=/fiery_brand,if=active_dot.fiery_brand_dot=0
 actions.ar_st+=/soul_carver
 actions.ar_st+=/fel_devastation,if=variable.fel_devastation_ready>0
-actions.ar_st+=/sigil_of_flame,line_cd=1,if=talent.quickened_sigils&buff.metamorphosis.remains<1&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)&variable.fury_gain_sigil_of_flame<=fury.deficit
-actions.ar_st+=/sigil_of_flame,line_cd=2,if=!talent.quickened_sigils&buff.metamorphosis.remains<2&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)&variable.fury_gain_sigil_of_flame<=fury.deficit
+actions.ar_st+=/sigil_of_flame,if=!action.sigil_of_flame.placed&buff.metamorphosis.remains<1&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)&variable.fury_gain_sigil_of_flame<=fury.deficit
 actions.ar_st+=/immolation_aura
 # [1097742] :: Felblade to generate Fury for Spirit Bomb.
 actions.ar_st+=/felblade,if=variable.souls_deficit=0&fury<variable.fury_cost_spirit_bomb
@@ -191,9 +189,6 @@ actions.fs_opener+=/shear,if=!prev_gcd.shear
 # fs_opener_duration is the approximate length of the Fel-Scarred opener used on pull.
 actions.fs+=/variable,name=fs_opener_duration,value=4*gcd.max
 
-# sigil_of_flame_placed is 1 if a Sigil of Flame/Doom has already been placed and is waiting for activation.
-# This is only approximate as it relies on counting GCDs, but this expression will at least work in SimC.
-actions.fs+=/variable,name=sigil_of_flame_placed,value=1,value_else=0,op=setif,condition=prev_gcd.sigil_of_flame|prev_gcd.sigil_of_doom|(!talent.quickened_sigils&(prev_gcd.2.sigil_of_flame|prev_gcd.2.sigil_of_doom))
 # sigil_activation_duration is the number of seconds before a placed sigil will activate.
 actions.fs+=/variable,name=sigil_activation_duration,value=1+talent.quickened_sigils
 
@@ -222,8 +217,8 @@ actions.fs+=/soul_carver
 # [5927628] :: Activate Demonsurge with Fel Desolation.
 actions.fs+=/fel_desolation,if=buff.demonsurge_fel_desolation.up
 # [5927628] :: Activate Demonsurge with Sigil of Doom.
-actions.fs+=/sigil_of_doom,if=variable.sigil_of_flame_placed=0&buff.demonsurge_sigil_of_doom.up&(variable.fury_gain_sigil_of_flame<=fury.deficit|variable.num_targets>1)
-actions.fs+=/sigil_of_flame,if=variable.sigil_of_flame_placed=0&buff.metamorphosis.remains<variable.sigil_activation_duration&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)&(variable.fury_gain_sigil_of_flame<=fury.deficit|variable.num_targets>1)
+actions.fs+=/sigil_of_doom,if=!action.sigil_of_doom.placed&!action.sigil_of_flame.placed&buff.demonsurge_sigil_of_doom.up&(variable.fury_gain_sigil_of_flame<=fury.deficit|variable.num_targets>1)
+actions.fs+=/sigil_of_flame,if=!action.sigil_of_doom.placed&!action.sigil_of_flame.placed&buff.metamorphosis.remains<variable.sigil_activation_duration&(variable.has_illuminated_sigils_safety=0|full_recharge_time<gcd)&(variable.fury_gain_sigil_of_flame<=fury.deficit|variable.num_targets>1)
 actions.fs+=/run_action_list,name=fs_aoe,if=variable.num_targets>1
 actions.fs+=/run_action_list,name=fs_st
 
