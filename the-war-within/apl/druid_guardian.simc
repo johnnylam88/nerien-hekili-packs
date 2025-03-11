@@ -13,6 +13,7 @@
 actions.precombat+=/mark_of_the_wild
 actions.precombat+=/heart_of_the_wild
 actions.precombat+=/bear_form
+actions.precombat+=/use_item,name=swarmlords_authority,if=buff.bear_form.up
 
 ### Constants ###
 
@@ -95,13 +96,14 @@ actions+=/variable,name=has_defensive_buff,value=1,op=setif,value_else=0,conditi
 actions+=/skull_bash
 actions+=/soothe
 actions+=/bear_form
-actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0
+actions+=/call_action_list,name=defensives,if=tanking
 actions+=/call_action_list,name=heal
-actions+=/call_action_list,name=mitigation
+actions+=/call_action_list,name=mitigation,if=tanking
 actions+=/run_action_list,name=bear,if=buff.bear_form.up
 
-actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken
-actions.defensives+=/survival_instincts,use_off_gcd=1,if=incoming_damage_5s>=variable.survival_instincts_damage_taken
+actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1
+actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&variable.has_defensive_buff=0
+actions.defensives+=/survival_instincts,use_off_gcd=1,if=incoming_damage_5s>=variable.survival_instincts_damage_taken&variable.has_defensive_buff=0
 
 actions.heal+=/natures_vigil,if=health.pct<variable.natures_vigil_health_pct
 actions.heal+=/regrowth,if=buff.dream_of_cenarius.up&health.pct<variable.regrowth_health_pct

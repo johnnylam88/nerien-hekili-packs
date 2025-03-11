@@ -15,6 +15,7 @@ actions.precombat+=/raise_dead
 actions.precombat+=/rune_tap,if=buff.rune_tap.down&rune.time_to_6<gcd
 actions.precombat+=/death_and_decay,if=!death_and_decay.ticking|rune.time_to_6<gcd
 actions.precombat+=/deaths_caress,if=buff.bone_shield.down|buff.bone_shield.remains<3
+actions.precombat+=/use_item,name=swarmlords_authority
 
 ### Tunables ###
 
@@ -39,7 +40,7 @@ actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,conditi
 actions+=/mind_freeze
 actions+=/strangulate
 actions+=/gorefiends_grasp,if=talent.tightening_grasp
-actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions+=/call_action_list,name=defensives,if=tanking
 actions+=/potion,if=buff.dancing_rune_weapon.up
 actions+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.up
 # heal :: Death Strike to heal only if it exceeds the minimum heal.
@@ -60,12 +61,13 @@ actions.racials+=/ancestral_call
 actions.racials+=/bag_of_tricks
 #actions.racials+=/arcane_torrent,if=runic_power.deficit>20
 
-#actions.defensives+=/antimagic_shell,if=incoming_magic_damage_5s>=0.2*health.max
-actions.defensives+=/vampiric_blood,if=buff.vampiric_blood.down&incoming_damage_5s>=vb_damage
-actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage
-actions.defensives+=/rune_tap,if=buff.rune_tap.down&incoming_damage_5s>=rt_damage
-#actions.defensives+=/antimagic_zone,if=incoming_magic_damage_5s>=0.2*health.max
-actions.defensives+=/lichborne,if=talent.unholy_endurance&incoming_damage_5s>=0.2*health.max
+actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1
+#actions.defensives+=/antimagic_shell,if=incoming_magic_damage_5s>=0.2*health.max&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions.defensives+=/vampiric_blood,if=buff.vampiric_blood.down&incoming_damage_5s>=vb_damage&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions.defensives+=/rune_tap,if=buff.rune_tap.down&incoming_damage_5s>=rt_damage&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+#actions.defensives+=/antimagic_zone,if=incoming_magic_damage_5s>=0.2*health.max&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions.defensives+=/lichborne,if=talent.unholy_endurance&incoming_damage_5s>=0.2*health.max&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 
 actions.drw_up+=/call_action_list,name=deathbringer,strict=1,if=hero_tree.deathbringer
 # [135277] :: Cast Marrowrend as one of the last three GCDs of Dancing Rune Weapon.

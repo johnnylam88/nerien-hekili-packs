@@ -8,6 +8,7 @@
 # - Reserve Fiery Brand Charges: 0
 
 actions.precombat+=/sigil_of_flame
+actions.precombat+=/use_item,name=swarmlords_authority
 
 ### Tunables ###
 
@@ -101,11 +102,13 @@ actions+=/consume_magic
 actions+=/run_action_list,name=fs,if=hero_tree.felscarred
 actions+=/run_action_list,name=ar
 
+actions.defensives+=/use_item,name=swarmlords_authority,if=buff.metamorphosis.down
+actions.defensives+=/metamorphosis,if=!talent.demonsurge&variable.has_defensive_buff=0
+
 actions.heal+=/bulk_extraction,if=talent.bulk_extraction&(health.pct<variable.bulk_extraction_health_pct_threshold)&(variable.souls_deficit<=variable.num_targets)&(soul_fragments<=2)
 
-actions.mitigation+=/metamorphosis,if=!talent.demonsurge
-actions.mitigation+=/demon_spikes,use_off_gcd=1,if=variable.should_demon_spikes>0
-actions.mitigation+=/soul_barrier,if=variable.souls_deficit<2&variable.should_demon_spikes>0
+actions.mitigation+=/demon_spikes,use_off_gcd=1,if=variable.should_demon_spikes>0&variable.has_defensive_buff=0
+actions.mitigation+=/soul_barrier,if=variable.souls_deficit<2&variable.should_demon_spikes>0&variable.has_defensive_buff=0
 
 #actions.racials+=/arcane_torrent
 
@@ -122,7 +125,8 @@ actions.ar+=/variable,name=ar_opener_duration,value=3*gcd.max
 
 actions.ar+=/call_action_list,name=ar_opener,if=time<variable.ar_opener_duration
 actions.ar+=/call_action_list,name=heal
-actions.ar+=/call_action_list,name=mitigation,if=tanking&variable.has_defensive_buff=0
+actions.ar+=/call_action_list,name=defensives,if=tanking
+actions.ar+=/call_action_list,name=mitigation,if=tanking
 actions.ar+=/call_action_list,name=glaive
 actions.ar+=/the_hunt,if=buff.reavers_glaive.down
 actions.ar+=/infernal_strike,use_off_gcd=1
@@ -203,7 +207,8 @@ actions.fs+=/variable,name=prep_time_metamorphosis,op=add,value=action.sigil_of_
 
 actions.fs+=/call_action_list,name=fs_opener,if=buff.metamorphosis.down&time<variable.fs_opener_duration
 actions.fs+=/call_action_list,name=heal
-actions.fs+=/call_action_list,name=mitigation,if=tanking&variable.has_defensive_buff=0
+actions.fs+=/call_action_list,name=defensives,if=tanking
+actions.fs+=/call_action_list,name=mitigation,if=tanking
 actions.fs+=/call_action_list,name=demonsurge,if=buff.metamorphosis.up&buff.metamorphosis.remains<gcd*(variable.demonsurge_remaining+1)
 actions.fs+=/run_action_list,name=metamorphosis,if=(cooldown.metamorphosis.remains<=variable.prep_time_metamorphosis)&(!cooldown.fel_devastation.ready&cooldown.fel_devastation.remains>10)&variable.demonsurge_remaining=0
 # [1450143] :: Felblade to generate Fury for Fel Devastation.

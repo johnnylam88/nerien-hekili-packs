@@ -19,6 +19,7 @@
 actions.precombat+=/variable,name=opener,value=1,op=set
 actions.precombat+=/defensive_stance,if=!buff.defensive_stance.up
 actions.precombat+=/battle_shout
+actions.precombat+=/use_item,name=swarmlords_authority
 
 actions+=/variable,name=rage_cost_execute,value=40
 actions+=/variable,name=rage_cost_ignore_pain,value=35
@@ -98,17 +99,18 @@ actions+=/pummel
 actions+=/spell_reflection
 actions+=/defensive_stance,if=!buff.defensive_stance.up&health.pct<70&incoming_damage_3s>0.2*health.max
 actions+=/run_action_list,name=opener,if=time<5*gcd.max&variable.opener>0
-actions+=/call_action_list,name=defensives,if=tanking&variable.has_defensive_buff=0
+actions+=/call_action_list,name=defensives,if=tanking
 actions+=/call_action_list,name=heal
 actions+=/battle_stance,if=!buff.battle_stance.up&health.pct>70
 actions+=/call_action_list,name=mitigation
 actions+=/run_action_list,name=standard
 
-actions.defensives+=/demoralizing_shout,if=!talent.booming_voice&incoming_damage_5s>variable.demoralizing_shout_damage_taken
-actions.defensives+=/shield_wall,use_off_gcd=1,if=(!talent.immovable_object|!cooldown.avatar.ready)&incoming_damage_5s>variable.shield_wall_damage_taken
-actions.defensives+=/spell_block,if=incoming_magic_damage_5s>variable.spell_block_damage_taken
-actions.defensives+=/last_stand,use_off_gcd=1,if=!talent.bolster&(incoming_damage_5s>variable.last_stand_damage_taken&health.pct<variable.last_stand_health_pct)
-actions.defensives+=/rallying_cry,use_off_gcd=1,if=incoming_damage_5s>variable.rallying_cry_damage_taken&health.pct<variable.rallying_cry_health_pct
+actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1
+actions.defensives+=/demoralizing_shout,if=!talent.booming_voice&incoming_damage_5s>variable.demoralizing_shout_damage_taken&variable.has_defensive_buff=0
+actions.defensives+=/shield_wall,use_off_gcd=1,if=(!talent.immovable_object|!cooldown.avatar.ready)&incoming_damage_5s>variable.shield_wall_damage_taken&variable.has_defensive_buff=0
+actions.defensives+=/spell_block,if=incoming_magic_damage_5s>variable.spell_block_damage_taken&variable.has_defensive_buff=0
+actions.defensives+=/last_stand,use_off_gcd=1,if=!talent.bolster&(incoming_damage_5s>variable.last_stand_damage_taken&health.pct<variable.last_stand_health_pct)&variable.has_defensive_buff=0
+actions.defensives+=/rallying_cry,use_off_gcd=1,if=incoming_damage_5s>variable.rallying_cry_damage_taken&health.pct<variable.rallying_cry_health_pct&variable.has_defensive_buff=0
 
 actions.heal+=/victory_rush,if=buff.victorious.up&health.pct<variable.victory_rush_health_pct
 actions.heal+=/impending_victory,if=health.pct<variable.victory_rush_health_pct
