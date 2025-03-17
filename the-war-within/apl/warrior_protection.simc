@@ -64,8 +64,8 @@ actions+=/variable,name=victory_rush_health_pct,value=victory_rush_health_pct
 actions+=/variable,name=rage_gen_multiplier,value=1+0.5*buff.unnerving_focus.remains%buff.unnerving_focus.duration
 actions+=/variable,name=rage_per_second_auto_attack,value=1*(1+0.5*talent.war_machine)+2*talent.instigate
 # 3 Rage per incoming auto-attack, and incoming auto-attack every 2s with 1 mob.
-# Assume at 5+ mobs, that we gain 3 Rage every second.
-actions+=/variable,name=rage_per_second_incoming_auto_attack,value=(3%2)+((3%2)%(5-1))*(active_enemies-1),op=setif,condition=active_enemies<5,value_else=3
+# Assume at 1 mob, we don't get any rage, but at 5+ mobs, that we gain 3 Rage every second.
+actions+=/variable,name=rage_per_second_incoming_auto_attack,value=(3%4)*(spell_targets.thunder_clap-1),op=setif,condition=spell_targets.thunder_clap<5,value_else=3
 actions+=/variable,name=rage_per_second_incoming_damage,value=variable.rage_per_second_incoming_auto_attack,op=setif,condition=incoming_physical_damage_5s>0,value_else=0
 # Bloodsurge has a 10% chance to gain 5 rage per Bleed tick.
 actions+=/variable,name=rage_per_second_bloodsurge,value=talent.bloodsurge*(0.1*5%3)*active_dot.deep_wounds
