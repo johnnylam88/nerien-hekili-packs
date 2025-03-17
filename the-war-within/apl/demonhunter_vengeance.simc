@@ -106,11 +106,8 @@ actions+=/variable,name=fs_metamorphosis_ready,value=1,value_else=0,op=setif,con
 # metamorphosis_ready is 1 if Metamorphosis is immiment.
 actions+=/variable,name=metamorphosis_ready,value=1,value_else=0,op=setif,condition=variable.ar_metamorphosis_ready>0|variable.fs_metamorphosis_ready>0
 
-# demon_form_ready is 1 if demon form from Metamorphosis or Fel Devastation (from Demonic) is present or imminent.
-actions+=/variable,name=demon_form_ready,value=1,value_else=0,op=setif,condition=buff.metamorphosis.up|variable.metamorphosis_ready>0|(talent.demonic&variable.fel_devastation_ready>0)
-
-# should_demon_spikes is 1 if Demon Spikes is down and demon form is not ready, or if Demon Spikes can have 100% uptime.
-actions+=/variable,name=should_demon_spikes,value=1,value_else=0,op=setif,condition=buff.demon_spikes.remains<2&(variable.demon_form_ready=0|variable.can_full_uptime_demon_spikes>0)
+# can_demon_spikes is 1 if Demon Spikes is down, and Metamorphosis is down or Demon Spikes can have 100% uptime.
+actions+=/variable,name=can_demon_spikes,value=1,value_else=0,op=setif,condition=buff.demon_spikes.remains<gcd&(buff.metamorphosis.remains<gcd|variable.can_full_uptime_demon_spikes>0)
 
 # has_defensive_buff is 1 if demon form is active, or if Demon Spikes is up but we can't have 100% uptime on it.
 actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=buff.metamorphosis.up|(buff.demon_spikes.up&variable.can_full_uptime_demon_spikes=0)
@@ -125,18 +122,22 @@ actions+=/run_action_list,name=ar
 actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=buff.metamorphosis.down
 actions.defensives+=/fel_devastation,if=!talent.demonsurge&variable.fel_devastation_ready>0&variable.has_fiery_brand_safety=0
 actions.defensives+=/metamorphosis,if=!talent.demonsurge&variable.metamorphosis_ready>0
-actions.defensives+=/darkness,if=incoming_damage_5s>=variable.darkness_damage_taken&buff.metamorphosis.down&variable.has_fiery_brand_safety=0
+actions.defensives+=/darkness,if=incoming_damage_5s>=variable.darkness_damage_taken&buff.metamorphosis.down&(debuff.fiery_brand_dot.down&variable.has_fiery_brand_safety=0)&variable.has_illuminated_sigils_safety=0
 
 actions.heal+=/bulk_extraction,if=talent.bulk_extraction&(health.pct<variable.bulk_extraction_health_pct_threshold)&(variable.souls_deficit<=variable.num_targets)&(soul_fragments<=2)
 
-actions.mitigation+=/demon_spikes,use_off_gcd=1,if=variable.should_demon_spikes>0
+# [1450143] :: Demon Spikes can be used but Fel Devastation is off cooldown.
+actions.mitigation+=/demon_spikes,use_off_gcd=1,if=variable.can_demon_spikes>0&variable.fel_devastation_ready>0
+# [1247262] :: Demon Spikes can be used but Metamorphosis is off cooldown.
+actions.mitigation+=/demon_spikes,use_off_gcd=1,if=variable.can_demon_spikes>0&variable.fel_devastation_ready=0&variable.metamorphosis_ready>0
+actions.mitigation+=/demon_spikes,use_off_gcd=1,if=variable.can_demon_spikes>0&variable.fel_devastation_ready=0&variable.metamorphosis_ready=0
 actions.mitigation+=/soul_barrier,if=variable.souls_deficit<2&variable.has_defensive_buff=0
 
 #actions.racials+=/arcane_torrent
 
 ### Aldrachi Reaver ###
 
-actions.ar_opener+=/demon_spikes,use_off_gcd=1,if=variable.has_defensive_buff=0
+actions.ar_opener+=/demon_spikes,use_off_gcd=1,if=buff.demon_spikes.remains<gcd
 actions.ar_opener+=/felblade
 actions.ar_opener+=/immolation_aura
 actions.ar_opener+=/infernal_strike
@@ -155,7 +156,7 @@ actions.ar+=/call_action_list,name=ar_glaive
 actions.ar+=/the_hunt,if=buff.reavers_glaive.down
 actions.ar+=/infernal_strike,use_off_gcd=1,if=full_recharge_time<gcd
 actions.ar+=/sigil_of_flame,if=!action.sigil_of_flame.placed&(talent.illuminated_sigils&(buff.metamorphosis.remains<variable.sigil_activation_duration+action.sigil_of_flame.execution_time)&variable.has_illuminated_sigils_safety=0)
-actions.ar+=/fiery_brand,if=buff.metamorphosis.down&(active_dot.fiery_brand_dot=0|(talent.burning_alive&variable.has_fiery_brand_safety=0))&variable.has_illuminated_sigils_safety=0
+actions.ar+=/fiery_brand,if=buff.metamorphosis.down&active_dot.fiery_brand_dot=0&variable.has_illuminated_sigils_safety=0
 actions.ar+=/soul_carver,if=variable.num_targets=1&debuff.fiery_brand_dot.up
 actions.ar+=/soul_carver,cycle_targets=1,if=variable.num_targets>1&debuff.fiery_brand_dot.up
 actions.ar+=/sigil_of_spite
@@ -196,7 +197,7 @@ actions.ar_spirit_bomb+=/soul_cleave,if=soul_fragments=0&variable.should_dump_fu
 
 actions.fs_opener+=/infernal_strike
 actions.fs_opener+=/fiery_brand,if=talent.fiery_demise&active_dot.fiery_brand_dot=0
-actions.fs_opener+=/demon_spikes,use_off_gcd=1,if=variable.has_defensive_buff=0
+actions.fs_opener+=/demon_spikes,use_off_gcd=1,if=buff.demon_spikes.remains<gcd
 actions.fs_opener+=/immolation_aura
 actions.fs_opener+=/felblade
 actions.fs_opener+=/fracture,if=!prev_gcd.fracture
