@@ -6,7 +6,7 @@
 #
 # Recommended Settings for `/hekili` > *Vengeance*:
 #
-# - Reserve Infernal Strike Charges: 0.8
+# - Reserve Infernal Strike Charges: 0
 # - Reserve Fiery Brand Charges: 0
 
 actions.precombat+=/sigil_of_flame,if=hero_tree.felscarred
