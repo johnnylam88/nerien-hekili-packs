@@ -55,7 +55,8 @@ actions+=/variable,name=survival_instincts_damage_taken,value=0.2*health.max
 # 4 Rage per auto-attack.
 actions+=/variable,name=rage_per_second_auto_attack,value=4%(2*attack_haste)
 # 3 Rage per incoming auto-attack, and incoming auto-attack every 2s with 1 mob.
-# Assume at 5+ mobs that we gain 3 Rage per second.
+# Assume at 1 mob, we don't get any rage, but at 5+ mobs that we gain 3 Rage per second.
+actions+=/variable,name=rage_per_second_incoming_auto_attack,value=(3%4)*(active_enemies-1),value_else=3,op=setif,condition=active_enemies<5
 actions+=/variable,name=rage_per_second_incoming_auto_attack,value=(3%2)+((3%2)%(5-1))*(active_enemies-1),value_else=3,op=setif,condition=active_enemies<5
 # Blood Frenzy causes the Thrash DoT to generate 3 Rage per tick on up to 5 targets.
 actions+=/variable,name=rage_per_second_blood_frenzy,value=talent.blood_frenzy*(3%dot.thrash_bear.tick_time)*(active_dot.thrash_bear<?5)
