@@ -59,6 +59,8 @@ actions+=/variable,name=shield_wall_damage_taken,value=shield_wall_damage_taken
 actions+=/variable,name=spell_block_damage_taken,value=0.2*health.max
 # Victory Rush tunable for minimum health percent (see /hekili > Protection).
 actions+=/variable,name=victory_rush_health_pct,value=victory_rush_health_pct
+# Minimum percent of mobs that must have Demoralizing Shout to avoid overlapping another defensive.
+actions+=/variable,name=demoralizing_shout_pct_threshold,value=75
 
 ################
 
@@ -91,8 +93,10 @@ actions+=/variable,name=rage_check_thunder_clap,value=1,value_else=0,op=setif,co
 # should_dump_rage is 1 if an ability is coming off cooldown and will overcap on Rage.
 actions+=/variable,name=should_dump_rage,value=1,value_else=0,op=setif,condition=variable.rage_check>0|variable.rage_check_avatar>0|variable.rage_check_demoralizing_shout>0|variable.rage_check_shield_charge>0|variable.rage_check_shield_slam>0|variable.rage_check_champions_spear>0|variable.rage_check_thunder_blast>0|variable.rage_check_thunder_blast>0|variable.rage_check_thunder_clap>0
 
+actions+=/variable,name=has_demoralizing_shout_safety,value=1,value_else=0,op=setif,condition=(active_dot.demoralizing_shout%active_enemies*100>=variable.demoralizing_shout_pct_threshold)
+
 actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.chromebustible_bomb_suit.up|buff.mudborne.up
-actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=active_dot.demoralizing_shout>0|buff.shield_wall.up|buff.spell_block.up|buff.chromebustible_bomb_suit.up
+actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=variable.has_demoralizing_shout_safety>0|buff.shield_wall.up|buff.spell_block.up|buff.chromebustible_bomb_suit.up
 
 actions+=/variable,name=ignore_pain_cap,value=0.3*health.max
 actions+=/variable,name=ignore_pain_absorb,value=buff.ignore_pain.v1,value_else=0,op=setif,condition=buff.ignore_pain.up
