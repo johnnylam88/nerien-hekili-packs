@@ -13,7 +13,9 @@
 actions.precombat+=/mark_of_the_wild
 actions.precombat+=/heart_of_the_wild
 actions.precombat+=/bear_form
-actions.precombat+=/use_item,name=swarmlords_authority,if=buff.bear_form.up
+actions.precombat+=/use_item,name=swarmlords_authority,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
+actions.precombat+=/use_item,name=chromebustible_bomb_suit,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
+actions.precombat+=/use_item,name=ringing_ritual_mud,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
 
 ### Constants ###
 
@@ -85,11 +87,13 @@ actions+=/variable,name=should_dump_rage,value=1,value_else=0,op=setif,condition
 actions+=/variable,name=ironfur_threshold,value=floor(incoming_physical_damage_5s%variable.ironfur_damage_taken)
 actions+=/variable,name=should_ironfur,value=1,value_else=0,op=setif,condition=buff.ironfur.down|buff.ironfur.remains<2|buff.ironfur.stack<variable.ironfur_threshold
 
-actions+=/variable,name=buff_berserk_up,value=1,value_else=0,op=setif,condition=buff.berserk_bear.up|buff.incarnation_guardian_of_ursoc.up
+# berserk_ready is 1 if Berserk or Incarnation is imminent.
+actions+=/variable,name=berserk_ready,value=1,value_else=0,op=setif,condition=(talent.incarnation&cooldown.incarnation.remains<gcd)|(!talent.incarnation&cooldown.berserk_bear.remains<gcd)
 
 # Several of the offensive cooldowns give a defensive benefit.
-actions+=/variable,name=has_offensive_defensive_buff,value=1,value_else=0,op=setif,condition=buff.lunar_beam.up|buff.rage_of_the_sleeper.up|variable.buff_berserk_up>0
-actions+=/variable,name=has_defensive_buff,value=1,op=setif,value_else=0,condition=buff.barkskin.up|buff.survival_instincts.up|variable.has_offensive_defensive_buff>0
+actions+=/variable,name=has_offensive_defensive_buff,value=1,value_else=0,op=setif,condition=buff.lunar_beam.up|buff.rage_of_the_sleeper.up|buff.berserk_bear.up|buff.incarnation.up
+actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=buff.barkskin.up|buff.survival_instincts.up|buff.chromebustible_bomb_suit.up|variable.has_offensive_defensive_buff>0
+actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.chromebustible_bomb_suit.up|buff.mudborne.up
 
 ################
 
@@ -101,9 +105,11 @@ actions+=/call_action_list,name=heal
 actions+=/call_action_list,name=mitigation,if=tanking
 actions+=/run_action_list,name=bear,if=buff.bear_form.up
 
-actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1
+actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0
+actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0
 actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&variable.has_defensive_buff=0
-actions.defensives+=/survival_instincts,use_off_gcd=1,if=incoming_damage_5s>=variable.survival_instincts_damage_taken&variable.has_defensive_buff=0
+actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions.defensives+=/survival_instincts,use_off_gcd=1,if=incoming_damage_5s>=variable.survival_instincts_damage_taken&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 
 actions.heal+=/natures_vigil,if=health.pct<variable.natures_vigil_health_pct
 actions.heal+=/regrowth,if=buff.dream_of_cenarius.up&health.pct<variable.regrowth_health_pct
@@ -124,8 +130,8 @@ actions.bear+=/heart_of_the_wild
 actions.bear+=/convoke_the_spirits
 actions.bear+=/berserk_bear
 actions.bear+=/incarnation
-actions.bear+=/call_action_list,name=racials,if=variable.buff_berserk_up>0
-actions.bear+=/potion,if=variable.buff_berserk_up>0
+actions.bear+=/call_action_list,name=racials,if=buff.berserk_bear.up|buff.incarnation.up
+actions.bear+=/potion,if=buff.berserk_bear.up|buff.incarnation.up
 actions.bear+=/lunar_beam
 actions.bear+=/rage_of_the_sleeper
 # free :: Maul is free with Tooth and Claw proc.

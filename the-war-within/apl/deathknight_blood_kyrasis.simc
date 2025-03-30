@@ -16,6 +16,8 @@ actions.precombat+=/rune_tap,if=buff.rune_tap.down&rune.time_to_6<gcd
 actions.precombat+=/death_and_decay,if=!death_and_decay.ticking|rune.time_to_6<gcd
 actions.precombat+=/deaths_caress,if=buff.bone_shield.down|buff.bone_shield.remains<3
 actions.precombat+=/use_item,name=swarmlords_authority
+actions.precombat+=/use_item,name=chromebustible_bomb_suit
+actions.precombat+=/use_item,name=ringing_ritual_mud
 
 ### Tunables ###
 
@@ -23,6 +25,8 @@ actions.precombat+=/use_item,name=swarmlords_authority
 actions+=/variable,name=death_strike_pool_value,value=105
 # Death Strike below 70% health.
 actions+=/variable,name=death_strike_health_pct_threshold,value=70
+# Lichborne tunable for incoming damage with Unholy Endurance.
+actions+=/variable,name=lichborne_damage_taken,value=0.2*health.max
 
 ################
 
@@ -32,10 +36,10 @@ actions+=/variable,name=death_strike_dump_amount,value=variable.death_strike_poo
 actions+=/variable,name=death_strike_minimum_heal,value=1,value_else=0,op=setif,condition=buff.coagulating_blood.stack*(25%100)<7
 
 # has_absorb_buff is 1 if Umbilicus Eternus is up.
-actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.umbilicus_eternus.up
+actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.umbilicus_eternus.up|buff.chromebustible_bomb_suit.up|buff.mudborne.up
 
 # has_defensive_buff is 1 if Vampiric Blood, Dancing Rune Weapon, Icebound Fortitude, Rune Tap, or Lichborne are active.
-actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=buff.vampiric_blood.up|buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.rune_tap.up|(talent.unholy_endurance&buff.lichborne.up)
+actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=buff.vampiric_blood.up|buff.dancing_rune_weapon.up|buff.icebound_fortitude.up|buff.rune_tap.up|(talent.unholy_endurance&buff.lichborne.up)|buff.chromebustible_bomb_suit.up
 
 actions+=/mind_freeze
 actions+=/strangulate
@@ -89,13 +93,15 @@ actions.core+=/heart_strike
 actions.core+=/soul_reaper,if=buff.reaper_of_souls.up
 actions.core+=/deaths_caress,if=(buff.bone_shield.stack<9|(talent.reinforced_bones&buff.bone_shield.stack<11))&buff.bonestorm.down
 
-actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1
+actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
+actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
 #actions.defensives+=/antimagic_shell,if=incoming_magic_damage_5s>=0.2*health.max&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 actions.defensives+=/vampiric_blood,if=buff.vampiric_blood.down&incoming_damage_5s>=vb_damage&variable.has_defensive_buff=0&variable.has_absorb_buff=0
-actions.defensives+=/icebound_fortitude,if=incoming_damage_5s>=ibf_damage&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=rt_damage&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions.defensives+=/icebound_fortitude,use_off_gcd=1,if=incoming_damage_5s>=ibf_damage&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 actions.defensives+=/rune_tap,if=buff.rune_tap.down&incoming_damage_5s>=rt_damage&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 #actions.defensives+=/antimagic_zone,if=incoming_magic_damage_5s>=0.2*health.max&variable.has_defensive_buff=0&variable.has_absorb_buff=0
-actions.defensives+=/lichborne,if=talent.unholy_endurance&incoming_damage_5s>=0.2*health.max&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions.defensives+=/lichborne,use_off_gcd=1,if=talent.unholy_endurance&incoming_damage_5s>=variable.lichborne_damage_taken&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 
 actions.racials=blood_fury,if=cooldown.dancing_rune_weapon.ready&(!cooldown.blooddrinker.ready|!talent.blooddrinker)
 actions.racials+=/berserking

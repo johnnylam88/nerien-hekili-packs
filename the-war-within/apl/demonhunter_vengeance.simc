@@ -109,8 +109,11 @@ actions+=/variable,name=metamorphosis_ready,value=1,value_else=0,op=setif,condit
 # can_demon_spikes is 1 if Demon Spikes is down, and Metamorphosis is down or Demon Spikes can have 100% uptime.
 actions+=/variable,name=can_demon_spikes,value=1,value_else=0,op=setif,condition=buff.demon_spikes.remains<gcd&(buff.metamorphosis.remains<gcd|variable.can_full_uptime_demon_spikes>0)
 
-# has_defensive_buff is 1 if demon form is active, or if Demon Spikes is up but we can't have 100% uptime on it.
-actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=buff.metamorphosis.up|(buff.demon_spikes.up&variable.can_full_uptime_demon_spikes=0)
+# has_defensive_buff is 1 if demon form is active.
+actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=buff.metamorphosis.up|buff.chromebustible_bomb_suit.up
+
+# has_absorb_buff is 1 if an absorb shield buff is active.
+actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.soul_barrier.up|buff.chromebustible_bomb_suit.up|buff.mudborne.up
 
 ################
 
@@ -119,19 +122,20 @@ actions+=/consume_magic
 actions+=/run_action_list,name=fs,if=hero_tree.felscarred
 actions+=/run_action_list,name=ar
 
-actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=buff.metamorphosis.down
+actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=variable.metamorphosis_damage_taken&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 actions.defensives+=/fel_devastation,if=!talent.demonsurge&variable.fel_devastation_ready>0&variable.has_fiery_brand_safety=0
 actions.defensives+=/metamorphosis,if=!talent.demonsurge&variable.metamorphosis_ready>0
-actions.defensives+=/darkness,if=incoming_damage_5s>=variable.darkness_damage_taken&buff.metamorphosis.down&(debuff.fiery_brand_dot.down&variable.has_fiery_brand_safety=0)&variable.has_illuminated_sigils_safety=0
+actions.defensives+=/darkness,if=incoming_damage_5s>=variable.darkness_damage_taken&variable.has_defensive_buff=0&(debuff.fiery_brand_dot.down&variable.has_fiery_brand_safety=0)&variable.has_illuminated_sigils_safety=0
 
-actions.heal+=/bulk_extraction,if=talent.bulk_extraction&(health.pct<variable.bulk_extraction_health_pct_threshold)&(variable.souls_deficit<=variable.num_targets)&(soul_fragments<=2)
+actions.heal+=/bulk_extraction,if=(health.pct<variable.bulk_extraction_health_pct_threshold)&(variable.souls_deficit<=variable.num_targets)&(soul_fragments<=2)
 
 # [1450143] :: Demon Spikes can be used but Fel Devastation is off cooldown.
 actions.mitigation+=/demon_spikes,use_off_gcd=1,if=variable.can_demon_spikes>0&variable.fel_devastation_ready>0
 # [1247262] :: Demon Spikes can be used but Metamorphosis is off cooldown.
 actions.mitigation+=/demon_spikes,use_off_gcd=1,if=variable.can_demon_spikes>0&variable.fel_devastation_ready=0&variable.metamorphosis_ready>0
 actions.mitigation+=/demon_spikes,use_off_gcd=1,if=variable.can_demon_spikes>0&variable.fel_devastation_ready=0&variable.metamorphosis_ready=0
-actions.mitigation+=/soul_barrier,if=variable.souls_deficit<2&variable.has_defensive_buff=0
 
 #actions.racials+=/arcane_torrent
 
