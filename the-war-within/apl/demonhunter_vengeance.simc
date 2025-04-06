@@ -178,7 +178,7 @@ actions.ar+=/felblade
 actions.ar+=/shear,if=variable.souls_deficit>0
 actions.ar+=/throw_glaive
 
-actions.ar_glaive+=/reavers_glaive,if=(buff.glaive_flurry.down&buff.rending_strike.down)&(buff.thrill_of_the_fight.down|buff.thrill_of_the_fight.remains<4)
+actions.ar_glaive+=/reavers_glaive,if=(buff.glaive_flurry.down&buff.rending_strike.down)&(buff.thrill_of_the_fight_damage.down|buff.thrill_of_the_fight_damage.remains<4)
 # [5927616] :: Empowered Soul Cleave from Art of the Glaive (single-target)
 actions.ar_glaive+=/soul_cleave,if=buff.glaive_flurry.up&(variable.num_targets=1&(debuff.reavers_mark.down|debuff.reavers_mark.stack<2|debuff.reavers_mark.remains<gcd*2))
 # [5927616] :: Empowered Fracture from Art of the Glaive
