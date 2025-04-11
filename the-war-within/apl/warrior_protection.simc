@@ -41,8 +41,8 @@ actions+=/variable,name=rage_gain_thunder_clap,value=5*variable.rage_gen_multipl
 
 # Pool enough Rage to cast Shield Block with some cushion in case our Rage estimate is wrong.
 actions+=/variable,name=rage_pool_value,value=variable.rage_cost_shield_block+20
-# Don't cast Ignore Pain if we will waste more than 30% of the casted absorb.
-actions+=/variable,name=ignore_pain_wasted_pct,value=30
+# Don't cast Ignore Pain if we will waste too much of the casted absorb.
+actions+=/variable,name=ignore_pain_wasted_pct,value=20
 # Demoralizing Shout tunable for incoming damage.
 actions+=/variable,name=demoralizing_shout_damage_taken,value=0.2*health.max
 # Last Stand tunable for incoming damage (see /hekili > Protection).
@@ -63,6 +63,9 @@ actions+=/variable,name=victory_rush_health_pct,value=victory_rush_health_pct
 actions+=/variable,name=demoralizing_shout_pct_threshold,value=75
 
 ################
+
+# has_deep_wounds_threat is 1 if the percentage of enemy mobs with the Deep Wounds DoT on them exceeds 75%.
+actions+=/variable,name=has_deep_wounds_threat,value=1,value_else=0,op=setif,condition=(active_dot.deep_wounds%active_enemies*100)>75
 
 actions+=/variable,name=rage_gen_multiplier,value=1+0.5*buff.unnerving_focus.remains%buff.unnerving_focus.duration
 actions+=/variable,name=rage_per_second_auto_attack,value=1*(1+0.5*talent.war_machine)+2*talent.instigate
@@ -101,14 +104,14 @@ actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,conditi
 actions+=/variable,name=ignore_pain_cap,value=0.3*health.max
 actions+=/variable,name=ignore_pain_absorb,value=buff.ignore_pain.v1,value_else=0,op=setif,condition=buff.ignore_pain.up
 # Magic constants to estimate the absorb granted by casting Ignore Pain.
-actions+=/variable,name=ignore_pain_absorb_oncast,value=stat.attack_power*4.375*(1+stat.versatility_atk_mod)*2
-# should_ignore_pain is 1 if we are keeping up the Ignore Pain absorb or should dump Rage.
-actions+=/variable,name=should_ignore_pain,value=1,value_else=0,op=setif,condition=(variable.has_absorb_buff=0&(buff.ignore_pain.down|buff.ignore_pain.remains<gcd|(variable.ignore_pain_cap-variable.ignore_pain_absorb)>(variable.ignore_pain_absorb_oncast*(1-variable.ignore_pain_wasted_pct%100))&incoming_damage_5s>0))|variable.should_dump_rage>0
+actions+=/variable,name=ignore_pain_absorb_oncast,value=stat.attack_power*5.75*(1+0.2*talent.no_stranger_to_pain)*(1+stat.versatility_atk_mod)*2
+# should_ignore_pain is 1 if we are keeping up the Ignore Pain absorb; keep adding to Ignore Pain if incoming damage exceeds the existing absorb amount.
+actions+=/variable,name=should_ignore_pain,value=1,value_else=0,op=setif,condition=buff.ignore_pain.down|buff.ignore_pain.remains<2|(variable.has_absorb_buff=0&(variable.ignore_pain_cap-variable.ignore_pain_absorb)>(variable.ignore_pain_absorb_oncast*(1-variable.ignore_pain_wasted_pct%100))&variable.has_deep_wounds_threat>0&incoming_damage_5s>variable.ignore_pain_absorb)
 
 actions+=/pummel
 actions+=/spell_reflection
 actions+=/defensive_stance,if=!buff.defensive_stance.up&health.pct<70&incoming_damage_3s>0.2*health.max
-actions+=/run_action_list,name=opener,if=time<5*gcd.max
+actions+=/call_action_list,name=opener,if=time<=3*gcd.max
 actions+=/call_action_list,name=mitigation,if=tanking
 actions+=/call_action_list,name=defensives,if=tanking
 actions+=/call_action_list,name=heal
@@ -132,26 +135,16 @@ actions.mitigation+=/shield_block,if=buff.shield_block.down|buff.shield_block.re
 actions.mitigation+=/last_stand,if=talent.bolster&buff.shield_block.down
 # [841383] :: Ignore Pain to trigger Violent Outburst.
 actions.mitigation+=/ignore_pain,use_off_gcd=1,if=variable.should_ignore_pain>0&variable.should_spend_rage>0&(buff.seeing_red.stack>=variable.seeing_red_ignore_pain&cooldown.shield_slam.ready)
-actions.mitigation+=/ignore_pain,if=variable.should_ignore_pain>0
+actions.mitigation+=/ignore_pain,use_off_gcd=1,if=variable.should_ignore_pain>0
 
+# Put up Shield Block as quickly as possible and debuff mobs with Demoralizing Shout at the start of a pull.
+actions.opener+=/shield_block,use_off_gcd=1,if=buff.shield_block.down
 actions.opener+=/ravager
-actions.opener+=/charge,if=movement.distance>8
-actions.opener+=/avatar
+actions.opener+=/charge,use_off_gcd=1,if=movement.distance>8
+actions.opener+=/avatar,use_off_gcd=1
 # [132110] :: Shield Charge to generate Rage for or apply Shield Block.
-actions.opener+=/shield_charge,if=buff.shield_block.down&rage<variable.rage_cost_shield_block
-actions.opener+=/shield_block,if=buff.shield_block.down|buff.shield_block.remains<4
-actions.opener+=/last_stand,if=talent.bolster&buff.shield_block.down
-actions.opener+=/ignore_pain,if=variable.should_dump_rage>0
-actions.opener+=/demoralizing_shout,if=talent.booming_voice
-actions.opener+=/champions_spear
-actions.opener+=/thunderous_roar
-actions.opener+=/shield_charge
-actions.opener+=/call_action_list,name=outburst,if=talent.violent_outburst
-actions.opener+=/thunder_blast,if=talent.unstoppable_force&buff.avatar.up
-actions.opener+=/thunder_clap,if=talent.unstoppable_force&buff.avatar.up
-actions.opener+=/shield_slam,if=buff.thunder_blast.stack<2
-actions.opener+=/thunder_blast,if=buff.burst_of_power.stack<2
-actions.opener+=/thunder_clap,if=buff.thunder_blast.down
+actions.opener+=/shield_charge,if=buff.shield_block.down|rage<variable.rage_cost_shield_block
+actions.opener+=/demoralizing_shout
 
 # [236308] :: Thunder Blast to consume Violent Outburst in multi-target.
 actions.outburst+=/thunder_blast,if=buff.violent_outburst.up&spell_targets.thunder_clap>=2
@@ -179,14 +172,25 @@ actions.racials+=/ancestral_call
 actions.racials+=/bag_of_tricks
 
 # [132090] :: Revenge to apply Deep Wounds
-actions.ravager_up+=/revenge,if=debuff.deep_wounds.down
+actions.ravager_up+=/revenge,if=debuff.deep_wounds.down|variable.has_deep_wounds_threat=0
 # [970854] :: Shield Slam during Ravager.
-actions.ravager_up+=/shield_slam,if=talent.heavy_repercussions
-# [970854] :: Revenge during Ravager.
-actions.ravager_up+=/revenge,if=variable.should_spend_rage>0
+actions.ravager_up+=/shield_slam
+# [970854] :: Revenge during Ravager in multi-target.
+actions.ravager_up+=/revenge,if=(variable.should_dump_rage>0|variable.should_spend_rage>0)&spell_targets.revenge>=2
+# [970854] :: Execute during Ravager.
+actions.ravager_up+=/execute,if=(variable.should_dump_rage>0|variable.should_spend_rage>0)
 
-actions.spend_rage+=/execute,if=variable.rage_at_next_shield_block-variable.rage_cost_execute>=variable.rage_pool_value&spell_targets.revenge<=4
-actions.spend_rage+=/revenge,if=variable.rage_at_next_shield_block-variable.rage_cost_revenge>=variable.rage_pool_value
+# dump :: Revenge with Colossus hero talents to prevent Rage from capping.
+actions.dump_rage+=/revenge,if=hero_tree.colossus
+# dump :: Execute to prevent Rage from capping with 4 or fewer targets.
+actions.dump_rage+=/execute,if=spell_targets.revenge<=4
+# dump :: Revenge to prevent Rage from capping.
+actions.dump_rage+=/revenge
+
+# Prefer Revenge to spend Rage with Colossus hero talents.
+actions.spend_rage+=/revenge,if=(variable.rage_at_next_shield_block-variable.rage_cost_revenge>=variable.rage_pool_value)&spell_targets.revenge>=2&hero_tree.colossus
+actions.spend_rage+=/execute,if=(variable.rage_at_next_shield_block-variable.rage_cost_execute>=variable.rage_pool_value)&spell_targets.revenge<=4
+actions.spend_rage+=/revenge,if=(variable.rage_at_next_shield_block-variable.rage_cost_revenge>=variable.rage_pool_value)
 
 actions.standard+=/charge,if=movement.distance>8
 # [613534] :: Thunder Blast during Avatar.
@@ -194,7 +198,7 @@ actions.standard+=/thunder_blast,if=talent.unstoppable_force&buff.avatar.up
 # [613534] :: Thunder Clap during Avatar.
 actions.standard+=/thunder_clap,if=talent.unstoppable_force&buff.avatar.up
 actions.standard+=/ravager
-actions.standard+=/avatar
+actions.standard+=/avatar,if=buff.avatar.down
 actions.standard+=/call_action_list,name=racials
 actions.standard+=/potion,if=buff.avatar.up
 actions.standard+=/demoralizing_shout,if=talent.booming_voice
@@ -207,11 +211,12 @@ actions.standard+=/revenge,if=buff.revenge.up
 actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.up&spell_targets.revenge<=4
 actions.standard+=/call_action_list,name=outburst,if=talent.violent_outburst
 actions.standard+=/call_action_list,name=ravager_up,if=talent.ravager&buff.shield_block.up&buff.ravager.remains>0
+actions.standard+=/call_action_list,name=dump_rage,if=variable.should_dump_rage>0
 actions.standard+=/shield_charge
 actions.standard+=/shield_slam,if=buff.thunder_blast.stack<2
 actions.standard+=/thunder_blast,if=buff.burst_of_power.stack<2
 actions.standard+=/thunder_clap,if=buff.thunder_blast.down
 # [132090] :: Revenge to apply Deep Wounds.
-actions.standard+=/revenge,if=debuff.deep_wounds.down
+actions.standard+=/revenge,if=debuff.deep_wounds.down|variable.has_deep_wounds_threat=0
 actions.standard+=/call_action_list,name=spend_rage,if=variable.should_ignore_pain=0&variable.should_spend_rage>0
 actions.standard+=/devastate
