@@ -109,10 +109,10 @@ actions+=/pummel
 actions+=/spell_reflection
 actions+=/defensive_stance,if=!buff.defensive_stance.up&health.pct<70&incoming_damage_3s>0.2*health.max
 actions+=/run_action_list,name=opener,if=time<5*gcd.max
+actions+=/call_action_list,name=mitigation,if=tanking
 actions+=/call_action_list,name=defensives,if=tanking
 actions+=/call_action_list,name=heal
 actions+=/battle_stance,if=!buff.battle_stance.up&health.pct>70
-actions+=/call_action_list,name=mitigation,if=tanking
 actions+=/run_action_list,name=standard
 
 actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0

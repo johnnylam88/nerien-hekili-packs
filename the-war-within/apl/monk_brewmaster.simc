@@ -73,9 +73,9 @@ actions+=/variable,name=opener_duration,value=4,value_else=3,op=setif,condition=
 
 actions+=/spear_hand_strike
 actions+=/call_action_list,name=opener,if=time<variable.opener_duration
-actions+=/call_action_list,name=heal
-actions+=/call_action_list,name=defensives,if=tanking
 actions+=/call_action_list,name=mitigation,if=tanking&buff.blackout_combo.down
+actions+=/call_action_list,name=defensives,if=tanking
+actions+=/call_action_list,name=heal
 actions+=/call_action_list,name=racials
 actions+=/touch_of_death
 actions+=/run_action_list,name=weapons,if=buff.weapons_of_order.up

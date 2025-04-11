@@ -101,9 +101,9 @@ actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=
 actions+=/skull_bash
 actions+=/soothe
 actions+=/bear_form
+actions+=/call_action_list,name=mitigation,if=tanking
 actions+=/call_action_list,name=defensives,if=tanking
 actions+=/call_action_list,name=heal
-actions+=/call_action_list,name=mitigation,if=tanking
 actions+=/run_action_list,name=bear,if=buff.bear_form.up
 
 actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0

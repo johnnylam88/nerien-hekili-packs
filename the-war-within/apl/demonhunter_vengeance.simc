@@ -153,9 +153,9 @@ actions.ar_opener+=/fel_devastation
 actions.ar+=/variable,name=ar_opener_duration,value=5*gcd.max
 
 actions.ar+=/call_action_list,name=ar_opener,if=time<variable.ar_opener_duration
-actions.ar+=/call_action_list,name=heal
-actions.ar+=/call_action_list,name=defensives,if=tanking
 actions.ar+=/call_action_list,name=mitigation,if=tanking
+actions.ar+=/call_action_list,name=defensives,if=tanking
+actions.ar+=/call_action_list,name=heal
 actions.ar+=/call_action_list,name=ar_glaive
 actions.ar+=/the_hunt,if=buff.reavers_glaive.down
 actions.ar+=/infernal_strike,use_off_gcd=1,if=full_recharge_time<gcd
@@ -220,9 +220,9 @@ actions.fs+=/variable,name=prep_time_metamorphosis,op=add,value=variable.prep_ti
 actions.fs+=/variable,name=prep_time_metamorphosis,op=add,value=action.sigil_of_flame.execute_time*cooldown.sigil_of_flame.charges,if=talent.violent_transformation
 
 actions.fs+=/call_action_list,name=fs_opener,if=buff.metamorphosis.down&time<variable.fs_opener_duration
-actions.fs+=/call_action_list,name=heal
-actions.fs+=/call_action_list,name=defensives,if=tanking
 actions.fs+=/call_action_list,name=mitigation,if=tanking
+actions.fs+=/call_action_list,name=defensives,if=tanking
+actions.fs+=/call_action_list,name=heal
 actions.fs+=/call_action_list,name=demonsurge,if=buff.metamorphosis.up&buff.metamorphosis.remains<gcd*(variable.demonsurge_remaining+1)
 actions.fs+=/run_action_list,name=metamorphosis,if=(cooldown.metamorphosis.remains<=variable.prep_time_metamorphosis)&(!cooldown.fel_devastation.ready&cooldown.fel_devastation.remains>10)&variable.demonsurge_remaining=0
 # [1450143] :: Felblade to generate Fury for Fel Devastation.
