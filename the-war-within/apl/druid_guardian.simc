@@ -124,7 +124,7 @@ actions.racials+=/berserking
 actions.spend_rage+=/maul
 actions.spend_rage+=/raze
 
-# stack :: Maintain max stacks of Thrash.
+# [132143] :: Maintain max stacks of Thrash for DR from Rend and Tear.
 actions.bear+=/thrash_bear,if=debuff.thrash_bear.stack<debuff.thrash_bear.max_stack
 actions.bear+=/moonfire,if=(!ticking|refreshable)&target.time_to_die>12
 actions.bear+=/heart_of_the_wild
@@ -135,9 +135,9 @@ actions.bear+=/call_action_list,name=racials,if=buff.berserk_bear.up|buff.incarn
 actions.bear+=/potion,if=buff.berserk_bear.up|buff.incarnation.up
 actions.bear+=/lunar_beam
 actions.bear+=/rage_of_the_sleeper
-# free :: Maul is free with Tooth and Claw proc.
+# [134298] :: Maul is free with Tooth and Claw proc.
 actions.bear+=/maul,if=buff.tooth_and_claw.up
-# free :: Raze is free with Tooth and Claw proc.
+# [134298] :: Raze is free with Tooth and Claw proc.
 actions.bear+=/raze,if=buff.tooth_and_claw.up
 actions.bear+=/call_action_list,name=spend_rage,if=variable.should_ironfur=0&variable.should_spend_rage>0
 actions.bear+=/thrash_bear
