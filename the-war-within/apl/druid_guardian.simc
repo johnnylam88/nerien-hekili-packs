@@ -4,15 +4,15 @@
 #
 # Recommended Settings for `/hekili` > *Guardian*:
 #
-# - Weave Cat Form and Bear Form : **unused**
+# - Weave Cat Form and Bear Form : enabled
 # - Maul (or Raze) Rage Threshold : 0
 # - Nature's Vigil Damage Threshold : 70
 # - Ironfur Damage Threshold : 5
 # - Ironfur Maximum Stacks : 14
 
 actions.precombat+=/mark_of_the_wild
-actions.precombat+=/heart_of_the_wild
-actions.precombat+=/bear_form
+actions.precombat+=/heart_of_the_wild,if=!(druid.catweave_bear&talent.rip&talent.rake&talent.fluid_form&talent.wildpower_surge)
+actions.precombat+=/bear_form,if=time=0&buff.feline_potential.down&buff.feline_potential_counter.stack<6
 actions.precombat+=/use_item,name=swarmlords_authority,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
 actions.precombat+=/use_item,name=chromebustible_bomb_suit,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
 actions.precombat+=/use_item,name=ringing_ritual_mud,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
@@ -52,6 +52,9 @@ actions+=/variable,name=survival_instincts_damage_taken,value=0.2*health.max
 
 ################
 
+# ripweave is 1 if the conditions for Ripweaving are true (Rip, Rake, Fluid Form, and Wildpower Surge are talented).
+actions+=/variable,name=ripweave,value=1,value_else=0,op=setif,condition=druid.catweave_bear&talent.rip&talent.rake&talent.fluid_form&talent.wildpower_surge
+
 # 4 Rage per auto-attack.
 actions+=/variable,name=rage_per_second_auto_attack,value=4%(2*attack_haste)
 # 3 Rage per incoming auto-attack, and incoming auto-attack every 2s with 1 mob.
@@ -86,7 +89,7 @@ actions+=/variable,name=should_dump_rage,value=1,value_else=0,op=setif,condition
 
 # Ironfur if not already up, about to expire, or we need more stacks.
 actions+=/variable,name=ironfur_threshold,value=floor(incoming_physical_damage_5s%variable.ironfur_damage_taken)
-actions+=/variable,name=should_ironfur,value=1,value_else=0,op=setif,condition=buff.ironfur.down|buff.ironfur.remains<2|buff.ironfur.stack<variable.ironfur_threshold
+actions+=/variable,name=should_ironfur,value=1,value_else=0,op=setif,condition=tanking&(buff.ironfur.down|buff.ironfur.remains<2|buff.ironfur.stack<variable.ironfur_threshold)
 
 # berserk_ready is 1 if Berserk or Incarnation is imminent.
 actions+=/variable,name=berserk_ready,value=1,value_else=0,op=setif,condition=(talent.incarnation&cooldown.incarnation.remains<gcd)|(!talent.incarnation&cooldown.berserk_bear.remains<gcd)
@@ -100,11 +103,14 @@ actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=
 
 actions+=/skull_bash
 actions+=/soothe
-actions+=/bear_form
+# [132276] :: Mangle to switch back to Bear Form.
+actions+=/mangle,if=buff.bear_form.down&talent.fluid_form&buff.feline_potential.down
+actions+=/bear_form,if=!talent.fluid_form&buff.feline_potential.down
 actions+=/call_action_list,name=mitigation,if=tanking
 actions+=/call_action_list,name=defensives,if=tanking
 actions+=/call_action_list,name=heal
 actions+=/run_action_list,name=bear,if=buff.bear_form.up
+actions+=/run_action_list,name=cat,if=buff.cat_form.up
 
 actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0
@@ -121,14 +127,35 @@ actions.mitigation+=/ironfur,use_off_gcd=1,if=variable.should_ironfur>0
 
 actions.racials+=/berserking
 
-actions.spend_rage+=/maul
-actions.spend_rage+=/raze
+# cat_duration is the minimum amount of time spent in Cat Form.
+actions+=/variable,name=cat_duration,op=reset,default=0
+actions+=/variable,name=cat_duration,op=add,value=action.rake.execute_time,if=talent.rake
+actions+=/variable,name=cat_duration,op=add,value=action.heart_of_the_wild.execute_time,if=talent.heart_of_the_wild&cooldown.heart_of_the_wild.ready
+actions+=/variable,name=cat_duration,op=add,value=action.convoke_the_spirits.execute_time,if=talent.convoke_the_spirits&cooldown.convoke_the_spirits.ready
+actions+=/variable,name=cat_duration,op=add,value=action.rip.execute_time,if=talent.rip
+
+# [132115] :: Heart of the Wild to increase damage in Cat Form.
+actions.cat+=/heart_of_the_wild
+# [132115] :: Convoke the Spirits for damage in Cat Form.
+actions.cat+=/convoke_the_spirits
+# [132115] :: Ferocious Bite if Rip shouldn't be refreshed yet.
+actions.cat+=/ferocious_bite,if=combo_points=5&(buff.berserk_bear.up|buff.incarnation.up)&!dot.rip.refreshable
+# [132115] :: Apply or refresh Rip.
+actions.cat+=/rip,if=combo_points=5
+# [132115] :: Shred if Rake shouldn't be refreshed yet.
+actions.cat+=/shred,if=!dot.rake.refreshable
+# [132115] :: Apply or refresh Rake.
+actions.cat+=/rake
 
 # [132143] :: Maintain max stacks of Thrash for DR from Rend and Tear.
 actions.bear+=/thrash_bear,if=debuff.thrash_bear.stack<debuff.thrash_bear.max_stack
 actions.bear+=/moonfire,if=(!ticking|refreshable)&target.time_to_die>12
-actions.bear+=/heart_of_the_wild
-actions.bear+=/convoke_the_spirits
+# [132127] :: Mangle to maintain Feline Potential stacks if present.
+actions.bear+=/mangle,if=variable.ripweave>0&buff.feline_potential_counter.up&buff.feline_potential_counter.remains<2
+# Ripweave preparation once Feline Potential nears max stacks.
+actions.bear+=/call_action_list,name=ripweave_prep,if=variable.ripweave>0&buff.feline_potential_counter.stack>=5&active_enemies<2
+actions.bear+=/heart_of_the_wild,if=variable.ripweave=0
+actions.bear+=/convoke_the_spirits,if=variable.ripweave=0
 actions.bear+=/berserk_bear
 actions.bear+=/incarnation
 actions.bear+=/call_action_list,name=racials,if=buff.berserk_bear.up|buff.incarnation.up
@@ -147,3 +174,29 @@ actions.bear+=/moonfire,if=buff.galactic_guardian.up&(buff.galactic_guardian.rem
 # filler :: Spread Moonfire
 actions.bear+=/moonfire,cycle_targets=1,if=(talent.lunar_insight|talent.twin_moonfire)&active_enemies>1
 actions.bear+=/swipe_bear
+
+# [132127] :: Dump Rage before shifting to Cat Form.
+actions.ripweave_prep+=/ironfur,use_off_gcd=1,if=rage-variable.rage_cost_ironfur>variable.rage_cost_max&buff.feline_potential_counter.stack<6&variable.should_ironfur>0
+# [132127] :: Dump Rage before shifting to Cat Form.
+actions.ripweave_prep+=/maul,if=rage-variable.rage_cost_maul>variable.rage_cost_max&buff.feline_potential_counter.stack<6&variable.should_ironfur=0
+# [132127] :: Dump Rage before shifting to Cat Form.
+actions.ripweave_prep+=/raze,if=rage-variable.rage_cost_raze>variable.rage_cost_max&buff.feline_potential_counter.stack<6&variable.should_ironfur=0
+# [132127] :: Mangle to get max stacks of Feline Potential.
+actions.ripweave_prep+=/mangle,if=buff.feline_potential_counter.stack<6
+# [132127] :: Thrash to maintain the Thrash DoT through time in Cat Form.
+actions.ripweave_prep+=/thrash_bear,if=buff.feline_potential_counter.stack=6&cooldown.mangle.remains>variable.cat_duration
+# [132127] :: Stay in Bear Form and Ironfur until Mangle cooldown is ready after casting Ferocious Bite or Rip.
+actions.ripweave_prep+=/ironfur,use_off_gcd=1,if=buff.feline_potential_counter.stack=6&cooldown.mangle.remains>variable.cat_duration&variable.should_ironfur>0
+# [132127] :: Stay in Bear Form and Maul until Mangle cooldown is ready after casting Ferocious Bite or Rip.
+actions.ripweave_prep+=/maul,if=buff.feline_potential_counter.stack=6&cooldown.mangle.remains>variable.cat_duration&variable.should_ironfur=0
+# [132127] :: Stay in Bear Form and Raze until Mangle cooldown is ready after casting Ferocious Bite or Rip.
+actions.ripweave_prep+=/raze,if=buff.feline_potential_counter.stack=6&cooldown.mangle.remains>variable.cat_duration&variable.should_ironfur=0
+# [132127] :: Stay in Bear Form and Swipe until Mangle cooldown is ready after casting Ferocious Bite or Rip.
+actions.ripweave_prep+=/swipe_bear,if=buff.feline_potential_counter.stack=6&cooldown.mangle.remains>variable.cat_duration
+# [132115] :: Shred to enter Cat Form if Rake shouldn't be refreshed yet.
+actions.ripweave_prep+=/shred,if=buff.feline_potential_counter.stack=6&!dot.rake.refreshable
+# [132115] :: Rake to enter Cat Form
+actions.ripweave_prep+=/rake,if=buff.feline_potential_counter.stack=6
+
+actions.spend_rage+=/maul
+actions.spend_rage+=/raze
