@@ -32,10 +32,9 @@ actions+=/variable,name=seeing_red_ignore_pain,value=100-(variable.rage_cost_ign
 actions+=/variable,name=seeing_red_revenge,value=100-(variable.rage_cost_revenge%5)
 actions+=/variable,name=seeing_red_shield_block,value=100-(variable.rage_cost_shield_block%5)
 
-actions+=/variable,name=rage_gen_multiplier_outburst,value=2,value_else=1,op=setif,condition=buff.violent_outburst.up
-actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercussions+3*talent.impenetrable_wall+3*talent.practiced_strikes)*variable.rage_gen_multiplier_outburst
-actions+=/variable,name=rage_gain_thunder_blast,value=10*variable.rage_gen_multiplier_outburst
-actions+=/variable,name=rage_gain_thunder_clap,value=5*variable.rage_gen_multiplier_outburst
+actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercussions+3*talent.impenetrable_wall+3*talent.practiced_strikes)
+actions+=/variable,name=rage_gain_thunder_blast,value=10
+actions+=/variable,name=rage_gain_thunder_clap,value=5
 
 ### Tunables ###
 
@@ -85,14 +84,15 @@ actions+=/variable,name=rage_at_next_shield_block,value=rage,value_else=rage+coo
 # should_spend_rage is 1 if the expected Rage by the next Shield Block exceeds the pool value.
 actions+=/variable,name=should_spend_rage,value=1,value_else=0,op=setif,condition=variable.rage_at_next_shield_block>variable.rage_pool_value
 
+actions+=/variable,name=rage_gen_multiplier_outburst,value=1.5,value_else=1,op=setif,condition=buff.violent_outburst.up
 actions+=/variable,name=rage_check,value=1,value_else=0,op=setif,condition=rage+variable.rage_per_second*gcd>rage.max
 actions+=/variable,name=rage_check_avatar,value=1,value_else=0,op=setif,condition=talent.avatar&cooldown.avatar.remains<gcd&rage+10*variable.rage_gen_multiplier>rage.max
 actions+=/variable,name=rage_check_champions_spear,value=1,value_else=0,op=setif,condition=talent.champions_spear&cooldown.champions_spear.remains<gcd&rage+20*variable.rage_gen_multiplier>rage.max
 actions+=/variable,name=rage_check_demoralizing_shout,value=1,value_else=0,op=setif,condition=talent.demoralizing_shout&talent.booming_voice&cooldown.demoralizing_shout.remains<gcd&rage+30*variable.rage_gen_multiplier>rage.max
 actions+=/variable,name=rage_check_shield_charge,value=1,value_else=0,op=setif,condition=talent.shield_charge&cooldown.shield_charge.remains<gcd&rage+(20+20*talent.champions_bulwark)*variable.rage_gen_multiplier>rage.max
-actions+=/variable,name=rage_check_shield_slam,value=1,value_else=0,op=setif,condition=cooldown.shield_slam.remains<gcd&rage+variable.rage_gain_shield_slam*variable.rage_gen_multiplier>rage.max
-actions+=/variable,name=rage_check_thunder_blast,value=1,value_else=0,op=setif,condition=talent.thunder_blast&cooldown.thunder_blast.remains<gcd&rage+variable.rage_gain_thunder_blast*variable.rage_gen_multiplier>rage.max
-actions+=/variable,name=rage_check_thunder_clap,value=1,value_else=0,op=setif,condition=talent.thunder_clap&cooldown.thunder_clap.remains<gcd&rage+variable.rage_gain_thunder_clap*variable.rage_gen_multiplier>rage.max
+actions+=/variable,name=rage_check_shield_slam,value=1,value_else=0,op=setif,condition=cooldown.shield_slam.remains<gcd&rage+variable.rage_gain_shield_slam*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier>rage.max
+actions+=/variable,name=rage_check_thunder_blast,value=1,value_else=0,op=setif,condition=talent.thunder_blast&cooldown.thunder_blast.remains<gcd&rage+variable.rage_gain_thunder_blast*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier>rage.max
+actions+=/variable,name=rage_check_thunder_clap,value=1,value_else=0,op=setif,condition=talent.thunder_clap&cooldown.thunder_clap.remains<gcd&rage+variable.rage_gain_thunder_clap*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier>rage.max
 # should_dump_rage is 1 if an ability is coming off cooldown and will overcap on Rage.
 actions+=/variable,name=should_dump_rage,value=1,value_else=0,op=setif,condition=variable.rage_check>0|variable.rage_check_avatar>0|variable.rage_check_demoralizing_shout>0|variable.rage_check_shield_charge>0|variable.rage_check_shield_slam>0|variable.rage_check_champions_spear>0|variable.rage_check_thunder_blast>0|variable.rage_check_thunder_blast>0|variable.rage_check_thunder_clap>0
 
