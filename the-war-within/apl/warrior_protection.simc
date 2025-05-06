@@ -33,7 +33,7 @@ actions+=/variable,name=seeing_red_revenge,value=100-(variable.rage_cost_revenge
 actions+=/variable,name=seeing_red_shield_block,value=100-(variable.rage_cost_shield_block%5)
 
 actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercussions+3*talent.impenetrable_wall+3*talent.practiced_strikes)
-actions+=/variable,name=rage_gain_thunder_blast,value=10
+actions+=/variable,name=rage_gain_thunder_blast,value=8
 actions+=/variable,name=rage_gain_thunder_clap,value=5
 
 ### Tunables ###
