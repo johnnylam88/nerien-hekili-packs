@@ -161,8 +161,8 @@ actions.bear+=/mangle,if=variable.ripweave>0&buff.feline_potential_counter.up&bu
 actions.bear+=/call_action_list,name=ripweave_prep,if=variable.ripweave>0&buff.feline_potential_counter.stack>=5&active_enemies<2
 actions.bear+=/heart_of_the_wild,if=variable.ripweave=0
 actions.bear+=/convoke_the_spirits,if=variable.ripweave=0
-actions.bear+=/berserk_bear
-actions.bear+=/incarnation
+actions.bear+=/berserk_bear,if=buff.berserk_bear.down
+actions.bear+=/incarnation,if=buff.incarnation.down
 actions.bear+=/call_action_list,name=cooldowns
 actions.bear+=/lunar_beam
 actions.bear+=/rage_of_the_sleeper
