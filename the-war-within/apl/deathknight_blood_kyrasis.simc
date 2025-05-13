@@ -45,9 +45,13 @@ actions+=/mind_freeze
 actions+=/strangulate
 actions+=/gorefiends_grasp,if=talent.tightening_grasp
 actions+=/call_action_list,name=defensives,if=tanking
-actions+=/potion,if=buff.dancing_rune_weapon.up
-actions+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.up
+actions+=/call_action_list,name=cooldowns
 actions+=/run_action_list,name=core
+
+actions.cooldowns+=/use_item,name=tome_of_lights_devotion,use_off_gcd=1,if=buff.inner_resilience.up&buff.resilience_verses.stack_pct<50
+actions.cooldowns+=/potion,if=buff.dancing_rune_weapon.remains>(8+talent.everlasting_bond*6)%2
+actions.cooldowns+=/use_items,if=buff.dancing_rune_weapon.remains>(8+talent.everlasting_bond*6)%2
+actions.cooldowns+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.remains>(8+talent.everlasting_bond*6)%2
 
 actions.core+=/raise_dead
 actions.core+=/blood_tap,if=(rune<=2&rune.time_to_3>gcd&full_recharge_time<2*gcd)|(rune<=1&rune.time_to_3>gcd)

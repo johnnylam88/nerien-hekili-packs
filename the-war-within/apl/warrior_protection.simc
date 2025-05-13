@@ -115,8 +115,14 @@ actions+=/call_action_list,name=opener,if=time<=3*gcd.max
 actions+=/call_action_list,name=mitigation,if=tanking
 actions+=/call_action_list,name=defensives,if=tanking
 actions+=/call_action_list,name=heal
+actions+=/call_action_list,name=cooldowns
 actions+=/battle_stance,if=!buff.battle_stance.up&health.pct>70
 actions+=/run_action_list,name=standard
+
+actions.cooldowns+=/use_item,name=tome_of_lights_devotion,use_off_gcd=1,if=buff.inner_resilience.up&buff.resilience_verses.stack_pct<50
+actions.cooldowns+=/potion,if=!talent.avatar|buff.avatar.remains>8
+actions.cooldowns+=/use_items,if=!talent.avatar|buff.avatar.remains>8
+actions.cooldowns+=/call_action_list,name=racials,if=!talent.avatar|buff.avatar.remains>8
 
 actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
@@ -199,8 +205,6 @@ actions.standard+=/thunder_blast,if=talent.unstoppable_force&buff.avatar.up
 actions.standard+=/thunder_clap,if=talent.unstoppable_force&buff.avatar.up
 actions.standard+=/ravager
 actions.standard+=/avatar,if=buff.avatar.down
-actions.standard+=/call_action_list,name=racials
-actions.standard+=/potion,if=buff.avatar.up
 actions.standard+=/demoralizing_shout,if=talent.booming_voice
 actions.standard+=/demolish,if=buff.colossal_might.stack>=3
 actions.standard+=/champions_spear

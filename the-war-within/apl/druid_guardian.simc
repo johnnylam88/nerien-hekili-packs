@@ -112,6 +112,11 @@ actions+=/call_action_list,name=heal
 actions+=/run_action_list,name=bear,if=buff.bear_form.up
 actions+=/run_action_list,name=cat,if=buff.cat_form.up
 
+actions.cooldowns+=/use_item,name=tome_of_lights_devotion,use_off_gcd=1,if=buff.inner_resilience.up&buff.resilience_verses.stack_pct<50
+actions.cooldowns+=/potion,if=buff.berserk_bear.remains>8|buff.incarnation.remains>8
+actions.cooldowns+=/use_items,if=buff.berserk_bear.remains>8|buff.incarnation.remains>8
+actions.cooldowns+=/call_action_list,name=racials,if=buff.berserk_bear.remains>8|buff.incarnation.remains>8
+
 actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0
 actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&variable.has_defensive_buff=0
@@ -158,8 +163,7 @@ actions.bear+=/heart_of_the_wild,if=variable.ripweave=0
 actions.bear+=/convoke_the_spirits,if=variable.ripweave=0
 actions.bear+=/berserk_bear
 actions.bear+=/incarnation
-actions.bear+=/call_action_list,name=racials,if=buff.berserk_bear.up|buff.incarnation.up
-actions.bear+=/potion,if=buff.berserk_bear.up|buff.incarnation.up
+actions.bear+=/call_action_list,name=cooldowns
 actions.bear+=/lunar_beam
 actions.bear+=/rage_of_the_sleeper
 # [134298] :: Maul is free with Tooth and Claw proc.

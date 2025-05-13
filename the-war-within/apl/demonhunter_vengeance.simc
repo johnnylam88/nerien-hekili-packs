@@ -122,6 +122,10 @@ actions+=/consume_magic
 actions+=/run_action_list,name=fs,if=hero_tree.felscarred
 actions+=/run_action_list,name=ar
 
+actions.cooldowns+=/use_item,name=tome_of_lights_devotion,use_off_gcd=1,if=buff.inner_resilience.up&buff.resilience_verses.stack_pct<50
+actions.cooldowns+=/potion,if=buff.metamorphosis.remains>7
+actions.cooldowns+=/use_items,if=buff.metamorphosis.remains>7
+
 actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=variable.metamorphosis_damage_taken&variable.has_defensive_buff=0&variable.has_absorb_buff=0
@@ -156,6 +160,7 @@ actions.ar+=/call_action_list,name=ar_opener,if=time<variable.ar_opener_duration
 actions.ar+=/call_action_list,name=mitigation,if=tanking
 actions.ar+=/call_action_list,name=defensives,if=tanking
 actions.ar+=/call_action_list,name=heal
+actions.ar+=/call_action_list,name=cooldowns
 actions.ar+=/call_action_list,name=ar_glaive
 actions.ar+=/the_hunt,if=buff.reavers_glaive.down
 actions.ar+=/infernal_strike,use_off_gcd=1,if=full_recharge_time<gcd
@@ -223,6 +228,7 @@ actions.fs+=/call_action_list,name=fs_opener,if=buff.metamorphosis.down&time<var
 actions.fs+=/call_action_list,name=mitigation,if=tanking
 actions.fs+=/call_action_list,name=defensives,if=tanking
 actions.fs+=/call_action_list,name=heal
+actions.fs+=/call_action_list,name=cooldowns
 actions.fs+=/call_action_list,name=demonsurge,if=buff.metamorphosis.up&buff.metamorphosis.remains<gcd*(variable.demonsurge_remaining+1)
 actions.fs+=/run_action_list,name=metamorphosis,if=(cooldown.metamorphosis.remains<=variable.prep_time_metamorphosis)&(!cooldown.fel_devastation.ready&cooldown.fel_devastation.remains>10)&variable.demonsurge_remaining=0
 # [1450143] :: Felblade to generate Fury for Fel Devastation.

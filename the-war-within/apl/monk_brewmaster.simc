@@ -76,11 +76,16 @@ actions+=/call_action_list,name=opener,if=time<variable.opener_duration
 actions+=/call_action_list,name=mitigation,if=tanking&buff.blackout_combo.down
 actions+=/call_action_list,name=defensives,if=tanking
 actions+=/call_action_list,name=heal
-actions+=/call_action_list,name=racials
+actions+=/call_action_list,name=cooldowns
 actions+=/touch_of_death
 actions+=/run_action_list,name=weapons,if=buff.weapons_of_order.up
 actions+=/run_action_list,name=aoe,if=active_enemies>1
 actions+=/run_action_list,name=st
+
+actions.cooldowns+=/use_item,name=tome_of_lights_devotion,use_off_gcd=1,if=buff.inner_resilience.up&buff.resilience_verses.stack_pct<50
+actions.cooldowns+=/potion,if=!talent.weapons_of_order|debuff.weapons_of_order_debuff.stack>=4
+actions.cooldowns+=/use_items,if=!talent.weapons_of_order|debuff.weapons_of_order_debuff.stack>=4
+actions.cooldowns+=/call_action_list,name=racials,if=!talent.weapons_of_order|debuff.weapons_of_order_debuff.stack>=4
 
 actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
@@ -181,7 +186,6 @@ actions.st+=/spinning_crane_kick,if=(talent.press_the_advantage&!prev_gcd.spinni
 actions.st+=/spinning_crane_kick,if=(talent.press_the_advantage&!prev_gcd.spinning_crane_kick)&(variable.energy_at_next_keg_smash>variable.energy_cost_keg_smash+variable.energy_cost_spinning_crane_kick)
 
 actions.weapons+=/rushing_jade_wind
-actions.weapons+=/potion,if=debuff.weapons_of_order_debuff.stack>=4
 # [5927638] :: Celestial Brew to apply Aspect of Harmony DoT with high stacks of Weapons of Order debuff.
 actions.weapons+=/celestial_brew,if=talent.endless_draught&!dot.aspect_of_harmony_damage.ticking&debuff.weapons_of_order_debuff.stack>=4
 # [6035314] :: Chi Burst with high stacks of Weapons of Order debuff.

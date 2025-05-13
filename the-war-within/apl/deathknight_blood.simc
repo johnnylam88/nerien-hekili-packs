@@ -45,8 +45,7 @@ actions+=/mind_freeze
 actions+=/strangulate
 actions+=/gorefiends_grasp,if=talent.tightening_grasp
 actions+=/call_action_list,name=defensives,if=tanking
-actions+=/potion,if=buff.dancing_rune_weapon.up
-actions+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.up
+actions+=/call_action_list,name=cooldowns
 # heal :: Death Strike to heal only if it exceeds the minimum heal.
 actions+=/death_strike,if=health.pct<variable.death_strike_health_pct_threshold&variable.death_strike_minimum_heal=0
 actions+=/sacrificial_pact,if=buff.dancing_rune_weapon.down&(pet.ghoul.remains<2|boss&fight_remains<gcd)
@@ -55,6 +54,11 @@ actions+=/raise_dead
 actions+=/run_action_list,name=drw_up_sanlayn,if=buff.dancing_rune_weapon.up&hero_tree.sanlayn
 actions+=/run_action_list,name=drw_up,if=buff.dancing_rune_weapon.up
 actions+=/run_action_list,name=standard
+
+actions.cooldowns+=/use_item,name=tome_of_lights_devotion,use_off_gcd=1,if=buff.inner_resilience.up&buff.resilience_verses.stack_pct<50
+actions.cooldowns+=/potion,if=buff.dancing_rune_weapon.remains>(8+talent.everlasting_bond*6)%2
+actions.cooldowns+=/use_items,if=buff.dancing_rune_weapon.remains>(8+talent.everlasting_bond*6)%2
+actions.cooldowns+=/call_action_list,name=racials,if=buff.dancing_rune_weapon.remains>(8+talent.everlasting_bond*6)%2
 
 actions.racials+=/blood_fury,if=cooldown.dancing_rune_weapon.ready&(!talent.blooddrinker|!cooldown.blooddrinker.ready)
 actions.racials+=/berserking
