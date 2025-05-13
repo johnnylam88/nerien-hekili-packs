@@ -198,9 +198,9 @@ actions.ripweave_prep+=/raze,if=buff.feline_potential_counter.stack=6&cooldown.m
 # [132127] :: Stay in Bear Form and Swipe until Mangle cooldown is ready after casting Ferocious Bite or Rip.
 actions.ripweave_prep+=/swipe_bear,if=buff.feline_potential_counter.stack=6&cooldown.mangle.remains>variable.cat_duration
 # [132115] :: Shred to enter Cat Form if Rake shouldn't be refreshed yet.
-actions.ripweave_prep+=/shred,if=buff.feline_potential_counter.stack=6&!dot.rake.refreshable
+actions.ripweave_prep+=/shred,if=buff.feline_potential_counter.stack=6&!dot.rake.refreshable&buff.rage_of_the_sleeper.down
 # [132115] :: Rake to enter Cat Form
-actions.ripweave_prep+=/rake,if=buff.feline_potential_counter.stack=6
+actions.ripweave_prep+=/rake,if=buff.feline_potential_counter.stack=6&buff.rage_of_the_sleeper.down
 
 actions.spend_rage+=/maul
 actions.spend_rage+=/raze
