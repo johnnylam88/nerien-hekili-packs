@@ -136,7 +136,9 @@ actions.defensives+=/rallying_cry,use_off_gcd=1,if=(incoming_damage_5s>variable.
 actions.heal+=/victory_rush,if=buff.victorious.up&health.pct<variable.victory_rush_health_pct
 actions.heal+=/impending_victory,if=health.pct<variable.victory_rush_health_pct
 
-actions.mitigation+=/shield_block,if=buff.shield_block.down|buff.shield_block.remains<4
+# [132358] :: Shield Block with Spell Block active.
+actions.mitigation+=/shield_block,if=(buff.shield_block.down|buff.shield_block.remains<4)&buff.spell_block.up
+actions.mitigation+=/shield_block,if=(buff.shield_block.down|buff.shield_block.remains<4)&buff.spell_block.down
 # [132110] :: Last Stand with Bolster to apply Shield Block.
 actions.mitigation+=/last_stand,if=talent.bolster&buff.shield_block.down
 # [841383] :: Ignore Pain to trigger Violent Outburst.
