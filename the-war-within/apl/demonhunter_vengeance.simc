@@ -57,7 +57,7 @@ actions+=/variable,name=should_dump_fury,value=1,value_else=0,op=setif,condition
 
 # Variables to treat souls as a resource.
 actions+=/variable,name=souls_max,value=5
-actions+=/variable,name=souls_deficit,value=variable.souls_max-soul_fragments
+actions+=/variable,name=souls_deficit,value=variable.souls_max-soul_fragments.active
 
 actions+=/variable,name=souls_gain_fracture,value=3,value_else=2,op=setif,condition=buff.metamorphosis.up
 actions+=/variable,name=souls_gain_immolation_aura,value=0.7*spell_targets.immolation_aura,value_else=0,op=setif,condition=talent.fallout
@@ -129,7 +129,7 @@ actions.defensives+=/fel_devastation,if=!talent.demonsurge&variable.fel_devastat
 actions.defensives+=/metamorphosis,if=!talent.demonsurge&variable.metamorphosis_ready>0
 actions.defensives+=/darkness,if=incoming_damage_5s>=variable.darkness_damage_taken&variable.has_defensive_buff=0&(debuff.fiery_brand_dot.down&variable.has_fiery_brand_safety=0)&variable.has_illuminated_sigils_safety=0
 
-actions.heal+=/bulk_extraction,if=(health.pct<variable.bulk_extraction_health_pct_threshold)&(variable.souls_deficit<=variable.num_targets)&(soul_fragments<=2)
+actions.heal+=/bulk_extraction,if=(health.pct<variable.bulk_extraction_health_pct_threshold)&(variable.souls_deficit<=variable.num_targets)&(soul_fragments.active<=2)
 
 # [1450143] :: Demon Spikes can be used but Fel Devastation is off cooldown.
 actions.mitigation+=/demon_spikes,use_off_gcd=1,if=variable.can_demon_spikes>0&variable.fel_devastation_ready>0
@@ -195,7 +195,7 @@ actions.ar_spirit_bomb+=/spirit_bomb,if=variable.should_dump_souls>0
 # [1097742] :: Fracture to generate Souls for Spirit Bomb.
 actions.ar_spirit_bomb+=/fracture,if=variable.num_targets>1&(variable.souls_gain_fracture>=variable.souls_deficit-1)|(variable.souls_gain_fracture=variable.souls_deficit)
 # [1097742] :: Dump Fury with Soul Cleave if it won't delay Spirit Bomb.
-actions.ar_spirit_bomb+=/soul_cleave,if=soul_fragments=0&variable.should_dump_fury>0
+actions.ar_spirit_bomb+=/soul_cleave,if=soul_fragments.active=0&variable.should_dump_fury>0
 
 ### Fel-Scarred ###
 
@@ -248,7 +248,7 @@ actions.demonsurge+=/soul_sunder,if=buff.demonsurge_soul_sunder.up&variable.shou
 # [5927628] :: Activate Demonsurge with Consuming Fire.
 actions.demonsurge+=/consuming_fire,if=buff.demonsurge_consuming_fire.up
 # [5927628] :: Activate Demonsurge with Spirit Burst.
-actions.demonsurge+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&soul_fragments>0
+actions.demonsurge+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&soul_fragments.active>0
 # [5927628] :: Activate Demonsurge with Soul Sunder.
 actions.demonsurge+=/soul_sunder,if=buff.demonsurge_soul_sunder.up
 # [5927628] :: Activate Demonsurge with Sigil of Doom.
@@ -270,14 +270,14 @@ actions.fs_aoe+=/consuming_fire
 actions.fs_aoe+=/immolation_aura
 actions.fs_aoe+=/fracture,if=variable.souls_deficit<=1+variable.souls_gain_fracture&active_dot.fiery_brand_dot>0
 # [1097742] :: Dump Fury with Soul Sunder if it won't delay Spirit Burst.
-actions.fs_aoe+=/soul_sunder,if=soul_fragments=0&variable.should_dump_fury>0
+actions.fs_aoe+=/soul_sunder,if=soul_fragments.active=0&variable.should_dump_fury>0
 # [1097742] :: Dump Fury with Soul Cleave if it won't delay Spirit Bomb.
-actions.fs_aoe+=/soul_cleave,if=soul_fragments=0&variable.should_dump_fury>0
+actions.fs_aoe+=/soul_cleave,if=soul_fragments.active=0&variable.should_dump_fury>0
 actions.fs_aoe+=/felblade,if=variable.fury_gain_felblade<=fury.deficit
 actions.fs_aoe+=/fracture,if=variable.fury_gain_fracture<=fury.deficit|!prev_gcd.fracture
 actions.fs_aoe+=/shear,if=variable.souls_deficit>0&variable.fury_gain_shear<=fury.deficit
 # [5927628] :: Activate Demonsurge with Spirit Burst to dump Fury.
-actions.fs_aoe+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&soul_fragments>0&variable.should_dump_fury>0
+actions.fs_aoe+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&soul_fragments.active>0&variable.should_dump_fury>0
 # fury :: Dump Fury with Soul Sunder.
 actions.fs_aoe+=/soul_sunder,if=variable.should_dump_fury>0
 # fury :: Dump Fury with Soul Cleave.
@@ -289,7 +289,7 @@ actions.fs_st+=/spirit_bomb,if=talent.fiery_demise&debuff.fiery_brand_dot.up&var
 actions.fs_st+=/consuming_fire
 actions.fs_st+=/immolation_aura
 # [5927628] :: Activate Demonsurge with Spirit Burst to dump Fury.
-actions.fs_st+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&soul_fragments>0&variable.should_dump_fury>0
+actions.fs_st+=/spirit_burst,if=buff.demonsurge_spirit_burst.up&soul_fragments.active>0&variable.should_dump_fury>0
 # fury :: Dump Fury with Soul Sunder.
 actions.fs_st+=/soul_sunder,if=variable.should_dump_fury>0
 # fury :: Dump Fury with Soul Cleave.
