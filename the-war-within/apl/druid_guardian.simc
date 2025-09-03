@@ -13,7 +13,6 @@
 actions.precombat+=/mark_of_the_wild
 actions.precombat+=/heart_of_the_wild,if=!(druid.catweave_bear&talent.rip&talent.rake&talent.fluid_form&talent.wildpower_surge)
 actions.precombat+=/bear_form,if=time=0&buff.feline_potential.down&buff.feline_potential_counter.stack<6
-actions.precombat+=/use_item,name=swarmlords_authority,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
 actions.precombat+=/use_item,name=chromebustible_bomb_suit,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
 actions.precombat+=/use_item,name=ringing_ritual_mud,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
 
@@ -117,7 +116,6 @@ actions.cooldowns+=/potion,if=buff.berserk_bear.remains>8|buff.incarnation.remai
 actions.cooldowns+=/use_items,if=buff.berserk_bear.remains>8|buff.incarnation.remains>8
 actions.cooldowns+=/call_action_list,name=racials,if=buff.berserk_bear.remains>8|buff.incarnation.remains>8
 
-actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0
 actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&variable.has_defensive_buff=0
 actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_defensive_buff=0&variable.has_absorb_buff=0

@@ -23,7 +23,6 @@
 
 actions.precombat+=/defensive_stance,if=!buff.defensive_stance.up
 actions.precombat+=/battle_shout
-actions.precombat+=/use_item,name=swarmlords_authority
 actions.precombat+=/use_item,name=chromebustible_bomb_suit
 actions.precombat+=/use_item,name=ringing_ritual_mud
 
@@ -147,7 +146,6 @@ actions.cooldowns+=/potion,if=!talent.avatar|buff.avatar.remains>8
 actions.cooldowns+=/use_items,if=!talent.avatar|buff.avatar.remains>8
 actions.cooldowns+=/call_action_list,name=racials,if=!talent.avatar|buff.avatar.remains>8
 
-actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
 actions.defensives+=/demoralizing_shout,if=!talent.booming_voice&incoming_damage_5s>variable.demoralizing_shout_damage_taken&variable.has_defensive_buff=0
 actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>variable.shield_wall_damage_taken&variable.has_defensive_buff=0&variable.has_absorb_buff=0

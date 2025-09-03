@@ -126,7 +126,6 @@ actions.cooldowns+=/use_item,name=tome_of_lights_devotion,use_off_gcd=1,if=buff.
 actions.cooldowns+=/potion,if=buff.metamorphosis.remains>7
 actions.cooldowns+=/use_items,if=buff.metamorphosis.remains>7
 
-actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=variable.metamorphosis_damage_taken&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 actions.defensives+=/fel_devastation,if=!talent.demonsurge&variable.fel_devastation_ready>0&variable.has_fiery_brand_safety=0

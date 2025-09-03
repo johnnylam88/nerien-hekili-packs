@@ -14,7 +14,6 @@
 # - Blackout Combo: Maximize Damage : **unused**
 
 actions.precombat+=/rushing_jade_wind
-actions.precombat+=/use_item,name=swarmlords_authority
 actions.precombat+=/use_item,name=chromebustible_bomb_suit
 actions.precombat+=/use_item,name=ringing_ritual_mud
 
@@ -82,7 +81,6 @@ actions.cooldowns+=/potion,if=!talent.weapons_of_order|(buff.weapons_of_order.re
 actions.cooldowns+=/use_items,if=!talent.weapons_of_order|(buff.weapons_of_order.remains>8&debuff.weapons_of_order_debuff.stack>=4)
 actions.cooldowns+=/call_action_list,name=racials,if=!talent.weapons_of_order|(buff.weapons_of_order.remains>8&debuff.weapons_of_order_debuff.stack>=4)
 
-actions.defensives+=/use_item,name=swarmlords_authority,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>variable.high_incoming_damage_amount&variable.has_defensive_buff=0&variable.has_absorb_buff=0
 actions.defensives+=/fortifying_brew,use_off_gcd=1,if=incoming_damage_5s>variable.high_incoming_damage_amount&variable.has_defensive_buff=0&variable.has_absorb_buff=0
