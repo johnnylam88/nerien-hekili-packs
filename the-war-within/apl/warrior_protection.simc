@@ -43,6 +43,12 @@ actions+=/variable,name=rage_gain_thunder_clap,value=5
 
 ### Tunables ###
 
+# Set a soft cap for maximum Rage.
+# This value is used when checking if we'll cap on Rage.
+# It's less than maximum Rage because our Rage generation estimates tend to
+# underestimate the true Rage generation due to procs, and comparing against
+# the true max Rage has a higher probability of capping.
+actions+=/variable,name=rage_cap,value=(rage.max-10)
 # Always maintain enough Rage for Ignore Pain or Shield Block.
 actions+=/variable,name=rage_floor,value=(variable.rage_cost_ignore_pain<?variable.rage_cost_shield_block)
 # Pool enough Rage to cast two of Ignore Pain or Shield Block.
@@ -68,12 +74,17 @@ actions+=/variable,name=demoralizing_shout_pct_threshold,value=75
 
 ################
 
+# Amount of Rage until the Rage cap is reached.
+actions+=/variable,name=rage_deficit,value=(variable.rage_cap-rage)
+
 # has_deep_wounds_threat is 1 if the percentage of enemy mobs with the Deep Wounds DoT on them exceeds 75%.
 actions+=/variable,name=has_deep_wounds_threat,value=1,value_else=0,op=setif,condition=(active_dot.deep_wounds%active_enemies*100)>75
 # has_rend_threat is 1 if the percentage of enemy mobs with the Rend DoT on them exceeds 75%.
 actions+=/variable,name=has_rend_threat,value=1,value_else=0,op=setif,condition=(active_dot.rend%active_enemies*100)>75
 
+# XXX This curving of the multiplier is goofy.
 actions+=/variable,name=rage_gen_multiplier,value=1+0.5*buff.unnerving_focus.remains%buff.unnerving_focus.duration
+actions+=/variable,name=rage_gen_multiplier_outburst,value=1.5,value_else=1,op=setif,condition=buff.violent_outburst.up
 actions+=/variable,name=rage_per_second_auto_attack,value=1*(1+0.5*talent.war_machine)+2*talent.devastator*talent.instigate
 # 3 Rage per incoming auto-attack, and incoming auto-attack every 2s with 1 mob.
 # Assume at 1 mob, we don't get any rage, but at 5+ mobs, that we gain 3 Rage every second.
@@ -96,17 +107,15 @@ actions+=/variable,name=can_spend_rage_on_execute,value=1,value_else=0,op=setif,
 # can_spend_rage_on_revenge is 1 if casting Revenge doesn't drop Rage below the floor value.
 actions+=/variable,name=can_spend_rage_on_revenge,value=1,value_else=0,op=setif,condition=(rage-variable.rage_cost_revenge>=variable.rage_floor)
 
-actions+=/variable,name=rage_gen_multiplier_outburst,value=1.5,value_else=1,op=setif,condition=buff.violent_outburst.up
-actions+=/variable,name=rage_check,value=1,value_else=0,op=setif,condition=rage+variable.rage_per_second*gcd>rage.max
-actions+=/variable,name=rage_check_avatar,value=1,value_else=0,op=setif,condition=talent.avatar&cooldown.avatar.remains<gcd&rage+10*variable.rage_gen_multiplier>rage.max
-actions+=/variable,name=rage_check_champions_spear,value=1,value_else=0,op=setif,condition=talent.champions_spear&cooldown.champions_spear.remains<gcd&rage+10*variable.rage_gen_multiplier>rage.max
-actions+=/variable,name=rage_check_demoralizing_shout,value=1,value_else=0,op=setif,condition=talent.demoralizing_shout&talent.booming_voice&cooldown.demoralizing_shout.remains<gcd&rage+30*variable.rage_gen_multiplier>rage.max
-actions+=/variable,name=rage_check_shield_charge,value=1,value_else=0,op=setif,condition=talent.shield_charge&cooldown.shield_charge.remains<gcd&rage+20*variable.rage_gen_multiplier>rage.max
-actions+=/variable,name=rage_check_shield_slam,value=1,value_else=0,op=setif,condition=cooldown.shield_slam.remains<gcd&rage+variable.rage_gain_shield_slam*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier>rage.max
-actions+=/variable,name=rage_check_thunder_blast,value=1,value_else=0,op=setif,condition=talent.thunder_blast&cooldown.thunder_blast.remains<gcd&rage+variable.rage_gain_thunder_blast*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier>rage.max
-actions+=/variable,name=rage_check_thunder_clap,value=1,value_else=0,op=setif,condition=talent.thunder_clap&cooldown.thunder_clap.remains<gcd&rage+variable.rage_gain_thunder_clap*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier>rage.max
-# should_dump_rage is 1 if an ability is coming off cooldown and will overcap on Rage.
-actions+=/variable,name=should_dump_rage,value=1,value_else=0,op=setif,condition=variable.rage_check>0|variable.rage_check_avatar>0|variable.rage_check_demoralizing_shout>0|variable.rage_check_shield_charge>0|variable.rage_check_shield_slam>0|variable.rage_check_champions_spear>0|variable.rage_check_thunder_blast>0|variable.rage_check_thunder_blast>0|variable.rage_check_thunder_clap>0
+# time_to_rage_cap is the number of seconds before a Rage-generating ability comes off cooldown and will cap total Rage if cast.
+actions+=/variable,name=time_to_rage_cap,op=reset,default=(variable.rage_deficit%variable.rage_per_second)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.avatar.remains,if=talent.avatar&((cooldown.avatar.remains*variable.rage_per_second+10*variable.rage_gen_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.champions_spear.remains,if=talent.champions_spear&((cooldown.champions_spear.remains*variable.rage_per_second+10*(1+talent.piercing_challenge)*variable.rage_gen_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.demoralizing_shout.remains,if=talent.demoralizing_shout&talent.booming_voice&((cooldown.demoralizing_shout.remains*variable.rage_per_second+20*variable.rage_gen_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.shield_charge.remains,if=talent.shield_charge&((cooldown.shield_charge.remains*variable.rage_per_second+20*variable.rage_gen_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.shield_slam.remains,if=((cooldown.shield_slam.remains*variable.rage_per_second+variable.rage_gain_shield_slam*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.thunder_blast.remains,if=talent.thunder_blast&buff.thunder_blast.up&((cooldown.thunder_blast.remains*variable.rage_per_second+variable.rage_gain_thunder_blast*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.thunder_clap.remains,if=talent.thunder_clap&((cooldown.thunder_clap.remains*variable.rage_per_second+variable.rage_gain_thunder_clap*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier)>=variable.rage_deficit)
 
 actions+=/variable,name=has_demoralizing_shout_safety,value=1,value_else=0,op=setif,condition=(active_dot.demoralizing_shout%active_enemies*100>=variable.demoralizing_shout_pct_threshold)
 
@@ -193,19 +202,21 @@ actions.ravager_up+=/revenge,if=debuff.deep_wounds.down|variable.has_deep_wounds
 # [970854] :: Shield Slam during Ravager.
 actions.ravager_up+=/shield_slam
 # [970854] :: Execute during Ravager when possible.
-actions.ravager_up+=/execute,if=(variable.should_dump_rage>0|(variable.should_spend_rage>0&variable.can_spend_rage_on_execute>0))&variable.should_execute>0
+actions.ravager_up+=/execute,if=((variable.time_to_rage_cap<(gcd.remains+execute_time))|(variable.should_spend_rage>0&variable.can_spend_rage_on_execute>0))&variable.should_execute>0
 # [970854] :: Revenge during Ravager.
-actions.ravager_up+=/revenge,if=(variable.should_dump_rage>0|(variable.should_spend_rage>0&variable.can_spend_rage_on_revenge>0))
+actions.ravager_up+=/revenge,if=((variable.time_to_rage_cap<(gcd.remains+execute_time))|(variable.should_spend_rage>0&variable.can_spend_rage_on_revenge>0))
 
 # dump :: Revenge to prevent Rage from capping with at least 5 stacks of Colossal Might.
-actions.dump_rage+=/revenge,if=talent.tide_of_battle&buff.colossal_might.stack>=5
+actions.dump_rage+=/revenge,if=(variable.time_to_rage_cap<(gcd.remains+execute_time))&(talent.tide_of_battle&buff.colossal_might.stack>=5)
 # dump :: Execute to prevent Rage from capping.
-actions.dump_rage+=/execute,if=variable.should_execute>0
+actions.dump_rage+=/execute,if=(variable.time_to_rage_cap<(gcd.remains+execute_time))&variable.should_execute>0
 # dump :: Revenge to prevent Rage from capping.
-actions.dump_rage+=/revenge
+actions.dump_rage+=/revenge,if=(variable.time_to_rage_cap<(gcd.remains+execute_time))
+# dump :: Ignore Pain to prevent Rage from capping.
+actions.dump_rage+=/ignore_pain,use_off_gcd=1,if=(variable.time_to_rage_cap<gcd.remains)
 
 # Prefer Revenge to spend Rage with at least 5 stacks of Colossal Might.
-actions.spend_rage+=/revenge,if=variable.can_spend_rage_on_revenge>0&spell_targets.revenge>=2&talent.tide_of_battle&buff.colossal_might.stack>=5
+actions.spend_rage+=/revenge,if=variable.can_spend_rage_on_revenge>0&talent.tide_of_battle&buff.colossal_might.stack>=5
 actions.spend_rage+=/execute,if=variable.can_spend_rage_on_execute>0&variable.should_execute>0
 actions.spend_rage+=/revenge,if=variable.can_spend_rage_on_revenge>0
 
@@ -234,7 +245,7 @@ actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.remains<(buf
 actions.standard+=/revenge,if=buff.revenge.up
 actions.standard+=/call_action_list,name=outburst,if=talent.violent_outburst
 actions.standard+=/call_action_list,name=ravager_up,if=talent.ravager&buff.shield_block.up&buff.ravager.remains>0
-actions.standard+=/call_action_list,name=dump_rage,if=variable.should_dump_rage>0
+actions.standard+=/call_action_list,name=dump_rage
 actions.standard+=/thunder_blast
 # [132090] :: Revenge to apply Deep Wounds.
 actions.standard+=/revenge,if=debuff.deep_wounds.down|variable.has_deep_wounds_threat=0
