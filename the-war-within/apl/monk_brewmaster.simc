@@ -53,7 +53,7 @@ actions+=/variable,name=energy_at_next_keg_smash,value=energy+energy.regen*coold
 
 actions+=/variable,name=cooldown_rising_sun_kick_duration,value=10*spell_haste
 
-actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.celestial_brew.up|buff.chromebustible_bomb_suit.up|buff.mudborne.up
+actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.celestial_brew.up|buff.celestial_infusion.up|buff.chromebustible_bomb_suit.up|buff.mudborne.up
 actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=buff.dampen_harm.up|buff.fortifying_brew.up|buff.chromebustible_bomb_suit.up
 actions+=/variable,name=can_breath_of_fire,value=1,value_else=0,op=setif,condition=active_dot.keg_smash%active_enemies*100>=variable.breath_of_fire_pct_threshold
 
