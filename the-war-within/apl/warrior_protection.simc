@@ -134,7 +134,7 @@ actions+=/pummel
 actions+=/spell_reflection
 actions+=/defensive_stance,if=!buff.defensive_stance.up&health.pct<70&incoming_damage_3s>0.2*health.max
 actions+=/call_action_list,name=opener,if=time<=3*gcd.max
-actions+=/call_action_list,name=mitigation,if=tanking
+actions+=/call_action_list,name=mitigation
 actions+=/call_action_list,name=defensives,if=tanking
 actions+=/call_action_list,name=heal
 actions+=/call_action_list,name=cooldowns
@@ -156,11 +156,9 @@ actions.defensives+=/rallying_cry,use_off_gcd=1,if=(incoming_damage_5s>variable.
 actions.heal+=/victory_rush,if=buff.victorious.up&health.pct<variable.victory_rush_health_pct
 actions.heal+=/impending_victory,if=health.pct<variable.victory_rush_health_pct
 
-actions.mitigation+=/shield_block,if=buff.shield_block.down|buff.shield_block.remains<4
+actions.mitigation+=/shield_block,if=tanking&(buff.shield_block.down|buff.shield_block.remains<4)
 # [132110] :: Last Stand with Bolster to apply Shield Block.
-actions.mitigation+=/last_stand,if=talent.bolster&buff.shield_block.down
-# [841383] :: Ignore Pain to trigger Violent Outburst.
-actions.mitigation+=/ignore_pain,use_off_gcd=1,if=variable.should_ignore_pain>0&variable.should_spend_rage>0&(buff.seeing_red.stack>=variable.seeing_red_ignore_pain&cooldown.shield_slam.ready)
+actions.mitigation+=/last_stand,if=tanking&talent.bolster&buff.shield_block.down
 actions.mitigation+=/ignore_pain,use_off_gcd=1,if=variable.should_ignore_pain>0
 
 # Put up Shield Block as quickly as possible and debuff mobs with Demoralizing Shout at the start of a pull.
@@ -186,6 +184,8 @@ actions.outburst+=/thunder_clap,if=((buff.seeing_red.stack>=variable.seeing_red_
 actions.outburst+=/execute,if=variable.should_ignore_pain=0&(variable.should_spend_rage>0&variable.can_spend_rage_on_execute>0)&(buff.seeing_red.stack>=variable.seeing_red_execute&cooldown.shield_slam.remains<(gcd.remains+execute_time))&variable.should_execute>0
 # [841383] :: Revenge to trigger Violent Outburst in multi-target.
 actions.outburst+=/revenge,if=variable.should_ignore_pain=0&(variable.should_spend_rage>0&variable.can_spend_rage_on_revenge>0)&(buff.seeing_red.stack>=variable.seeing_red_revenge&cooldown.shield_slam.remains<(gcd.remains+execute_time))
+# [841383] :: Ignore Pain to trigger Violent Outburst.
+actions.mitigation+=/ignore_pain,use_off_gcd=1,if=variable.should_ignore_pain>0&variable.should_spend_rage>0&(buff.seeing_red.stack>=variable.seeing_red_ignore_pain&cooldown.shield_slam.remains<gcd.remains)
 
 actions.racials+=/blood_fury
 actions.racials+=/berserking
