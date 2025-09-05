@@ -220,13 +220,17 @@ actions.standard+=/thunder_blast,if=talent.unstoppable_force&buff.avatar.up
 # [613534] :: Thunder Clap during Avatar.
 actions.standard+=/thunder_clap,if=talent.unstoppable_force&buff.avatar.up
 actions.standard+=/ravager
-actions.standard+=/avatar,if=buff.avatar.down
+actions.standard+=/avatar,if=buff.avatar.down&(buff.thunder_blast.down|!buff.thunder_blast.at_max_stacks)
 actions.standard+=/demoralizing_shout,if=talent.booming_voice
 actions.standard+=/demolish,if=buff.colossal_might.stack>=3
 actions.standard+=/champions_spear
 actions.standard+=/thunderous_roar
 actions.standard+=/shield_charge
-# free :: Execute when Sudden Death is at max stacks.
+# [458976] :: Thunder Blast with Severe Thunder buff (TWW3 tier 4-set bonus).
+actions.standard+=/thunder_blast,if=buff.severe_thunder.up
+# cap :: Thunder Blast when capped at max charges.
+actions.standard+=/thunder_blast,if=buff.thunder_blast.at_max_stacks
+# cap :: Execute when Sudden Death is at max stacks.
 actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.at_max_stacks&variable.should_execute>0
 actions.standard+=/shield_slam
 # [132155] :: Thunder Blast to apply Rend.
