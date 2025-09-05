@@ -82,8 +82,7 @@ actions+=/variable,name=has_deep_wounds_threat,value=1,value_else=0,op=setif,con
 # has_rend_threat is 1 if the percentage of enemy mobs with the Rend DoT on them exceeds 75%.
 actions+=/variable,name=has_rend_threat,value=1,value_else=0,op=setif,condition=(active_dot.rend%active_enemies*100)>75
 
-# XXX This curving of the multiplier is goofy.
-actions+=/variable,name=rage_gain_multiplier,value=1+0.5*buff.unnerving_focus.remains%buff.unnerving_focus.duration
+actions+=/variable,name=rage_gain_multiplier,value=1+0.5*buff.unnerving_focus.up
 actions+=/variable,name=rage_per_second_auto_attack,value=1*(1+0.5*talent.war_machine)+2*talent.devastator*talent.instigate
 # 3 Rage per incoming auto-attack, and incoming auto-attack every 2s with 1 mob.
 # Assume at 1 mob, we don't get any rage, but at 5+ mobs, that we gain 3 Rage every second.
