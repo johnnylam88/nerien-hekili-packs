@@ -122,7 +122,7 @@ actions+=/variable,name=ignore_pain_absorb,value=buff.ignore_pain.v1,value_else=
 actions+=/variable,name=ignore_pain_absorb_oncast,value=stat.attack_power*5.75*(1+0.2*talent.no_stranger_to_pain)*(1+stat.versatility_atk_mod)*2
 # should_ignore_pain is 1 if we are keeping up the Ignore Pain absorb; keep adding to Ignore Pain if incoming damage exceeds the existing absorb amount.
 actions+=/variable,name=should_ignore_pain,value=1,value_else=0,op=setif,condition=buff.ignore_pain.down|buff.ignore_pain.remains<2|(variable.has_absorb_buff=0&(variable.ignore_pain_cap-variable.ignore_pain_absorb)>(variable.ignore_pain_absorb_oncast*(1-variable.ignore_pain_wasted_pct%100))&variable.has_deep_wounds_threat>0&incoming_damage_5s>variable.ignore_pain_absorb)
-
+# should_execute is 1 if it's worth using Execute over Revenge to spend Rage for damage.
 actions+=/variable,name=should_execute,value=1,value_else=0,op=setif,condition=(talent.heavy_handed&spell_targets.revenge<=6)|spell_targets.revenge<=3
 
 actions+=/pummel
