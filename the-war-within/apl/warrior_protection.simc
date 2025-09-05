@@ -238,7 +238,7 @@ actions.standard+=/thunder_blast,if=talent.rend&(debuff.rend.down|variable.has_r
 # [132155] :: Thunder Clap to apply Rend.
 actions.standard+=/thunder_clap,if=talent.rend&(debuff.rend.down|variable.has_rend_threat=0)
 # free :: Execute before Sudden Death expires.
-actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.remains<(buff.sudden_death.stack*gcd)&variable.should_execute>0
+actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.remains<(buff.sudden_death.stack*execute_time)&variable.should_execute>0
 # free :: Revenge is free with Revenge!.
 actions.standard+=/revenge,if=buff.revenge.up
 actions.standard+=/call_action_list,name=outburst,if=talent.violent_outburst
