@@ -36,9 +36,10 @@ actions+=/variable,name=seeing_red_ignore_pain,value=100-(variable.rage_cost_ign
 actions+=/variable,name=seeing_red_revenge,value=100-(variable.rage_cost_revenge%5)
 actions+=/variable,name=seeing_red_shield_block,value=100-(variable.rage_cost_shield_block%5)
 
-actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercussions+3*talent.practiced_strikes)
-actions+=/variable,name=rage_gain_thunder_blast,value=8
-actions+=/variable,name=rage_gain_thunder_clap,value=5
+actions+=/variable,name=rage_gain_multiplier_outburst,value=1+(0.5*buff.violent_outburst.up)
+actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercussions+3*talent.practiced_strikes)*variable.rage_gain_multiplier
+actions+=/variable,name=rage_gain_thunder_blast,value=8*variable.rage_gain_multiplier
+actions+=/variable,name=rage_gain_thunder_clap,value=5*variable.rage_gain_multiplier
 
 ### Tunables ###
 
@@ -82,8 +83,7 @@ actions+=/variable,name=has_deep_wounds_threat,value=1,value_else=0,op=setif,con
 actions+=/variable,name=has_rend_threat,value=1,value_else=0,op=setif,condition=(active_dot.rend%active_enemies*100)>75
 
 # XXX This curving of the multiplier is goofy.
-actions+=/variable,name=rage_gen_multiplier,value=1+0.5*buff.unnerving_focus.remains%buff.unnerving_focus.duration
-actions+=/variable,name=rage_gen_multiplier_outburst,value=1.5,value_else=1,op=setif,condition=buff.violent_outburst.up
+actions+=/variable,name=rage_gain_multiplier,value=1+0.5*buff.unnerving_focus.remains%buff.unnerving_focus.duration
 actions+=/variable,name=rage_per_second_auto_attack,value=1*(1+0.5*talent.war_machine)+2*talent.devastator*talent.instigate
 # 3 Rage per incoming auto-attack, and incoming auto-attack every 2s with 1 mob.
 # Assume at 1 mob, we don't get any rage, but at 5+ mobs, that we gain 3 Rage every second.
@@ -93,7 +93,7 @@ actions+=/variable,name=rage_per_second_incoming_damage,value=variable.rage_per_
 actions+=/variable,name=rage_per_second_bloodsurge,value=talent.bloodsurge*(0.1*5%3)*active_dot.deep_wounds
 # Ravager ticks every 2s for 12s (hasted) for 10 rage every time it does damage.
 actions+=/variable,name=rage_per_second_ravager,value=buff.ravager.up*5
-actions+=/variable,name=rage_per_second,value=(variable.rage_per_second_auto_attack+variable.rage_per_second_incoming_damage+variable.rage_per_second_bloodsurge+variable.rage_per_second_ravager)*variable.rage_gen_multiplier
+actions+=/variable,name=rage_per_second,value=(variable.rage_per_second_auto_attack+variable.rage_per_second_incoming_damage+variable.rage_per_second_bloodsurge+variable.rage_per_second_ravager)*variable.rage_gain_multiplier
 actions+=/variable,name=rage_at_next_shield_block,value=rage,value_else=rage+cooldown.shield_block.remains*variable.rage_per_second,op=setif,condition=cooldown.shield_block.charges>0
 # should_spend_rage is 1 if the expected Rage by the next Shield Block exceeds the pool value.
 actions+=/variable,name=should_spend_rage,value=1,value_else=0,op=setif,condition=(variable.rage_at_next_shield_block>variable.rage_pool)
@@ -104,13 +104,13 @@ actions+=/variable,name=can_spend_rage_on_revenge,value=1,value_else=0,op=setif,
 
 # time_to_rage_cap is the number of seconds before a Rage-generating ability comes off cooldown and will cap total Rage if cast.
 actions+=/variable,name=time_to_rage_cap,op=reset,default=(variable.rage_deficit%variable.rage_per_second)
-actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.avatar.remains,if=talent.avatar&((cooldown.avatar.remains*variable.rage_per_second+10*variable.rage_gen_multiplier)>=variable.rage_deficit)
-actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.champions_spear.remains,if=talent.champions_spear&((cooldown.champions_spear.remains*variable.rage_per_second+10*(1+talent.piercing_challenge)*variable.rage_gen_multiplier)>=variable.rage_deficit)
-actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.demoralizing_shout.remains,if=talent.demoralizing_shout&talent.booming_voice&((cooldown.demoralizing_shout.remains*variable.rage_per_second+20*variable.rage_gen_multiplier)>=variable.rage_deficit)
-actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.shield_charge.remains,if=talent.shield_charge&((cooldown.shield_charge.remains*variable.rage_per_second+20*variable.rage_gen_multiplier)>=variable.rage_deficit)
-actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.shield_slam.remains,if=((cooldown.shield_slam.remains*variable.rage_per_second+variable.rage_gain_shield_slam*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier)>=variable.rage_deficit)
-actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.thunder_blast.remains,if=talent.thunder_blast&buff.thunder_blast.up&((cooldown.thunder_blast.remains*variable.rage_per_second+variable.rage_gain_thunder_blast*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier)>=variable.rage_deficit)
-actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.thunder_clap.remains,if=talent.thunder_clap&((cooldown.thunder_clap.remains*variable.rage_per_second+variable.rage_gain_thunder_clap*variable.rage_gen_multiplier_outburst*variable.rage_gen_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.avatar.remains,if=talent.avatar&((cooldown.avatar.remains*variable.rage_per_second+10*variable.rage_gain_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.champions_spear.remains,if=talent.champions_spear&((cooldown.champions_spear.remains*variable.rage_per_second+10*(1+talent.piercing_challenge)*variable.rage_gain_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.demoralizing_shout.remains,if=talent.demoralizing_shout&talent.booming_voice&((cooldown.demoralizing_shout.remains*variable.rage_per_second+20*variable.rage_gain_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.shield_charge.remains,if=talent.shield_charge&((cooldown.shield_charge.remains*variable.rage_per_second+20*variable.rage_gain_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.shield_slam.remains,if=((cooldown.shield_slam.remains*variable.rage_per_second+variable.rage_gain_shield_slam*variable.rage_gain_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.thunder_blast.remains,if=talent.thunder_blast&buff.thunder_blast.up&((cooldown.thunder_blast.remains*variable.rage_per_second+variable.rage_gain_thunder_blast*variable.rage_gain_multiplier)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.thunder_clap.remains,if=talent.thunder_clap&((cooldown.thunder_clap.remains*variable.rage_per_second+variable.rage_gain_thunder_clap*variable.rage_gain_multiplier)>=variable.rage_deficit)
 
 actions+=/variable,name=has_demoralizing_shout_safety,value=1,value_else=0,op=setif,condition=(active_dot.demoralizing_shout%active_enemies*100>=variable.demoralizing_shout_pct_threshold)
 
