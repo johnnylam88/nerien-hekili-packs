@@ -232,15 +232,15 @@ actions.standard+=/thunder_blast,if=buff.thunder_blast.at_max_stacks
 actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.at_max_stacks&variable.should_execute>0
 actions.standard+=/shield_slam
 # [132155] :: Thunder Blast to apply Rend.
-actions.standard+=/thunder_blast,if=talent.rend&(debuff.rend.down|variable.has_rend_threat=0)
+actions.standard+=/thunder_blast,if=talent.rend&(dot.rend.remains<=execute_time|variable.has_rend_threat=0)
 # [132155] :: Thunder Clap to apply Rend.
-actions.standard+=/thunder_clap,if=talent.rend&(debuff.rend.down|variable.has_rend_threat=0)
+actions.standard+=/thunder_clap,if=talent.rend&(dot.rend.remains<=execute_time|variable.has_rend_threat=0)
 # free :: Execute before Sudden Death expires.
 actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.remains<(buff.sudden_death.stack*execute_time)&variable.should_execute>0
 # free :: Revenge is free with Revenge!.
 actions.standard+=/revenge,if=buff.revenge.up
 # [132090] :: Revenge to apply Deep Wounds.
-actions.standard+=/revenge,if=debuff.deep_wounds.down|variable.has_deep_wounds_threat=0
+actions.standard+=/revenge,if=dot.deep_wounds.remains<=execute_time|variable.has_deep_wounds_threat=0
 actions.standard+=/call_action_list,name=outburst,if=talent.violent_outburst
 actions.standard+=/call_action_list,name=ravager_up,if=talent.ravager&buff.shield_block.up&buff.ravager.remains>0
 actions.standard+=/call_action_list,name=dump_rage
