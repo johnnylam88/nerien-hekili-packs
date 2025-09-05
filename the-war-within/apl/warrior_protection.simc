@@ -219,16 +219,17 @@ actions.standard+=/thunder_blast,if=talent.unstoppable_force&buff.avatar.up
 actions.standard+=/thunder_clap,if=talent.unstoppable_force&buff.avatar.up
 actions.standard+=/ravager
 actions.standard+=/avatar,if=buff.avatar.down&(buff.thunder_blast.down|!buff.thunder_blast.at_max_stacks)
-actions.standard+=/demoralizing_shout,if=talent.booming_voice
+actions.standard+=/demoralizing_shout,if=talent.booming_voice&(buff.thunder_blast.down|(talent.snap_induction&!buff.thunder_blast.at_max_stacks))
 actions.standard+=/demolish,if=buff.colossal_might.stack>=3
 actions.standard+=/champions_spear
 actions.standard+=/thunderous_roar
 actions.standard+=/shield_charge
 # [458976] :: Thunder Blast with Severe Thunder buff (TWW3 tier 4-set bonus).
 actions.standard+=/thunder_blast,if=buff.severe_thunder.up
-# cap :: Thunder Blast when capped at max charges.
+# dump :: Thunder Blast when capped at max charges.
 actions.standard+=/thunder_blast,if=buff.thunder_blast.at_max_stacks
-# cap :: Execute when Sudden Death is at max stacks.
+# drop :: Drop Thunder Blast charges if abilities are coming off cooldown and will grant Thunder Blast charges.
+actions.standard+=/thunder_blast,if=(talent.avatar_of_the_storm&cooldown.avatar.remains<=(gcd.remains+execute_time))|(talent.snap_induction&cooldown.demoralizing_shout.remains<=(gcd.remains+execute_time))
 actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.at_max_stacks&variable.should_execute>0
 actions.standard+=/shield_slam
 # [132155] :: Thunder Blast to apply Rend.
