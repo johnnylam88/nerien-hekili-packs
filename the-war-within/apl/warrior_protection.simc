@@ -191,8 +191,6 @@ actions.racials+=/ancestral_call
 #actions.racials+=/fireblood
 actions.racials+=/bag_of_tricks
 
-# [132090] :: Revenge to apply Deep Wounds
-actions.ravager_up+=/revenge,if=debuff.deep_wounds.down|variable.has_deep_wounds_threat=0
 # [970854] :: Shield Slam during Ravager.
 actions.ravager_up+=/shield_slam
 # [970854] :: Execute during Ravager when possible.
@@ -241,12 +239,12 @@ actions.standard+=/thunder_clap,if=talent.rend&(debuff.rend.down|variable.has_re
 actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.remains<(buff.sudden_death.stack*execute_time)&variable.should_execute>0
 # free :: Revenge is free with Revenge!.
 actions.standard+=/revenge,if=buff.revenge.up
+# [132090] :: Revenge to apply Deep Wounds.
+actions.standard+=/revenge,if=debuff.deep_wounds.down|variable.has_deep_wounds_threat=0
 actions.standard+=/call_action_list,name=outburst,if=talent.violent_outburst
 actions.standard+=/call_action_list,name=ravager_up,if=talent.ravager&buff.shield_block.up&buff.ravager.remains>0
 actions.standard+=/call_action_list,name=dump_rage
 actions.standard+=/thunder_blast
-# [132090] :: Revenge to apply Deep Wounds.
-actions.standard+=/revenge,if=debuff.deep_wounds.down|variable.has_deep_wounds_threat=0
 actions.standard+=/call_action_list,name=spend_rage,if=variable.should_ignore_pain=0&variable.should_spend_rage>0
 actions.standard+=/thunder_clap
 actions.standard+=/devastate
