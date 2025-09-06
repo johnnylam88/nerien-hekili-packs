@@ -24,16 +24,21 @@ actions+=/variable,name=rage_cost_maul,value=40
 actions+=/variable,name=rage_cost_raze,value=40
 actions+=/variable,name=rage_cost_max,value=((variable.rage_cost_ironfur<?variable.rage_cost_maul)<?variable.rage_cost_raze)
 
-actions+=/variable,name=rage_gain_mangle,value=(12+5*talent.soul_of_the_forest)
+actions+=/variable,name=rage_gain_mangle,value=(12+5*talent.soul_of_the_forest+4*buff.gore.up)
 actions+=/variable,name=rage_gain_thrash_bear,value=5
-
-actions+=/variable,name=cooldown_mangle_duration,value=6*spell_haste
-actions+=/variable,name=cooldown_thrash_bear_duration,value=6*spell_haste
 
 ### Tunables ###
 
-# Pool enough Rage to cast Ironfur and Frenzied Regeneration.
-actions+=/variable,name=rage_pool_value,value=variable.rage_cost_ironfur+variable.rage_cost_frenzied_regeneration
+# Set a soft cap for maximum Rage.
+# This value is used when checking if we'll cap on Rage.
+# It's less than maximum Rage because our Rage generation estimates tend to
+# underestimate the true Rage generation due to procs, and comparing against
+# the true max Rage has a higher probability of capping.
+actions+=/variable,name=rage_cap,value=(rage.max-10)
+# Always maintain enough Rage for Ironfur or Frenzied Regeneration.
+actions+=/variable,name=rage_floor,value=(variable.rage_cost_ironfur+variable.rage_cost_frenzied_regeneration)
+# Pool enough Rage to cast Ironfur twice.
+actions+=/variable,name=rage_pool,value=(variable.rage_cap-20)
 # Barkskin tunable for incoming damage.
 actions+=/variable,name=barkskin_damage_taken,value=0.2*health.max
 # Frenzied Regeneration tunable for minimum health percent.
@@ -54,6 +59,12 @@ actions+=/variable,name=survival_instincts_damage_taken,value=0.2*health.max
 # ripweave is 1 if the conditions for Ripweaving are true (Rip, Rake, Fluid Form, and Wildpower Surge are talented).
 actions+=/variable,name=ripweave,value=1,value_else=0,op=setif,condition=druid.catweave_bear&talent.rip&talent.rake&talent.fluid_form&talent.wildpower_surge
 
+# has_thrash_bear_threat is 1 if the percentage of enemy mobs with the Thrash DoT on them exceeds 75%.
+actions+=/variable,name=has_thrash_bear_threat,value=1,value_else=0,op=setif,condition=(active_dot.thrash_bear%active_enemies*100)>75
+
+# Amount of Rage until the Rage cap is reached.
+actions+=/variable,name=rage_deficit,value=(variable.rage_cap-rage)
+
 # 4 Rage per auto-attack.
 actions+=/variable,name=rage_per_second_auto_attack,value=4%(2*attack_haste)
 # 3 Rage per incoming auto-attack, and incoming auto-attack every 2s with 1 mob.
@@ -69,22 +80,21 @@ actions+=/variable,name=rage_per_second_galactic_guardian,value=talent.galactic_
 # Galactic Guardian causes damage to have a 5% chance to trigger a free Moonfire on that target.
 # This underestimates the Rage generated because we only factor in Thrash ticks to proc Galactic Guardian.
 actions+=/variable,name=rage_per_second_moon_guardian,value=talent.moon_guardian*talent.galactic_guardian*5*0.05*(active_dot.thrash_bear%dot.thrash_bear.tick_time)
-# This underestimates the Rage from Mangle because we don't account for the Gore talent.
-actions+=/variable,name=rage_per_second_mangle,value=variable.rage_gain_mangle%variable.cooldown_mangle_duration
-actions+=/variable,name=rage_per_second_thrash_bear,value=variable.rage_gain_thrash_bear%variable.cooldown_thrash_bear_duration
-actions+=/variable,name=rage_per_second,value=variable.rage_per_second_auto_attack+variable.rage_per_second_incoming_auto_attack+variable.rage_per_second_blood_frenzy+variable.rage_per_second_galactic_guardian+variable.rage_per_second_moon_guardian+variable.rage_per_second_mangle+variable.rage_per_second_thrash_bear
-actions+=/variable,name=rage_at_next_gcd,value=rage+gcd*variable.rage_per_second
-# should_spend_rage is 1 if spending Rage in the next GCD won't drop below the pool value.
-actions+=/variable,name=should_spend_rage,value=1,op=setif,condition=variable.rage_at_next_gcd-variable.rage_cost_max>=variable.rage_pool_value
+actions+=/variable,name=rage_per_second,value=variable.rage_per_second_auto_attack+variable.rage_per_second_incoming_auto_attack+variable.rage_per_second_blood_frenzy+variable.rage_per_second_galactic_guardian+variable.rage_per_second_moon_guardian
+actions+=/variable,name=rage_at_next_gcd,value=rage+gcd.remains*variable.rage_per_second
+# should_spend_rage is 1 if the expected Rage by the next GCD exceeds the pool value.
+actions+=/variable,name=should_spend_rage,value=1,value_else=0,op=setif,condition=(variable.rage_at_next_gcd>variable.rage_pool)
+# can_spend_rage_on_maul is 1 if casting Maul doesn't drop Rage below the floor value.
+actions+=/variable,name=can_spend_rage_on_maul,value=1,value_else=0,op=setif,condition=(rage-variable.rage_cost_maul>=variable.rage_floor)
+# can_spend_rage_on_raze is 1 if casting Raze doesn't drop Rage below the floor value.
+actions+=/variable,name=can_spend_rage_on_raze,value=1,value_else=0,op=setif,condition=(rage-variable.rage_cost_raze>=variable.rage_floor)
 
-actions+=/variable,name=rage_check,value=1,value_else=0,op=setif,condition=rage+variable.rage_per_second*gcd>rage.max
-# Mangle with Gore generates 4 additional Rage.
-actions+=/variable,name=rage_check_mangle,value=1,value_else=0,op=setif,condition=cooldown.mangle.remains<gcd&rage+variable.rage_gain_mangle+4*buff.gore.up>rage.max
+# time_to_rage_cap is the number of seconds before a Rage-generating ability comes off cooldown and will cap total Rage if cast.
+actions+=/variable,name=time_to_rage_cap,op=reset,default=(variable.rage_deficit%variable.rage_per_second)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.mangle.remains,if=((cooldown.mangle.remains*variable.rage_per_second+variable.rage_gain_mangle)>=variable.rage_deficit)
+actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.thrash_bear.remains,if=talent.thrash&((cooldown.thrash_bear.remains*variable.rage_per_second+variable.rage_gain_thrash_bear)>=variable.rage_deficit)
 # Moonfire with Galactic Guardian generates 8 Rage.
-actions+=/variable,name=rage_check_moonfire,value=1,value_else=0,op=setif,condition=rage+8*buff.galactic_guardian.up>rage.max
-actions+=/variable,name=rage_check_thrash_bear,value=1,value_else=0,op=setif,condition=cooldown.thrash_bear.remains<gcd&rage+variable.rage_gain_thrash_bear+4*buff.gore.up>rage.max
-# should_dump_rage is 1 if an ability is coming off cooldown and will overcap on Rage.
-actions+=/variable,name=should_dump_rage,value=1,value_else=0,op=setif,condition=variable.rage_check>0|variable.rage_check_moonfire>0|variable.rage_check_mangle>0|variable.rage_check_thrash_bear>0
+actions+=/variable,name=time_to_rage_cap,op=min,value=gcd.remains,if=talent.galactic_guardian&buff.galactic_guardian.up&((gcd.remains*variable.rage_per_second+8)>=variable.rage_deficit)
 
 # Ironfur if not already up, about to expire, or we need more stacks.
 actions+=/variable,name=ironfur_threshold,value=floor(incoming_physical_damage_5s%variable.ironfur_damage_taken)
@@ -150,13 +160,11 @@ actions.cat+=/shred,if=!dot.rake.refreshable
 # [132115] :: Apply or refresh Rake.
 actions.cat+=/rake
 
-# [132143] :: Maintain max stacks of Thrash for DR from Rend and Tear.
-actions.bear+=/thrash_bear,if=debuff.thrash_bear.stack<debuff.thrash_bear.max_stack
-actions.bear+=/moonfire,if=(!ticking|refreshable)&target.time_to_die>12
-# [132127] :: Mangle to maintain Feline Potential stacks if present.
-actions.bear+=/mangle,if=variable.ripweave>0&buff.feline_potential_counter.up&buff.feline_potential_counter.remains<2
-# Ripweave preparation once Feline Potential nears max stacks.
-actions.bear+=/call_action_list,name=ripweave_prep,if=variable.ripweave>0&buff.feline_potential_counter.stack>=5&active_enemies<2
+actions.bear+=/maul,if=buff.ravage.up
+# [stack] :: Maintain max stacks of Thrash.
+actions.bear+=/thrash_bear,if=!ticking|refreshable|!dot.thrash_bear.at_max_stacks|variable.has_thrash_bear_threat=0
+actions.bear+=/moonfire,if=active_enemies<=2&(!ticking|refreshable)&target.time_to_die>12
+actions.bear+=/call_action_list,name=ripweave,if=variable.ripweave>0
 actions.bear+=/heart_of_the_wild,if=variable.ripweave=0
 actions.bear+=/convoke_the_spirits,if=variable.ripweave=0
 actions.bear+=/berserk_bear,if=buff.berserk_bear.down
@@ -168,6 +176,7 @@ actions.bear+=/rage_of_the_sleeper
 actions.bear+=/maul,if=buff.tooth_and_claw.up
 # [134298] :: Raze is free with Tooth and Claw proc.
 actions.bear+=/raze,if=buff.tooth_and_claw.up
+actions.bear+=/call_action_list,name=dump_rage
 actions.bear+=/call_action_list,name=spend_rage,if=variable.should_ironfur=0&variable.should_spend_rage>0
 actions.bear+=/thrash_bear
 actions.bear+=/mangle
@@ -177,28 +186,40 @@ actions.bear+=/moonfire,if=buff.galactic_guardian.up&(buff.galactic_guardian.rem
 actions.bear+=/moonfire,cycle_targets=1,if=(talent.lunar_insight|talent.twin_moonfire)&active_enemies>1
 actions.bear+=/swipe_bear
 
-# [132127] :: Dump Rage before shifting to Cat Form.
-actions.ripweave_prep+=/ironfur,use_off_gcd=1,if=rage-variable.rage_cost_ironfur>variable.rage_cost_max&buff.feline_potential_counter.stack<6&variable.should_ironfur>0
-# [132127] :: Dump Rage before shifting to Cat Form.
-actions.ripweave_prep+=/maul,if=rage-variable.rage_cost_maul>variable.rage_cost_max&buff.feline_potential_counter.stack<6&variable.should_ironfur=0
-# [132127] :: Dump Rage before shifting to Cat Form.
-actions.ripweave_prep+=/raze,if=rage-variable.rage_cost_raze>variable.rage_cost_max&buff.feline_potential_counter.stack<6&variable.should_ironfur=0
-# [132127] :: Mangle to get max stacks of Feline Potential.
-actions.ripweave_prep+=/mangle,if=buff.feline_potential_counter.stack<6
-# [132127] :: Thrash to maintain the Thrash DoT through time in Cat Form.
-actions.ripweave_prep+=/thrash_bear,if=buff.feline_potential_counter.stack=6&cooldown.mangle.remains>variable.cat_duration
-# [132127] :: Stay in Bear Form and Ironfur until Mangle cooldown is ready after casting Ferocious Bite or Rip.
-actions.ripweave_prep+=/ironfur,use_off_gcd=1,if=buff.feline_potential_counter.stack=6&cooldown.mangle.remains>variable.cat_duration&variable.should_ironfur>0
-# [132127] :: Stay in Bear Form and Maul until Mangle cooldown is ready after casting Ferocious Bite or Rip.
-actions.ripweave_prep+=/maul,if=buff.feline_potential_counter.stack=6&cooldown.mangle.remains>variable.cat_duration&variable.should_ironfur=0
-# [132127] :: Stay in Bear Form and Raze until Mangle cooldown is ready after casting Ferocious Bite or Rip.
-actions.ripweave_prep+=/raze,if=buff.feline_potential_counter.stack=6&cooldown.mangle.remains>variable.cat_duration&variable.should_ironfur=0
-# [132127] :: Stay in Bear Form and Swipe until Mangle cooldown is ready after casting Ferocious Bite or Rip.
-actions.ripweave_prep+=/swipe_bear,if=buff.feline_potential_counter.stack=6&cooldown.mangle.remains>variable.cat_duration
-# [132115] :: Shred to enter Cat Form if Rake shouldn't be refreshed yet.
-actions.ripweave_prep+=/shred,if=buff.feline_potential_counter.stack=6&!dot.rake.refreshable&buff.rage_of_the_sleeper.down
-# [132115] :: Rake to enter Cat Form
-actions.ripweave_prep+=/rake,if=buff.feline_potential_counter.stack=6&buff.rage_of_the_sleeper.down
+# [132127] :: Mangle to maintain Feline Potential stacks if present.
+actions.ripweave+=/mangle,if=buff.feline_potential_counter.up&buff.feline_potential_counter.remains<2
+# Ripweave preparation once Feline Potential nears max stacks.
+actions.ripweave+=/call_action_list,name=ripweave_prep,if=(buff.feline_potential_counter.stack>=(buff.feline_potential_counter.max_stack-1))&active_enemies<2
 
-actions.spend_rage+=/maul
-actions.spend_rage+=/raze
+# [132127] :: Dump Rage with Maul before shifting to Cat Form.
+actions.ripweave_prep+=/maul,if=(buff.feline_potential_counter.stack<buff.feline_potential_counter.max_stack)&(variable.should_ironfur=0&variable.can_spend_rage_on_maul)
+# [132127] :: Dump Rage with Raze before shifting to Cat Form.
+actions.ripweave_prep+=/raze,if=(buff.feline_potential_counter.stack<buff.feline_potential_counter.max_stack)&(variable.should_ironfur=0&variable.can_spend_rage_on_raze)
+# [132127] :: Dump Rage with Ironfur before shifting to Cat Form.
+actions.ripweave_prep+=/ironfur,use_off_gcd=1,if=(buff.feline_potential_counter.stack<buff.feline_potential_counter.max_stack)&(variable.should_ironfur>0)
+# [132127] :: Mangle to get max stacks of Feline Potential.
+actions.ripweave_prep+=/mangle,if=!buff.feline_potential_counter.at_max_stacks
+# [132127] :: Thrash to maintain the Thrash DoT through time in Cat Form.
+actions.ripweave_prep+=/thrash_bear,if=buff.feline_potential_counter.at_max_stacks&cooldown.mangle.remains>variable.cat_duration
+# [132127] :: Stay in Bear Form and Maul until Mangle cooldown is ready after casting Ferocious Bite or Rip.
+actions.ripweave_prep+=/maul,if=buff.feline_potential_counter.at_max_stacks&cooldown.mangle.remains>variable.cat_duration&(variable.should_ironfur=0&variable.can_spend_rage_on_maul)
+# [132127] :: Stay in Bear Form and Raze until Mangle cooldown is ready after casting Ferocious Bite or Rip.
+actions.ripweave_prep+=/raze,if=buff.feline_potential_counter.at_max_stacks&cooldown.mangle.remains>variable.cat_duration&(variable.should_ironfur=0&variable.can_spend_rage_on_raze)
+# [132127] :: Stay in Bear Form and Swipe until Mangle cooldown is ready after casting Ferocious Bite or Rip.
+actions.ripweave_prep+=/swipe_bear,if=buff.feline_potential_counter.at_max_stacks&cooldown.mangle.remains>variable.cat_duration
+# [132127] :: Dump Rage with Ironfur before entering Cat Form.
+actions.ripweave_prep+=/ironfur,use_off_gcd=1,if=buff.feline_potential_counter.at_max_stacks&cooldown.mangle.remains<=variable.cat_duration
+# [132115] :: Shred to enter Cat Form if Rake shouldn't be refreshed yet.
+actions.ripweave_prep+=/shred,if=buff.feline_potential_counter.at_max_stacks&!dot.rake.refreshable&buff.rage_of_the_sleeper.down
+# [132115] :: Rake to enter Cat Form
+actions.ripweave_prep+=/rake,if=buff.feline_potential_counter.at_max_stacks&buff.rage_of_the_sleeper.down
+
+# dump :: Maul to prevent Rage from capping.
+actions.dump_rage+=/maul,if=(variable.time_to_rage_cap<(gcd.remains+execute_time))&(variable.should_ironfur=0&variable.can_spend_rage_on_maul>0)
+# dump :: Raze to prevent Rage from capping.
+actions.dump_rage+=/raze,if=(variable.time_to_rage_cap<(gcd.remains+execute_time))&(variable.should_ironfur=0&variable.can_spend_rage_on_raze>0)
+# dump :: Ironfur to prevent Rage from capping.
+actions.dump_rage+=/ironfur,use_off_gcd=1,if=(variable.time_to_rage_cap<gcd.remains)&(variable.should_ironfur>0)
+
+actions.spend_rage+=/maul,if=variable.can_spend_rage_on_maul>0
+actions.spend_rage+=/raze,if=variable.can_spend_rage_on_raze>0
