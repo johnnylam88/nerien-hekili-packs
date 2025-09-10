@@ -26,6 +26,7 @@ actions.precombat+=/battle_shout
 actions.precombat+=/use_item,name=chromebustible_bomb_suit
 actions.precombat+=/use_item,name=ringing_ritual_mud
 
+# Full-damage Execute costs 40 Rage.
 actions+=/variable,name=rage_cost_execute,value=40
 actions+=/variable,name=rage_cost_ignore_pain,value=35
 actions+=/variable,name=rage_cost_revenge,value=20
@@ -166,21 +167,22 @@ actions.opener+=/shield_charge,if=buff.shield_block.down|rage<variable.rage_cost
 actions.opener+=/demoralizing_shout
 
 # [236308] :: Thunder Blast to consume Violent Outburst in multi-target.
-actions.outburst+=/thunder_blast,if=buff.violent_outburst.up&spell_targets.thunder_clap>=3
+actions.outburst+=/thunder_blast,if=spell_targets.thunder_clap>=3
 # [236308] :: Shield Slam to consume Violent Outburst.
-actions.outburst+=/shield_slam,if=buff.violent_outburst.up
-# [236308] :: Thunder Blast to consume Violent Outburst in multi-target.
-actions.outburst+=/thunder_blast,if=buff.violent_outburst.up&cooldown.shield_slam.remains>2&spell_targets.thunder_clap>=2
-# [236308] :: Thunder Clap to consume Violent Outburst in multi-target.
-actions.outburst+=/thunder_clap,if=buff.violent_outburst.up&cooldown.shield_slam.remains>2&spell_targets.thunder_clap>=2
-# [841383] :: Put Thunder Clap on cooldown so Violent Outburst is consumed by Shield Slam instead in single-target.
-actions.outburst+=/thunder_clap,if=((buff.seeing_red.stack>=variable.seeing_red_execute)|(buff.seeing_red.stack>=variable.seeing_red_revenge)|(buff.seeing_red.stack>=variable.seeing_red_ignore_pain))&spell_targets.thunder_clap<3
+actions.outburst+=/shield_slam
+# [236308] :: Fish for Shield Slam resets with Execute.
+actions.outburst+=/execute,if=talent.strategist&(cooldown.shield_slam.remains>(2*action.shield_slam.execute_time))&variable.should_ignore_pain=0&(variable.should_spend_rage>0&variable.can_spend_rage_on_execute>0)&variable.should_execute>0
+# [236308] :: Fish for Shield Slam resets with Revenge.
+actions.outburst+=/revenge,if=talent.strategist&(cooldown.shield_slam.remains>(2*action.shield_slam.execute_time))&variable.should_ignore_pain=0&(variable.should_spend_rage>0&variable.can_spend_rage_on_revenge>0)&variable.should_execute=0
+# [236308] :: Thunder Clap to consume Violent Outburst and Shield Slam is more than 2 GCDs away and Shield Slam cooldown can't be reset.
+actions.outburst+=/thunder_clap,if=talent.strategist&(cooldown.shield_slam.remains>(2*action.shield_slam.execute_time))&(variable.should_spend_rage<0|(action.execute.ready&variable.can_spend_rage_on_execute=0)|variable.can_spend_rage_on_revenge=0)
+
 # [841383] :: Execute to trigger Violent Outburst.
-actions.outburst+=/execute,if=variable.should_ignore_pain=0&(variable.should_spend_rage>0&variable.can_spend_rage_on_execute>0)&(buff.seeing_red.stack>=variable.seeing_red_execute&cooldown.shield_slam.remains<(gcd.remains+execute_time))&variable.should_execute>0
+actions.outburst_prep+=/execute,if=variable.should_ignore_pain=0&(variable.should_spend_rage>0&variable.can_spend_rage_on_execute>0)&(buff.seeing_red.stack>=variable.seeing_red_execute)&variable.should_execute>0
 # [841383] :: Revenge to trigger Violent Outburst in multi-target.
-actions.outburst+=/revenge,if=variable.should_ignore_pain=0&(variable.should_spend_rage>0&variable.can_spend_rage_on_revenge>0)&(buff.seeing_red.stack>=variable.seeing_red_revenge&cooldown.shield_slam.remains<(gcd.remains+execute_time))
+actions.outburst_prep+=/revenge,if=variable.should_ignore_pain=0&(variable.should_spend_rage>0&variable.can_spend_rage_on_revenge>0)&(buff.seeing_red.stack>=variable.seeing_red_revenge)
 # [841383] :: Ignore Pain to trigger Violent Outburst.
-actions.mitigation+=/ignore_pain,use_off_gcd=1,if=variable.should_ignore_pain>0&variable.should_spend_rage>0&(buff.seeing_red.stack>=variable.seeing_red_ignore_pain&cooldown.shield_slam.remains<gcd.remains)
+actions.outburst_prep+=/ignore_pain,use_off_gcd=1,if=variable.should_ignore_pain>0&variable.should_spend_rage>0&(buff.seeing_red.stack>=variable.seeing_red_ignore_pain&cooldown.shield_slam.remains<gcd.remains)
 
 actions.racials+=/blood_fury
 actions.racials+=/berserking
@@ -190,19 +192,12 @@ actions.racials+=/ancestral_call
 #actions.racials+=/fireblood
 actions.racials+=/bag_of_tricks
 
-# [970854] :: Shield Slam during Ravager.
-actions.ravager_up+=/shield_slam
-# [970854] :: Execute during Ravager when possible.
-actions.ravager_up+=/execute,if=((variable.time_to_rage_cap<(gcd.remains+execute_time))|(variable.should_spend_rage>0&variable.can_spend_rage_on_execute>0))&variable.should_execute>0
-# [970854] :: Revenge during Ravager.
-actions.ravager_up+=/revenge,if=((variable.time_to_rage_cap<(gcd.remains+execute_time))|(variable.should_spend_rage>0&variable.can_spend_rage_on_revenge>0))
-
 # dump :: Revenge to prevent Rage from capping with at least 5 stacks of Colossal Might.
-actions.dump_rage+=/revenge,if=(variable.time_to_rage_cap<(gcd.remains+execute_time))&(talent.tide_of_battle&buff.colossal_might.stack>=5)
+actions.dump_rage+=/revenge,if=variable.should_ignore_pain=0&(variable.time_to_rage_cap<(gcd.remains+execute_time))&(talent.tide_of_battle&buff.colossal_might.stack>=5)
 # dump :: Execute to prevent Rage from capping.
-actions.dump_rage+=/execute,if=(variable.time_to_rage_cap<(gcd.remains+execute_time))&variable.should_execute>0
+actions.dump_rage+=/execute,if=variable.should_ignore_pain=0&(variable.time_to_rage_cap<(gcd.remains+execute_time))&variable.should_execute>0
 # dump :: Revenge to prevent Rage from capping.
-actions.dump_rage+=/revenge,if=(variable.time_to_rage_cap<(gcd.remains+execute_time))
+actions.dump_rage+=/revenge,if=variable.should_ignore_pain=0&(variable.time_to_rage_cap<(gcd.remains+execute_time))
 # dump :: Ignore Pain to prevent Rage from capping.
 actions.dump_rage+=/ignore_pain,use_off_gcd=1,if=(variable.time_to_rage_cap<gcd.remains)
 
@@ -212,39 +207,32 @@ actions.spend_rage+=/execute,if=variable.can_spend_rage_on_execute>0&variable.sh
 actions.spend_rage+=/revenge,if=variable.can_spend_rage_on_revenge>0
 
 actions.standard+=/charge,if=movement.distance>8
-# [613534] :: Thunder Blast during Avatar.
-actions.standard+=/thunder_blast,if=talent.unstoppable_force&buff.avatar.up
-# [613534] :: Thunder Clap during Avatar.
-actions.standard+=/thunder_clap,if=talent.unstoppable_force&buff.avatar.up
 actions.standard+=/ravager
 actions.standard+=/avatar,if=buff.avatar.down&(buff.thunder_blast.down|!buff.thunder_blast.at_max_stacks)
-actions.standard+=/demoralizing_shout,if=talent.booming_voice&(buff.thunder_blast.down|(talent.snap_induction&!buff.thunder_blast.at_max_stacks))
-actions.standard+=/demolish,if=buff.colossal_might.stack>=3
-actions.standard+=/champions_spear
 actions.standard+=/thunderous_roar
+actions.standard+=/demoralizing_shout,if=talent.booming_voice&(buff.thunder_blast.down|(talent.snap_induction&!buff.thunder_blast.at_max_stacks))
+actions.standard+=/champions_spear
+actions.standard+=/demolish,if=buff.colossal_might.stack>=3
 actions.standard+=/shield_charge
 # [458976] :: Thunder Blast with Severe Thunder buff (TWW3 tier 4-set bonus).
 actions.standard+=/thunder_blast,if=buff.severe_thunder.up
-# dump :: Thunder Blast when capped at max charges.
-actions.standard+=/thunder_blast,if=buff.thunder_blast.at_max_stacks
-# drop :: Drop Thunder Blast charges if abilities are coming off cooldown and will grant Thunder Blast charges.
-actions.standard+=/thunder_blast,if=(talent.avatar_of_the_storm&cooldown.avatar.remains<=(gcd.remains+execute_time))|(talent.snap_induction&cooldown.demoralizing_shout.remains<=(gcd.remains+execute_time))
+# [132346] :: Use free Execute when capped on stacks of Sudden Death
 actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.at_max_stacks&variable.should_execute>0
+actions.standard+=/call_action_list,name=outburst,if=buff.violent_outburst.up
 actions.standard+=/shield_slam
 # [132155] :: Thunder Blast to apply Rend.
 actions.standard+=/thunder_blast,if=talent.rend&(dot.rend.remains<=execute_time|variable.has_rend_threat=0)
 # [132155] :: Thunder Clap to apply Rend.
 actions.standard+=/thunder_clap,if=talent.rend&(dot.rend.remains<=execute_time|variable.has_rend_threat=0)
-# free :: Execute before Sudden Death expires.
-actions.standard+=/execute,if=talent.sudden_death&buff.sudden_death.remains<(buff.sudden_death.stack*execute_time)&variable.should_execute>0
+# free :: Use free Execute before Sudden Death expires.
+actions.standard+=/execute,if=talent.sudden_death&(buff.sudden_death.remains<(buff.sudden_death.stack*execute_time))&variable.should_execute>0
+actions.standard+=/thunder_blast
 # free :: Revenge is free with Revenge!.
 actions.standard+=/revenge,if=buff.revenge.up
+actions.standard+=/thunder_clap
+actions.standard+=/call_action_list,name=outburst_prep,if=talent.violent_outburst
 # [132090] :: Revenge to apply Deep Wounds.
 actions.standard+=/revenge,if=dot.deep_wounds.remains<=execute_time|variable.has_deep_wounds_threat=0
-actions.standard+=/call_action_list,name=outburst,if=talent.violent_outburst
-actions.standard+=/call_action_list,name=ravager_up,if=talent.ravager&buff.shield_block.up&buff.ravager.remains>0
 actions.standard+=/call_action_list,name=dump_rage
-actions.standard+=/thunder_blast
 actions.standard+=/call_action_list,name=spend_rage,if=variable.should_ignore_pain=0&variable.should_spend_rage>0
-actions.standard+=/thunder_clap
 actions.standard+=/devastate
