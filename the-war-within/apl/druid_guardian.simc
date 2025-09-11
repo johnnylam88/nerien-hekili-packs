@@ -139,25 +139,29 @@ actions.mitigation+=/ironfur,use_off_gcd=1,if=variable.should_ironfur>0
 
 actions.racials+=/berserking
 
-# cat_duration is the minimum amount of time spent in Cat Form.
+# cat_duration is the amount of time spent in Cat Form while Ripweaving.
 actions+=/variable,name=cat_duration,op=reset,default=0
+# Rake or Shred to enter Cat Form with Fluid Form.
 actions+=/variable,name=cat_duration,op=add,value=action.rake.execute_time,if=talent.rake
+# Heart of the Wild in Cat Form for damage.
 actions+=/variable,name=cat_duration,op=add,value=action.heart_of_the_wild.execute_time,if=talent.heart_of_the_wild&cooldown.heart_of_the_wild.ready
+# Convoke the Spirits in Cat Form for damage.
 actions+=/variable,name=cat_duration,op=add,value=action.convoke_the_spirits.execute_time,if=talent.convoke_the_spirits&cooldown.convoke_the_spirits.ready
+# Rip or Ferocious Bite to spend 5 Combo Points from Wildpower Surge and Feline Potential.
 actions+=/variable,name=cat_duration,op=add,value=action.rip.execute_time,if=talent.rip
 
 # [132115] :: Heart of the Wild to increase damage in Cat Form.
 actions.cat+=/heart_of_the_wild
 # [132115] :: Convoke the Spirits for damage in Cat Form.
 actions.cat+=/convoke_the_spirits
-# [132115] :: Ferocious Bite if Rip shouldn't be refreshed yet.
-actions.cat+=/ferocious_bite,if=combo_points=5&(buff.berserk_bear.up|buff.incarnation.up)&!dot.rip.refreshable
 # [132115] :: Apply or refresh Rip.
-actions.cat+=/rip,if=combo_points=5
-# [132115] :: Shred if Rake shouldn't be refreshed yet.
-actions.cat+=/shred,if=!dot.rake.refreshable
+actions.cat+=/rip,if=combo_points=5&(!ticking|dot.rip.refreshable)
+# [132115] :: Ferocious Bite
+actions.cat+=/ferocious_bite,if=combo_points=5
 # [132115] :: Apply or refresh Rake.
-actions.cat+=/rake
+actions.cat+=/rake,if=!ticking|dot.rake.refreshable
+# [132115] :: Shred for Combo Points.
+actions.cat+=/shred
 
 actions.bear+=/heart_of_the_wild,if=variable.ripweave=0
 actions.bear+=/maul,if=buff.ravage.up
@@ -186,17 +190,17 @@ actions.bear+=/moonfire,cycle_targets=1,if=(talent.lunar_insight|talent.twin_moo
 actions.bear+=/swipe_bear
 
 # [132127] :: Mangle to maintain Feline Potential stacks if present.
-actions.ripweave+=/mangle,if=buff.feline_potential_counter.up&buff.feline_potential_counter.remains<2
+actions.ripweave+=/mangle,if=buff.feline_potential_counter.up&(buff.feline_potential_counter.remains<(gcd.remains+execute_time))
 # Ripweave preparation once Feline Potential nears max stacks.
-actions.ripweave+=/call_action_list,name=ripweave_prep,if=(buff.feline_potential_counter.stack>=(buff.feline_potential_counter.max_stack-1))&active_enemies<2
+actions.ripweave+=/call_action_list,name=ripweave_prep,if=(buff.feline_potential_counter.stack>=(buff.feline_potential_counter.max_stack-1))&active_enemies=1
 
 # [132127] :: Dump Rage with Maul before shifting to Cat Form.
-actions.ripweave_prep+=/maul,if=(buff.feline_potential_counter.stack<buff.feline_potential_counter.max_stack)&(variable.should_ironfur=0&variable.can_spend_rage_on_maul)
+actions.ripweave_prep+=/maul,if=!buff.feline_potential_counter.at_max_stacks&(variable.should_ironfur=0&variable.can_spend_rage_on_maul)
 # [132127] :: Dump Rage with Raze before shifting to Cat Form.
-actions.ripweave_prep+=/raze,if=(buff.feline_potential_counter.stack<buff.feline_potential_counter.max_stack)&(variable.should_ironfur=0&variable.can_spend_rage_on_raze)
+actions.ripweave_prep+=/raze,if=!buff.feline_potential_counter.at_max_stacks&(variable.should_ironfur=0&variable.can_spend_rage_on_raze)
 # [132127] :: Dump Rage with Ironfur before shifting to Cat Form.
-actions.ripweave_prep+=/ironfur,use_off_gcd=1,if=(buff.feline_potential_counter.stack<buff.feline_potential_counter.max_stack)&(variable.should_ironfur>0)
-# [132127] :: Mangle to get max stacks of Feline Potential.
+actions.ripweave_prep+=/ironfur,use_off_gcd=1,if=!buff.feline_potential_counter.at_max_stacks&(variable.should_ironfur>0)
+# [132127] :: Mangle to reach max stacks of Feline Potential.
 actions.ripweave_prep+=/mangle,if=!buff.feline_potential_counter.at_max_stacks
 # [132127] :: Thrash to maintain the Thrash DoT through time in Cat Form.
 actions.ripweave_prep+=/thrash_bear,if=buff.feline_potential_counter.at_max_stacks&cooldown.mangle.remains>variable.cat_duration
