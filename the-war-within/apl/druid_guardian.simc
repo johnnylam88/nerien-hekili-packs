@@ -165,7 +165,7 @@ actions.cat+=/shred
 
 actions.bear+=/heart_of_the_wild,if=variable.ripweave=0
 actions.bear+=/maul,if=buff.ravage.up
-# [stack] :: Maintain max stacks of Thrash.
+# stack :: Maintain max stacks of Thrash.
 actions.bear+=/thrash_bear,if=!ticking|refreshable|!dot.thrash_bear.at_max_stacks|variable.has_thrash_bear_threat=0
 actions.bear+=/moonfire,if=active_enemies<=2&(!ticking|refreshable)&target.time_to_die>12
 actions.bear+=/call_action_list,name=ripweave,if=variable.ripweave>0
