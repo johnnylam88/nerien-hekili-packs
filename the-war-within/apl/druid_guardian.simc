@@ -179,10 +179,10 @@ actions.bear+=/rage_of_the_sleeper
 actions.bear+=/maul,if=buff.tooth_and_claw.up
 # [134298] :: Raze is free with Tooth and Claw proc.
 actions.bear+=/raze,if=buff.tooth_and_claw.up
-actions.bear+=/call_action_list,name=dump_rage
-actions.bear+=/call_action_list,name=spend_rage,if=variable.should_ironfur=0&variable.should_spend_rage>0
 actions.bear+=/thrash_bear
 actions.bear+=/mangle
+actions.bear+=/call_action_list,name=dump_rage
+actions.bear+=/call_action_list,name=spend_rage,if=variable.should_ironfur=0&variable.should_spend_rage>0
 # [135853] :: Moonfire with Galactic Guardian
 actions.bear+=/moonfire,if=buff.galactic_guardian.up&(buff.galactic_guardian.remains<action.moonfire.execute_time+gcd|active_enemies<4)
 # filler :: Spread Moonfire
