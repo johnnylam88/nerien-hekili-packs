@@ -16,17 +16,6 @@ actions.precombat+=/bear_form,if=time=0&buff.feline_potential.down&buff.feline_p
 actions.precombat+=/use_item,name=chromebustible_bomb_suit,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
 actions.precombat+=/use_item,name=ringing_ritual_mud,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
 
-### Constants ###
-
-actions+=/variable,name=rage_cost_frenzied_regeneration,value=10
-actions+=/variable,name=rage_cost_ironfur,value=40
-actions+=/variable,name=rage_cost_maul,value=40
-actions+=/variable,name=rage_cost_raze,value=40
-actions+=/variable,name=rage_cost_max,value=((variable.rage_cost_ironfur<?variable.rage_cost_maul)<?variable.rage_cost_raze)
-
-actions+=/variable,name=rage_gain_mangle,value=(12+5*talent.soul_of_the_forest+4*buff.gore.up)
-actions+=/variable,name=rage_gain_thrash_bear,value=5
-
 ### Tunables ###
 
 # Set a soft cap for maximum Rage.
@@ -53,6 +42,16 @@ actions+=/variable,name=renewal_health_pct,value=65
 actions+=/variable,name=regrowth_health_pct,value=85
 # Survival Instincts tunable for incoming damage.
 actions+=/variable,name=survival_instincts_damage_taken,value=0.2*health.max
+
+### Constants ###
+
+actions+=/variable,name=rage_cost_frenzied_regeneration,value=10
+actions+=/variable,name=rage_cost_ironfur,value=40
+actions+=/variable,name=rage_cost_maul,value=40
+actions+=/variable,name=rage_cost_raze,value=40
+
+actions+=/variable,name=rage_gain_mangle,value=(12+5*talent.soul_of_the_forest+4*buff.gore.up)
+actions+=/variable,name=rage_gain_thrash_bear,value=5
 
 ################
 
