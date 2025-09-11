@@ -71,7 +71,7 @@ actions+=/variable,name=rage_per_second_auto_attack,value=4%(2*attack_haste)
 actions+=/variable,name=rage_per_second_incoming_auto_attack,value=(3%4)*(active_enemies-1),value_else=3,op=setif,condition=active_enemies<5
 actions+=/variable,name=rage_per_second_incoming_auto_attack,value=(3%2)+((3%2)%(5-1))*(active_enemies-1),value_else=3,op=setif,condition=active_enemies<5
 # Blood Frenzy causes the Thrash DoT to generate 3 Rage per tick on up to 5 targets.
-actions+=/variable,name=rage_per_second_blood_frenzy,value=talent.blood_frenzy*(3%dot.thrash_bear.tick_time)*(active_dot.thrash_bear<?5)
+actions+=/variable,name=rage_per_second_blood_frenzy,value=talent.blood_frenzy*(3%dot.thrash_bear.tick_time)*(active_dot.thrash_bear>?5)
 # Galactic Guardian causes damage to have a 5% chance to trigger a free Moonfire on that target, and the next Moonfire cast generates 8 Rage.
 # This underestimates the Rage generated because we only factor in Thrash ticks to proc Galactic Guardian.
 actions+=/variable,name=rage_per_second_galactic_guardian,value=talent.galactic_guardian*8*0.05*(active_dot.thrash_bear%dot.thrash_bear.tick_time)
