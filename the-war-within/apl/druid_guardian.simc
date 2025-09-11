@@ -97,7 +97,7 @@ actions+=/variable,name=time_to_rage_cap,op=min,value=gcd.remains,if=talent.gala
 
 # Ironfur if not already up, about to expire, or we need more stacks.
 actions+=/variable,name=ironfur_threshold,value=floor(incoming_physical_damage_5s%variable.ironfur_damage_taken)
-actions+=/variable,name=should_ironfur,value=1,value_else=0,op=setif,condition=tanking&(buff.ironfur.down|buff.ironfur.remains<2|buff.ironfur.stack<variable.ironfur_threshold)
+actions+=/variable,name=should_ironfur,value=1,value_else=0,op=setif,condition=(buff.ironfur.down|buff.ironfur.remains<2|buff.ironfur.stack<variable.ironfur_threshold)
 
 # berserk_ready is 1 if Berserk or Incarnation is imminent.
 actions+=/variable,name=berserk_ready,value=1,value_else=0,op=setif,condition=(talent.incarnation&cooldown.incarnation.remains<gcd)|(!talent.incarnation&cooldown.berserk_bear.remains<gcd)
@@ -114,7 +114,7 @@ actions+=/soothe
 # [132276] :: Mangle to switch back to Bear Form.
 actions+=/mangle,if=buff.bear_form.down&talent.fluid_form&buff.feline_potential.down
 actions+=/bear_form,if=!talent.fluid_form&buff.feline_potential.down
-actions+=/call_action_list,name=mitigation,if=tanking
+actions+=/call_action_list,name=mitigation
 actions+=/call_action_list,name=defensives,if=tanking
 actions+=/call_action_list,name=heal
 actions+=/run_action_list,name=bear,if=buff.bear_form.up
