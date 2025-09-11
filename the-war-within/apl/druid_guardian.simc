@@ -218,11 +218,11 @@ actions.ripweave_prep+=/shred,if=buff.feline_potential_counter.at_max_stacks&!do
 actions.ripweave_prep+=/rake,if=buff.feline_potential_counter.at_max_stacks&buff.rage_of_the_sleeper.down
 
 # dump :: Maul to prevent Rage from capping.
-actions.dump_rage+=/maul,if=(variable.time_to_rage_cap<(gcd.remains+execute_time))&(variable.should_ironfur=0&variable.can_spend_rage_on_maul>0)
+actions.dump_rage+=/maul,if=variable.should_ironfur=0&(variable.time_to_rage_cap<(gcd.remains+execute_time))
 # dump :: Raze to prevent Rage from capping.
-actions.dump_rage+=/raze,if=(variable.time_to_rage_cap<(gcd.remains+execute_time))&(variable.should_ironfur=0&variable.can_spend_rage_on_raze>0)
+actions.dump_rage+=/raze,if=variable.should_ironfur=0&(variable.time_to_rage_cap<(gcd.remains+execute_time))
 # dump :: Ironfur to prevent Rage from capping.
-actions.dump_rage+=/ironfur,use_off_gcd=1,if=(variable.time_to_rage_cap<gcd.remains)&(variable.should_ironfur>0)
+actions.dump_rage+=/ironfur,use_off_gcd=1,if=(variable.time_to_rage_cap<gcd.remains)
 
 actions.spend_rage+=/maul,if=variable.can_spend_rage_on_maul>0
 actions.spend_rage+=/raze,if=variable.can_spend_rage_on_raze>0
