@@ -21,13 +21,13 @@ The action packs are my interpretations of the advice from [Wowhead], [Icy Veins
 
 The following classes and specializations are supported for 11.2:
 
+- Druid: Guardian
 - Warrior: Protection
 
 The following classes and specializations may still be usable but need updates from 11.1:
 
 - Death Knight: Blood, Blood (Kyrasis)
 - Demon Hunter: Vengeance
-- Druid: Guardian
 - Monk: Brewmaster, Brewmaster (Equinox)
 
 ### Links ###
