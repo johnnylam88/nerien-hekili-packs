@@ -41,7 +41,7 @@ actions+=/variable,name=renewal_health_pct,value=65
 # Regrowth tunable for minimum health percent.
 actions+=/variable,name=regrowth_health_pct,value=85
 # Survival Instincts tunable for incoming damage.
-actions+=/variable,name=survival_instincts_damage_taken,value=0.2*health.max
+actions+=/variable,name=survival_instincts_damage_taken,value=0.3*health.max
 
 ### Constants ###
 
@@ -102,10 +102,21 @@ actions+=/variable,name=should_ironfur,value=1,value_else=0,op=setif,condition=(
 # berserk_ready is 1 if Berserk or Incarnation is imminent.
 actions+=/variable,name=berserk_ready,value=1,value_else=0,op=setif,condition=(talent.incarnation&cooldown.incarnation.remains<gcd)|(!talent.incarnation&cooldown.berserk_bear.remains<gcd)
 
-# Several of the offensive cooldowns give a defensive benefit.
-actions+=/variable,name=has_offensive_defensive_buff,value=1,value_else=0,op=setif,condition=buff.lunar_beam.up|buff.rage_of_the_sleeper.up|buff.berserk_bear.up|buff.incarnation.up
-actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=buff.barkskin.up|buff.survival_instincts.up|buff.chromebustible_bomb_suit.up|variable.has_offensive_defensive_buff>0
+# has_absorb_buff is 1 if there is an existing damage absorption buff.
 actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.chromebustible_bomb_suit.up|buff.mudborne.up
+
+# defensive_layer_stack is the number of self-activiated damage reduction buffs that are active.
+actions+=/variable,name=defensive_layer_stack,op=reset,default=0
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.lunar_beam&buff.lunar_beam.up
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.berserk_bear.up
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.incarnation&buff.incarnation.up
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.barkskin&buff.barkskin.up
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.rage_of_the_sleeper&buff.rage_of_the_sleeper.up
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.survival_instincts&buff.survival_instincts.up
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.chromebustible_bomb_suit.up
+
+# can_use_defensive_buff is 1 if we should layer another defensive buff based on incoming damage.
+actions+=/variable,name=can_use_defensive_buff,value=1,value_else=0,op=setif,condition=((incoming_damage_5s<0.2*health.max)&variable.defensive_layer_stack<1)|((incoming_damage_5s<0.35*health.max)&variable.defensive_layer_stack<2)|((incoming_damage_5s<0.45*health.max)&variable.defensive_layer_stack<3)|((incoming_damage_5s>=0.45*health.max)&variable.defensive_layer_stack<4)
 
 ################
 
@@ -126,9 +137,9 @@ actions.cooldowns+=/use_items,if=buff.berserk_bear.remains>8|buff.incarnation.re
 actions.cooldowns+=/call_action_list,name=racials,if=buff.berserk_bear.remains>8|buff.incarnation.remains>8
 
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0
-actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&variable.has_defensive_buff=0
-actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_defensive_buff=0&variable.has_absorb_buff=0
-actions.defensives+=/survival_instincts,use_off_gcd=1,if=incoming_damage_5s>=variable.survival_instincts_damage_taken&variable.has_defensive_buff=0&variable.has_absorb_buff=0
+actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&variable.can_use_defensive_buff>0
+actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0&variable.can_use_defensive_buff>0
+actions.defensives+=/survival_instincts,use_off_gcd=1,if=incoming_damage_5s>=variable.survival_instincts_damage_taken&variable.has_absorb_buff=0&variable.can_use_defensive_buff>0
 
 actions.heal+=/natures_vigil,if=health.pct<variable.natures_vigil_health_pct
 actions.heal+=/regrowth,if=buff.dream_of_cenarius.up&health.pct<variable.regrowth_health_pct
@@ -173,8 +184,9 @@ actions.bear+=/convoke_the_spirits,if=variable.ripweave=0
 actions.bear+=/berserk_bear,if=buff.berserk_bear.down
 actions.bear+=/incarnation,if=buff.incarnation.down
 actions.bear+=/call_action_list,name=cooldowns
-actions.bear+=/lunar_beam
-actions.bear+=/rage_of_the_sleeper
+actions.bear+=/lunar_beam,if=variable.can_use_defensive_buff>0
+actions.bear+=/rage_of_the_sleeper,if=variable.can_use_defensive_buff>0
+actions.bear+=/call_action_list,name=ursocs_guidance,if=(talent.ursocs_guidance&buff.incarnation.up)
 # [134298] :: Maul is free with Tooth and Claw proc.
 actions.bear+=/maul,if=buff.tooth_and_claw.up
 # [134298] :: Raze is free with Tooth and Claw proc.
@@ -216,6 +228,13 @@ actions.ripweave_prep+=/ironfur,use_off_gcd=1,if=buff.feline_potential_counter.a
 actions.ripweave_prep+=/shred,if=buff.feline_potential_counter.at_max_stacks&!dot.rake.refreshable&buff.rage_of_the_sleeper.down
 # [132115] :: Rake to enter Cat Form
 actions.ripweave_prep+=/rake,if=buff.feline_potential_counter.at_max_stacks&buff.rage_of_the_sleeper.down
+
+# [6035309] :: Thrash to generate Rage with Incarnation up.
+actions.ursocs_guidance+=/thrash_bear
+# [6035309] :: Mangle to generate Rage with Incarnation up.
+actions.ursocs_guidance+=/mangle
+# [6035309] :: Ironfur to shed Rage during Incarnation.
+actions.ursocs_guidance+=/ironfur,use_off_gcd=1,if=variable.should_spend_rage>0
 
 # dump :: Maul to prevent Rage from capping.
 actions.dump_rage+=/maul,if=variable.should_ironfur=0&(variable.time_to_rage_cap<(gcd.remains+execute_time))
