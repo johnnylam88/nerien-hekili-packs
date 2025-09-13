@@ -1,30 +1,25 @@
-# Protection Warrior Priority List
-# Based on:
-# - *Protection Warrior Tank Guide* by Nomeratur
-#   [https://www.wowhead.com/guide/classes/warrior/protection/overview-pve-tank]
-# - *Protection Warrior Tank Guide* by Mwahi
-#   [https://www.icy-veins.com/wow/protection-warrior-pve-tank-guide]
-# - *Yoda's Prot warrior guide* by Yoda
-#   [https://docs.google.com/document/d/1iomJ1BcyBc4Fy1HFIfiuAeL_B5t6kioRW4DBPR1MPgg]
-#
-# Recommended Settings in `/hekili` > *Protection*:
-#
-# - Only Shockwave as Interrupt : **unused**
-# - Overlap Shield Block : checked
-# - Allow Stance Changes : unchecked
-# - Reserve Rage for Mitigation : 0
-# - Shield Wall Damage Required : 20
-# - Shield Wall Health Percentage : 80
-# - Rallying Cry Damage Required : 20
-# - Rallying Cry Health Percentage : 80
-# - Last Stand Damage Required : 20
-# - Last Stand Health Percentage : 80
-# - Victory Rush Health Threshold : 75
-
-actions.precombat+=/defensive_stance,if=!buff.defensive_stance.up
-actions.precombat+=/battle_shout
-actions.precombat+=/use_item,name=chromebustible_bomb_suit
-actions.precombat+=/use_item,name=ringing_ritual_mud
+### Protection Warrior Priority List
+### Based on:
+### - *Protection Warrior Tank Guide* by Nomeratur
+###   [https://www.wowhead.com/guide/classes/warrior/protection/overview-pve-tank]
+### - *Protection Warrior Tank Guide* by Mwahi
+###   [https://www.icy-veins.com/wow/protection-warrior-pve-tank-guide]
+### - *Yoda's Prot warrior guide* by Yoda
+###   [https://docs.google.com/document/d/1iomJ1BcyBc4Fy1HFIfiuAeL_B5t6kioRW4DBPR1MPgg]
+###
+### Recommended Settings in `/hekili` > *Protection*:
+###
+### - Only Shockwave as Interrupt : **unused**
+### - Overlap Shield Block : checked
+### - Allow Stance Changes : unchecked
+### - Reserve Rage for Mitigation : 0
+### - Shield Wall Damage Required : 20
+### - Shield Wall Health Percentage : 80
+### - Rallying Cry Damage Required : 20
+### - Rallying Cry Health Percentage : 80
+### - Last Stand Damage Required : 20
+### - Last Stand Health Percentage : 80
+### - Victory Rush Health Threshold : 75
 
 # Full-damage Execute costs 40 Rage.
 actions+=/variable,name=rage_cost_execute,value=40
@@ -126,7 +121,7 @@ actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.shield_wall
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.chromebustible_bomb_suit.up
 
 # can_use_defensive_buff is 1 if we can use a defensive buff without overlapping another one.
-actions+=/variable,name=can_use_defensive_buff,value=1,value_else=0,op=setif,condition=(incoming_damage_5s>0)&(variable.defensive_layer_stack<1)
+actions+=/variable,name=can_use_defensive_buff,value=1,value_else=0,op=setif,condition=(time=0|incoming_damage_5s>0)&(variable.defensive_layer_stack<1)
 
 actions+=/variable,name=ignore_pain_cap,value=0.3*health.max
 actions+=/variable,name=ignore_pain_absorb,value=buff.ignore_pain.v1,value_else=0,op=setif,condition=buff.ignore_pain.up
@@ -137,6 +132,16 @@ actions+=/variable,name=should_ignore_pain,value=1,value_else=0,op=setif,conditi
 # should_execute is 1 if it's worth using Execute over Revenge to spend Rage for damage.
 actions+=/variable,name=should_execute,value=1,value_else=0,op=setif,condition=(talent.heavy_handed&spell_targets.revenge<=6)|spell_targets.revenge<=3
 
+################
+
+actions.on_pull+=/defensive_stance,if=!buff.defensive_stance.up
+actions.on_pull+=/battle_shout
+# pull :: Enter pull with absorb shield from Chromebustible Bomb Suit.
+actions.on_pull+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+# pull :: Enter pull with absorb shield from Ringing Ritual Mud.
+actions.on_pull+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+
+actions+=/call_action_list,name=on_pull,strict=1,if=time=0
 actions+=/pummel
 actions+=/spell_reflection
 actions+=/defensive_stance,if=!buff.defensive_stance.up&health.pct<70&incoming_damage_3s>0.2*health.max

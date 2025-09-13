@@ -1,20 +1,14 @@
-# Guardian Druid Action Priority List
-# Based on *Guardian Druid Tank Guide* by Pumps
-# [https://www.icy-veins.com/wow/guardian-druid-pve-tank-guide]
-#
-# Recommended Settings for `/hekili` > *Guardian*:
-#
-# - Weave Cat Form and Bear Form : enabled
-# - Maul (or Raze) Rage Threshold : 0
-# - Nature's Vigil Damage Threshold : 70
-# - Ironfur Damage Threshold : 5
-# - Ironfur Maximum Stacks : 14
-
-actions.precombat+=/mark_of_the_wild
-actions.precombat+=/heart_of_the_wild,if=!(druid.catweave_bear&talent.rip&talent.rake&talent.fluid_form&talent.wildpower_surge)
-actions.precombat+=/bear_form,if=time=0&buff.feline_potential.down&buff.feline_potential_counter.stack<6
-actions.precombat+=/use_item,name=chromebustible_bomb_suit,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
-actions.precombat+=/use_item,name=ringing_ritual_mud,if=buff.bear_form.up&(buff.berserk_bear.down&buff.incarnation.down)
+### Guardian Druid Action Priority List
+### Based on *Guardian Druid Tank Guide* by Pumps
+### [https://www.icy-veins.com/wow/guardian-druid-pve-tank-guide]
+###
+### Recommended Settings for `/hekili` > *Guardian*:
+###
+### - Weave Cat Form and Bear Form : enabled
+### - Maul (or Raze) Rage Threshold : 0
+### - Nature's Vigil Damage Threshold : 70
+### - Ironfur Damage Threshold : 5
+### - Ironfur Maximum Stacks : 14
 
 ### Tunables ###
 
@@ -118,10 +112,20 @@ actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.survival_
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.chromebustible_bomb_suit.up
 
 # can_use_defensive_buff is 1 if we should layer another defensive buff based on incoming damage.
-actions+=/variable,name=can_use_defensive_buff,value=1,value_else=0,op=setif,condition=((incoming_damage_5s<0.2*health.max)&variable.defensive_layer_stack<1)|((incoming_damage_5s<0.35*health.max)&variable.defensive_layer_stack<2)|((incoming_damage_5s<0.45*health.max)&variable.defensive_layer_stack<3)|((incoming_damage_5s>=0.45*health.max)&variable.defensive_layer_stack<4)
+actions+=/variable,name=can_use_defensive_buff,value=1,value_else=0,op=setif,condition=((time=0|incoming_damage_5s<0.2*health.max)&variable.defensive_layer_stack<1)|((incoming_damage_5s<0.35*health.max)&variable.defensive_layer_stack<2)|((incoming_damage_5s<0.45*health.max)&variable.defensive_layer_stack<3)|((incoming_damage_5s>=0.45*health.max)&variable.defensive_layer_stack<4)
 
 ################
 
+actions.on_pull+=/bear_form,if=buff.feline_potential.down&buff.feline_potential_counter.stack<6
+actions.on_pull+=/mark_of_the_wild
+# pull :: Enter pull with absorb shield from Chromebustible Bomb Suit.
+actions.on_pull+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+# pull :: Enter pull with absorb shield from Ringing Ritual Mud.
+actions.on_pull+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+# pull :: Enter pull with Barkskin.
+actions.on_pull+=/barkskin,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+
+actions+=/call_action_list,name=on_pull,strict=1,if=time=0
 actions+=/skull_bash
 actions+=/soothe
 # [132276] :: Mangle to switch back to Bear Form.
