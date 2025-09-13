@@ -103,7 +103,7 @@ actions+=/variable,name=should_ironfur,value=1,value_else=0,op=setif,condition=(
 actions+=/variable,name=berserk_ready,value=1,value_else=0,op=setif,condition=(talent.incarnation&cooldown.incarnation.remains<gcd)|(!talent.incarnation&cooldown.berserk_bear.remains<gcd)
 
 # has_absorb_buff is 1 if there is an existing damage absorption buff.
-actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.chromebustible_bomb_suit.up|buff.mudborne.up
+actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=(buff.chromebustible_bomb_suit.up|buff.mudborne.up|buff.ethereal_barrier.up|buff.ethereal_barricade.up)
 
 # defensive_layer_stack is the number of self-activiated damage reduction buffs that are active.
 actions+=/variable,name=defensive_layer_stack,op=reset,default=0
@@ -112,6 +112,8 @@ actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.berserk_bea
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.incarnation&buff.incarnation.up
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.barkskin&buff.barkskin.up
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.rage_of_the_sleeper&buff.rage_of_the_sleeper.up
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.ethereal_barrier.up
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.ethereal_barricade.up
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.survival_instincts&buff.survival_instincts.up
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.chromebustible_bomb_suit.up
 
