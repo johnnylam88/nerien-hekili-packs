@@ -114,8 +114,17 @@ actions+=/variable,name=time_to_rage_cap,op=min,value=cooldown.thunder_clap.rema
 
 actions+=/variable,name=has_demoralizing_shout_safety,value=1,value_else=0,op=setif,condition=(active_dot.demoralizing_shout%active_enemies*100>=variable.demoralizing_shout_pct_threshold)
 
+# has_absorb_buff is 1 if there is an existing damage absorption buff.
 actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=buff.chromebustible_bomb_suit.up|buff.mudborne.up
-actions+=/variable,name=has_defensive_buff,value=1,value_else=0,op=setif,condition=variable.has_demoralizing_shout_safety>0|buff.shield_wall.up|buff.chromebustible_bomb_suit.up
+
+# defensive_layer_stack is the number of self-activated damage reduction buffs that are active.
+actions+=/variable,name=defensive_layer_stack,op=reset,default=0
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=variable.has_demoralizing_shout_safety>0
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.shield_wall.up
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.chromebustible_bomb_suit.up
+
+# can_use_defensive_buff is 1 if we can use a defensive buff without overlapping another one.
+actions+=/variable,name=can_use_defensive_buff,value=1,value_else=0,op=setif,condition=(incoming_damage_5s>0)&(variable.defensive_layer_stack<1)
 
 actions+=/variable,name=ignore_pain_cap,value=0.3*health.max
 actions+=/variable,name=ignore_pain_absorb,value=buff.ignore_pain.v1,value_else=0,op=setif,condition=buff.ignore_pain.up
@@ -142,12 +151,12 @@ actions.cooldowns+=/potion,if=!talent.avatar|buff.avatar.remains>8
 actions.cooldowns+=/use_items,if=!talent.avatar|buff.avatar.remains>8
 actions.cooldowns+=/call_action_list,name=racials,if=!talent.avatar|buff.avatar.remains>8
 
-actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
-actions.defensives+=/demoralizing_shout,if=!talent.booming_voice&incoming_damage_5s>variable.demoralizing_shout_damage_taken&variable.has_defensive_buff=0
-actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>variable.shield_wall_damage_taken&variable.has_defensive_buff=0&variable.has_absorb_buff=0
-actions.defensives+=/shield_wall,use_off_gcd=1,if=(!talent.immovable_object|!cooldown.avatar.ready)&incoming_damage_5s>variable.shield_wall_damage_taken&variable.has_defensive_buff=0&variable.has_absorb_buff=0
-actions.defensives+=/last_stand,use_off_gcd=1,if=!talent.bolster&(incoming_damage_5s>variable.last_stand_damage_taken&health.pct<variable.last_stand_health_pct)&buff.rallying_cry.down
-actions.defensives+=/rallying_cry,use_off_gcd=1,if=(incoming_damage_5s>variable.rallying_cry_damage_taken&health.pct<variable.rallying_cry_health_pct)&buff.last_stand.down
+actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=(incoming_damage_5s>0)&variable.has_absorb_buff=0
+actions.defensives+=/demoralizing_shout,if=!talent.booming_voice&(incoming_damage_5s>variable.demoralizing_shout_damage_taken)&variable.can_use_defensive_buff>0
+actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=(incoming_damage_5s>variable.shield_wall_damage_taken)&variable.has_absorb_buff=0&variable.can_use_defensive_buff>0
+actions.defensives+=/shield_wall,use_off_gcd=1,if=(!talent.immovable_object|!cooldown.avatar.ready)&(incoming_damage_5s>variable.shield_wall_damage_taken)&variable.has_absorb_buff=0&variable.can_use_defensive_buff>0
+actions.defensives+=/last_stand,use_off_gcd=1,if=!talent.bolster&(incoming_damage_5s>variable.last_stand_damage_taken)&(health.pct<variable.last_stand_health_pct)&buff.rallying_cry.down
+actions.defensives+=/rallying_cry,use_off_gcd=1,if=(incoming_damage_5s>variable.rallying_cry_damage_taken)&(health.pct<variable.rallying_cry_health_pct)&buff.last_stand.down
 
 actions.heal+=/victory_rush,if=buff.victorious.up&health.pct<variable.victory_rush_health_pct
 actions.heal+=/impending_victory,if=health.pct<variable.victory_rush_health_pct
