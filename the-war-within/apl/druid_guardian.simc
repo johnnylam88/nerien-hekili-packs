@@ -37,6 +37,15 @@ actions+=/variable,name=regrowth_health_pct,value=85
 # Survival Instincts tunable for incoming damage.
 actions+=/variable,name=survival_instincts_damage_taken,value=0.3*health.max
 
+# The maximum number of defensive buffs that can be recommended to be layered (minimum value is 1).
+actions+=/variable,name=defensive_layer_max_stack,value=3
+# The incoming damage threshold before allowing a defensive layer of stack size 1.
+actions+=/variable,name=defensive_layer_threshold_1,value=(0.2*health.max)
+# The incoming damage threshold before allowing a defensive layer of stack size 2.
+actions+=/variable,name=defensive_layer_threshold_2,value=(0.4*health.max)
+# The incoming damage threshold before allowing a defensive layer of stack size 3.
+actions+=/variable,name=defensive_layer_threshold_3,value=(0.6*health.max)
+
 ### Constants ###
 
 actions+=/variable,name=rage_cost_frenzied_regeneration,value=10
@@ -112,7 +121,11 @@ actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.survival_
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.chromebustible_bomb_suit.up
 
 # can_use_defensive_buff is 1 if we should layer another defensive buff based on incoming damage.
-actions+=/variable,name=can_use_defensive_buff,value=1,value_else=0,op=setif,condition=((time=0|incoming_damage_5s<0.2*health.max)&variable.defensive_layer_stack<1)|((incoming_damage_5s<0.35*health.max)&variable.defensive_layer_stack<2)|((incoming_damage_5s<0.45*health.max)&variable.defensive_layer_stack<3)|((incoming_damage_5s>=0.45*health.max)&variable.defensive_layer_stack<4)
+actions+=/variable,name=can_use_defensive_buff,op=reset,default=0
+actions+=/variable,name=can_use_defensive_buff,op=set,value=1,if=(time=0|incoming_damage_5s>variable.defensive_layer_threshold_1)&variable.defensive_layer_stack<1
+actions+=/variable,name=can_use_defensive_buff,op=set,value=1,if=(incoming_damage_5s>variable.defensive_layer_threshold_2)&variable.defensive_layer_stack<2
+actions+=/variable,name=can_use_defensive_buff,op=set,value=1,if=(incoming_damage_5s>variable.defensive_layer_threshold_3)&variable.defensive_layer_stack<3
+actions+=/variable,name=can_use_defensive_buff,op=set,value=0,if=variable.defensive_layer_stack>=variable.defensive_layer_max_stack
 
 ################
 
@@ -143,9 +156,9 @@ actions.cooldowns+=/use_items,if=buff.berserk_bear.remains>8|buff.incarnation.re
 actions.cooldowns+=/call_action_list,name=racials,if=buff.berserk_bear.remains>8|buff.incarnation.remains>8
 
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0
-actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&variable.can_use_defensive_buff>0
-actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0&variable.can_use_defensive_buff>0
-actions.defensives+=/survival_instincts,use_off_gcd=1,if=incoming_damage_5s>=variable.survival_instincts_damage_taken&variable.has_absorb_buff=0&variable.can_use_defensive_buff>0
+actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+actions.defensives+=/survival_instincts,use_off_gcd=1,if=incoming_damage_5s>=variable.survival_instincts_damage_taken&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
 
 actions.heal+=/natures_vigil,if=health.pct<variable.natures_vigil_health_pct
 actions.heal+=/regrowth,if=buff.dream_of_cenarius.up&health.pct<variable.regrowth_health_pct
