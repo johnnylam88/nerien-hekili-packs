@@ -112,7 +112,9 @@ actions.core+=/deaths_caress,if=(buff.bone_shield.stack<7&buff.bonestorm.down)&t
 actions.core+=/marrowrend,if=(buff.bone_shield.stack<7&buff.bonestorm.down)
 actions.core+=/consumption,if=talent.reapers_mark&buff.coagulopathy.stack>=4
 actions.core+=/tombstone,if=buff.bone_shield.stack>7&(!talent.shattering_bone|death_and_decay.ticking)&(!talent.dancing_rune_weapon|!talent.insatiable_blade|cooldown.dancing_rune_weapon.remains>25)&(!talent.gift_of_the_sanlayn|buff.dancing_rune_weapon.down)
-actions.core+=/death_and_decay,if=!death_and_decay.ticking&(!talent.visceral_strength|spell_targets.blood_boil>=4|(buff.crimson_scourge.up&buff.visceral_strength.down))
+# Death and Decay needs a check for Visceral Strength as San'layn but it's not yet supported in Hekili.
+#actions.core+=/death_and_decay,if=!death_and_decay.ticking&(!talent.visceral_strength|spell_targets.blood_boil>=4|(buff.crimson_scourge.up&buff.visceral_strength.down))
+actions.core+=/death_and_decay,if=!death_and_decay.ticking&(!talent.visceral_strength|spell_targets.blood_boil>=4|buff.crimson_scourge.up)
 # [135277] :: Blood Boil if it's the first one cast during DRW.
 actions.core+=/blood_boil,line_cd=8,if=!talent.everlasting_bond&buff.dancing_rune_weapon.up
 # [135277] :: Blood Boil if it's the first one cast during DRW.
