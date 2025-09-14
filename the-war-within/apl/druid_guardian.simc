@@ -262,7 +262,7 @@ actions.ursocs_guidance+=/thrash_bear
 # [6035309] :: Mangle to generate Rage with Incarnation up.
 actions.ursocs_guidance+=/mangle
 # [6035309] :: Ironfur to shed Rage during Incarnation.
-actions.ursocs_guidance+=/ironfur,use_off_gcd=1,if=variable.should_spend_rage>0
+actions.ursocs_guidance+=/ironfur,use_off_gcd=1,if=(!talent.ravage|buff.ravage.down)&variable.should_spend_rage>0
 
 # dump :: Maul to prevent Rage from capping.
 actions.dump_rage+=/maul,if=variable.should_ironfur=0&(variable.time_to_rage_cap<(gcd.remains+execute_time))
