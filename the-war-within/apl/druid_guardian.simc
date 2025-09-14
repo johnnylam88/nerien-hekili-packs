@@ -134,12 +134,16 @@ actions+=/variable,name=can_use_defensive_buff,op=set,value=0,if=variable.defens
 
 actions.on_pull+=/bear_form,if=buff.feline_potential.down&buff.feline_potential_counter.stack<6
 actions.on_pull+=/mark_of_the_wild
+# pull :: Enter pull with Heart of the Wild if not Ripweaving.
+actions.on_pull+=/heart_of_the_wild,if=variable.ripweave=0
 # pull :: Enter pull with absorb shield from Chromebustible Bomb Suit.
 actions.on_pull+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
 # pull :: Enter pull with absorb shield from Ringing Ritual Mud.
 actions.on_pull+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
 # pull :: Enter pull with Barkskin.
 actions.on_pull+=/barkskin,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+# pull :: Enter combat with Moonfire on pull.
+actions.on_pull+=/moonfire
 
 actions+=/call_action_list,name=on_pull,strict=1,if=time=0
 actions+=/skull_bash
