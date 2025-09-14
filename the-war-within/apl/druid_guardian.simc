@@ -206,8 +206,8 @@ actions.bear+=/convoke_the_spirits,if=variable.ripweave=0
 actions.bear+=/berserk_bear,if=buff.berserk_bear.down
 actions.bear+=/incarnation,if=buff.incarnation.down
 actions.bear+=/call_action_list,name=cooldowns
-actions.bear+=/lunar_beam,if=variable.can_use_defensive_buff>0
-actions.bear+=/rage_of_the_sleeper,if=variable.can_use_defensive_buff>0
+actions.bear+=/lunar_beam,if=(variable.can_use_defensive_buff>0)|(talent.lunar_calling&talent.lunation)
+actions.bear+=/rage_of_the_sleeper,if=(variable.can_use_defensive_buff>0)
 actions.bear+=/call_action_list,name=ursocs_guidance,if=(talent.ursocs_guidance&buff.incarnation.up)
 # [134298] :: Maul is free with Tooth and Claw proc.
 actions.bear+=/maul,if=buff.tooth_and_claw.up
