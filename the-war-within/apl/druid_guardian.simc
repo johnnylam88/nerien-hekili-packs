@@ -1,6 +1,9 @@
 ### Guardian Druid Action Priority List
-### Based on *Guardian Druid Tank Guide* by Pumps
-### [https://www.icy-veins.com/wow/guardian-druid-pve-tank-guide]
+### Based on:
+### - *Guardian Druid Tank Guide* by Pumps
+###   [https://www.icy-veins.com/wow/guardian-druid-pve-tank-guide]
+### - *Guardian Druid Guide* by Tactyks
+###   [https://www.method.gg/guides/guardian-druid]
 ###
 ### Recommended Settings for `/hekili` > *Guardian*:
 ###
@@ -216,8 +219,9 @@ actions.bear+=/call_action_list,name=dump_rage
 actions.bear+=/call_action_list,name=spend_rage,if=variable.should_ironfur=0&variable.should_spend_rage>0
 # [135853] :: Moonfire with Galactic Guardian
 actions.bear+=/moonfire,if=buff.galactic_guardian.up&(buff.galactic_guardian.remains<action.moonfire.execute_time+gcd|active_enemies<4)
-# filler :: Spread Moonfire
-actions.bear+=/moonfire,cycle_targets=1,if=(talent.lunar_insight|talent.twin_moonfire)&active_enemies>1
+# filler :: Moonfire as filler with Lunation talent to reduce cooldown of Lunar Beam.
+actions.bear+=/moonfire,cycle_targets=1,if=talent.lunar_beam&talent.lunation
+# filler :: Swipe as lowest priority action.
 actions.bear+=/swipe_bear
 
 # [132127] :: Mangle to maintain Feline Potential stacks if present.
