@@ -34,13 +34,14 @@ actions+=/variable,name=can_death_strike,value=1,value_else=0,op=setif,condition
 actions+=/variable,name=death_strike_minimum_heal,value=1,value_else=0,op=setif,condition=buff.coagulating_blood.stack*(25%100)<7
 
 # has_absorb_buff is 1 if there is an existing damage absorption buff.
-actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=(buff.umbilicus_eternus.up|buff.chromebustible_bomb_suit.up|buff.mudborne.up|buff.ethereal_barrier.up|buff.ethereal_barricade.up)
+actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=(buff.umbilicus_eternus.up|buff.soulbinders_embrace.up|buff.chromebustible_bomb_suit.up|buff.mudborne.up|buff.ethereal_barrier.up|buff.ethereal_barricade.up)
 
 # defensive_layer_stack is the number of self-activated defensive buffs that are active.
 actions+=/variable,name=defensive_layer_stack,op=reset,default=0
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.chromebustible_bomb_suit.up
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.ethereal_barrier.up
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.ethereal_barricade.up
+actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=buff.soulbinders_embrace.up
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.dancing_rune_weapon&buff.dancing_rune_weapon.up
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.icebound_fortitude&buff.icebound_fortitude.up
 actions+=/variable,name=defensive_layer_stack,op=add,value=1,if=talent.rune_tap&buff.rune_tap.up
@@ -56,6 +57,8 @@ actions+=/variable,name=can_use_defensive_buff,value=1,value_else=0,op=setif,con
 actions.on_pull+=/death_and_decay,if=!death_and_decay.ticking&(rune.time_to_6<=(gcd.remains+execute_time))&(buff.bone_shield.remains>10)
 # pull :: Rune Tap to put runes on cooldown if capped on runes.
 actions.on_pull+=/rune_tap,use_off_gcd=1,if=buff.rune_tap.down&(rune.time_to_6<=gcd.remains)
+# pull :: Enter pull with absorb shield from Soulbinder's Embrace.
+actions.on_pull+=/use_item,name=soulbinders_embrace,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
 # pull :: Enter pull with absorb shield from Chromebustible Bomb Suit.
 actions.on_pull+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
 # pull :: Enter pull with absorb shield from Ringing Ritual Mud.
@@ -132,6 +135,7 @@ actions.core+=/deaths_caress,if=!buff.bone_shield.at_max_stacks&buff.bonestorm.d
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&variable.has_absorb_buff=0
 #actions.defensives+=/antimagic_shell,if=incoming_magic_damage_5s>=0.2*health.max&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
 actions.defensives+=/vampiric_blood,if=buff.vampiric_blood.down&incoming_damage_5s>=vb_damage&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+actions.defensives+=/use_item,name=soulbinders_embrace,use_off_gcd=1,if=incoming_damage_5s>=rt_damage&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=rt_damage&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
 actions.defensives+=/icebound_fortitude,use_off_gcd=1,if=incoming_damage_5s>=ibf_damage&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
 actions.defensives+=/rune_tap,use_off_gcd=1,if=buff.rune_tap.down&incoming_damage_5s>=rt_damage&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
