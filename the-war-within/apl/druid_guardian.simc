@@ -43,7 +43,8 @@ actions+=/variable,name=survival_instincts_damage_taken,value=0.3*health.max
 # The maximum number of defensive buffs that can be recommended to be layered (minimum value is 1).
 actions+=/variable,name=defensive_layer_max_stack,value=3
 # The incoming damage threshold before allowing a defensive layer of stack size 1.
-actions+=/variable,name=defensive_layer_threshold_1,value=(0.2*health.max)
+# This is zero because the first layer of defensives is activated based on their own thresholds.
+actions+=/variable,name=defensive_layer_threshold_1,value=0
 # The incoming damage threshold before allowing a defensive layer of stack size 2.
 actions+=/variable,name=defensive_layer_threshold_2,value=(0.4*health.max)
 # The incoming damage threshold before allowing a defensive layer of stack size 3.
