@@ -21,22 +21,6 @@
 ### - Last Stand Health Percentage : 80
 ### - Victory Rush Health Threshold : 75
 
-# Full-damage Execute costs 40 Rage.
-actions+=/variable,name=rage_cost_execute,value=40
-actions+=/variable,name=rage_cost_ignore_pain,value=35
-actions+=/variable,name=rage_cost_revenge,value=20
-actions+=/variable,name=rage_cost_shield_block,value=30
-
-actions+=/variable,name=seeing_red_execute,value=100-(variable.rage_cost_execute%5)
-actions+=/variable,name=seeing_red_ignore_pain,value=100-(variable.rage_cost_ignore_pain%5)
-actions+=/variable,name=seeing_red_revenge,value=100-(variable.rage_cost_revenge%5)
-actions+=/variable,name=seeing_red_shield_block,value=100-(variable.rage_cost_shield_block%5)
-
-actions+=/variable,name=rage_gain_multiplier_outburst,value=1+(0.5*buff.violent_outburst.up)
-actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercussions+3*talent.practiced_strikes)*variable.rage_gain_multiplier
-actions+=/variable,name=rage_gain_thunder_blast,value=8*variable.rage_gain_multiplier
-actions+=/variable,name=rage_gain_thunder_clap,value=5*variable.rage_gain_multiplier
-
 ### Tunables ###
 
 # Set a soft cap for maximum Rage.
@@ -79,6 +63,22 @@ actions+=/variable,name=defensive_layer_threshold_2,value=(0.4*health.max)
 actions+=/variable,name=defensive_layer_threshold_3,value=(0.6*health.max)
 
 ################
+
+# Full-damage Execute costs 40 Rage.
+actions+=/variable,name=rage_cost_execute,value=40
+actions+=/variable,name=rage_cost_ignore_pain,value=35
+actions+=/variable,name=rage_cost_revenge,value=20
+actions+=/variable,name=rage_cost_shield_block,value=30
+
+actions+=/variable,name=seeing_red_execute,value=100-(variable.rage_cost_execute%5)
+actions+=/variable,name=seeing_red_ignore_pain,value=100-(variable.rage_cost_ignore_pain%5)
+actions+=/variable,name=seeing_red_revenge,value=100-(variable.rage_cost_revenge%5)
+actions+=/variable,name=seeing_red_shield_block,value=100-(variable.rage_cost_shield_block%5)
+
+actions+=/variable,name=rage_gain_multiplier_outburst,value=1+(0.5*buff.violent_outburst.up)
+actions+=/variable,name=rage_gain_shield_slam,value=(15+2*talent.heavy_repercussions+3*talent.practiced_strikes)*variable.rage_gain_multiplier
+actions+=/variable,name=rage_gain_thunder_blast,value=8*variable.rage_gain_multiplier
+actions+=/variable,name=rage_gain_thunder_clap,value=5*variable.rage_gain_multiplier
 
 # Amount of Rage until the Rage cap is reached.
 actions+=/variable,name=rage_deficit,value=(variable.rage_cap-rage)
