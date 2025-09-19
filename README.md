@@ -23,12 +23,12 @@ The following classes and specializations are supported for 11.2:
 
 - Death Knight: Blood, Blood (Kyrasis)
 - Druid: Guardian
+- Monk: Brewmaster
 - Warrior: Protection
 
 The following classes and specializations may still be usable but need updates from 11.1:
 
 - Demon Hunter: Vengeance
-- Monk: Brewmaster, Brewmaster (Equinox)
 
 ### Links ###
 
