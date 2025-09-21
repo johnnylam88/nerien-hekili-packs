@@ -13,8 +13,8 @@
 ### - Overlap Shield Block : checked
 ### - Allow Stance Changes : unchecked
 ### - Reserve Rage for Mitigation : 0
-### - Shield Wall Damage Required : 20
-### - Shield Wall Health Percentage : 80
+### - Shield Wall Damage Required : 30
+### - Shield Wall Health Percentage : **unused**
 ### - Rallying Cry Damage Required : 20
 ### - Rallying Cry Health Percentage : 80
 ### - Last Stand Damage Required : 20
