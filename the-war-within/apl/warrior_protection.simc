@@ -157,6 +157,12 @@ actions.on_pull+=/use_item,name=soulbinders_embrace,use_off_gcd=1,if=variable.ca
 actions.on_pull+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
 # pull :: Enter pull with absorb shield from Ringing Ritual Mud.
 actions.on_pull+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+# pull :: Enter combat with Ravager.
+actions.opener+=/ravager
+# pull :: Enter combat with Charge to generate Rage.
+actions.opener+=/charge,use_off_gcd=1,if=target.distance>8
+# pull :: Avatar on pull during Charge to generate Rage.
+actions.opener+=/avatar,use_off_gcd=1
 
 actions+=/call_action_list,name=on_pull,strict=1,if=time=0
 actions+=/pummel
@@ -194,7 +200,7 @@ actions.mitigation+=/ignore_pain,use_off_gcd=1,if=variable.should_ignore_pain>0
 # Put up Shield Block as quickly as possible and debuff mobs with Demoralizing Shout at the start of a pull.
 actions.opener+=/shield_block,use_off_gcd=1,if=buff.shield_block.down
 actions.opener+=/ravager
-actions.opener+=/charge,use_off_gcd=1,if=movement.distance>8
+actions.opener+=/charge,use_off_gcd=1,if=target.distance>8
 actions.opener+=/avatar,use_off_gcd=1
 # [132110] :: Shield Charge to generate Rage for or apply Shield Block.
 actions.opener+=/shield_charge,if=buff.shield_block.down|rage<variable.rage_cost_shield_block
