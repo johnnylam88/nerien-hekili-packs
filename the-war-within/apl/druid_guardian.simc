@@ -110,7 +110,19 @@ actions+=/variable,name=should_ironfur,value=1,value_else=0,op=setif,condition=(
 actions+=/variable,name=berserk_ready,value=1,value_else=0,op=setif,condition=(talent.incarnation&cooldown.incarnation.remains<gcd)|(!talent.incarnation&cooldown.berserk_bear.remains<gcd)
 
 # has_absorb_buff is 1 if there is an existing damage absorption buff.
-actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=(buff.soulbinders_embrace.up|buff.chromebustible_bomb_suit.up|buff.mudborne.up|buff.ethereal_barrier.up|buff.ethereal_barricade.up)
+actions+=/variable,name=has_absorb_buff,op=reset,default=0
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=buff.chromebustible_bomb_suit.up
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=buff.ethereal_barrier.up
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=buff.ethereal_barricade.up
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=buff.mudborne.up
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=buff.soulbinders_embrace.up
+
+# has_mutually_exclusive_buff is 1 if one of the mutually-exlusive defensive buffs is active.
+actions+=/variable,name=has_mutually_exclusive_buff,op=reset,default=0
+actions+=/variable,name=has_mutually_exclusive_buff,op=set,value=1,if=buff.berserk_bear.up
+actions+=/variable,name=has_mutually_exclusive_buff,op=set,value=1,if=talent.barkskin&buff.barkskin.up
+actions+=/variable,name=has_mutually_exclusive_buff,op=set,value=1,if=talent.incarnation&buff.incarnation.up
+actions+=/variable,name=has_mutually_exclusive_buff,op=set,value=1,if=talent.survival_instincts&buff.survival_instincts.up
 
 # defensive_layer_stack is the number of self-activiated damage reduction buffs that are active.
 actions+=/variable,name=defensive_layer_stack,op=reset,default=0
@@ -139,13 +151,13 @@ actions.on_pull+=/mark_of_the_wild
 # pull :: Enter pull with Heart of the Wild if not Ripweaving.
 actions.on_pull+=/heart_of_the_wild,if=variable.ripweave=0
 # pull :: Enter pull with absorb shield from Soulbinder's Embrace.
-actions.on_pull+=/use_item,name=soulbinders_embrace,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+actions.on_pull+=/use_item,name=soulbinders_embrace,use_off_gcd=1,if=(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)
 # pull :: Enter pull with absorb shield from Chromebustible Bomb Suit.
-actions.on_pull+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+actions.on_pull+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)
 # pull :: Enter pull with absorb shield from Ringing Ritual Mud.
-actions.on_pull+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+actions.on_pull+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)
 # pull :: Enter pull with Barkskin.
-actions.on_pull+=/barkskin,use_off_gcd=1,if=variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+actions.on_pull+=/barkskin,use_off_gcd=1,if=(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)&variable.has_mutually_exclusive_buff=0
 # pull :: Enter combat with Moonfire on pull.
 actions.on_pull+=/moonfire
 
@@ -166,11 +178,11 @@ actions.cooldowns+=/potion,if=buff.berserk_bear.remains>8|buff.incarnation.remai
 actions.cooldowns+=/use_items,if=buff.berserk_bear.remains>8|buff.incarnation.remains>8
 actions.cooldowns+=/call_action_list,name=racials,if=buff.berserk_bear.remains>8|buff.incarnation.remains>8
 
-actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.has_absorb_buff=0
-actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
-actions.defensives+=/use_item,name=soulbinders_embrace,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
-actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&(buff.berserk_bear.down&buff.incarnation.down)&variable.berserk_ready=0&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
-actions.defensives+=/survival_instincts,use_off_gcd=1,if=incoming_damage_5s>=variable.survival_instincts_damage_taken&variable.can_use_defensive_buff>0&variable.has_absorb_buff=0
+actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=incoming_damage_5s>0&(buff.berserk_bear.down&buff.incarnation.down&variable.berserk_ready=0)&variable.has_absorb_buff=0
+actions.defensives+=/barkskin,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)&variable.has_mutually_exclusive_buff=0
+actions.defensives+=/use_item,name=soulbinders_embrace,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&(buff.berserk_bear.down&buff.incarnation.down&variable.berserk_ready=0)&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)
+actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=incoming_damage_5s>=variable.barkskin_damage_taken&(buff.berserk_bear.down&buff.incarnation.down&variable.berserk_ready=0)&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)
+actions.defensives+=/survival_instincts,use_off_gcd=1,if=incoming_damage_5s>=variable.survival_instincts_damage_taken&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)&variable.has_mutually_exclusive_buff=0
 
 actions.heal+=/natures_vigil,if=health.pct<variable.natures_vigil_health_pct
 actions.heal+=/regrowth,if=buff.dream_of_cenarius.up&health.pct<variable.regrowth_health_pct

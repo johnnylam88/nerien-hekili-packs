@@ -65,7 +65,19 @@ actions+=/variable,name=stagger_time_to_die,value=(health%(2*stagger.amount)),va
 actions+=/variable,name=dangerous_stagger,value=1,value_else=0,op=setif,condition=(variable.stagger_time_to_die<variable.stagger_max_time_to_die)
 
 # has_absorb_buff is 1 if there is an existing damage absorption buff.
-actions+=/variable,name=has_absorb_buff,value=1,value_else=0,op=setif,condition=(buff.celestial_brew.up|buff.celestial_infusion.up|buff.soulbinders_embrace.up|buff.chromebustible_bomb_suit.up|buff.mudborne.up|buff.ethereal_barrier.up|buff.ethereal_barricade.up)
+actions+=/variable,name=has_absorb_buff,op=reset,default=0
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=buff.chromebustible_bomb_suit.up
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=buff.ethereal_barrier.up
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=buff.ethereal_barricade.up
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=buff.mudborne.up
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=buff.soulbinders_embrace.up
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=talent.celestial_brew&buff.celestial_brew.up
+actions+=/variable,name=has_absorb_buff,op=set,value=1,if=talent.celestial_infusion&buff.celestial_infusion.up
+
+# has_mutually_exclusive_buff is 1 if one of the mutually-exlusive defensive buffs is active.
+actions+=/variable,name=has_mutually_exclusive_buff,op=reset,default=0
+actions+=/variable,name=has_mutually_exclusive_buff,op=set,value=1,if=talent.dampen_harm&buff.dampen_harm.up
+actions+=/variable,name=has_mutually_exclusive_buff,op=set,value=1,if=talent.fortifying_brew&buff.fortifying_brew.up
 
 # defensive_layer_stack is the number of self-activated defensive buffs that are active.
 actions+=/variable,name=defensive_layer_stack,op=reset,default=0
@@ -144,9 +156,9 @@ actions.cooldowns+=/call_action_list,name=racials,if=!talent.weapons_of_order|de
 actions.defensives+=/use_item,name=ringing_ritual_mud,use_off_gcd=1,if=(incoming_damage_5s>0)&variable.has_absorb_buff=0
 actions.defensives+=/use_item,name=soulbinders_embrace,use_off_gcd=1,if=(incoming_damage_5s>variable.high_incoming_damage_amount)&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)
 actions.defensives+=/use_item,name=chromebustible_bomb_suit,use_off_gcd=1,if=(incoming_damage_5s>variable.high_incoming_damage_amount)&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)
-actions.defensives+=/fortifying_brew,use_off_gcd=1,if=(incoming_damage_5s>variable.high_incoming_damage_amount)&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)
+actions.defensives+=/fortifying_brew,use_off_gcd=1,if=(incoming_damage_5s>variable.high_incoming_damage_amount)&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)&variable.has_mutually_exclusive_buff=0
 actions.defensives+=/diffuse_magic,use_off_gcd=1,if=(incoming_magic_damage_5s>variable.high_incoming_damage_amount)&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)
-actions.defensives+=/dampen_harm,use_off_gcd=1,if=(incoming_damage_5s>variable.high_incoming_damage_amount)&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)
+actions.defensives+=/dampen_harm,use_off_gcd=1,if=(incoming_damage_5s>variable.high_incoming_damage_amount)&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)&variable.has_mutually_exclusive_buff=0
 # cap :: Celestial Brew/Infusion to avoid capping on charges.
 actions.defensives+=/celestial_brew,if=(incoming_damage_5s>0)&(talent.endless_draught&full_recharge_time<(gcd.remains+execute_time))&(time>0)&(!settings.max_damage|buff.blackout_combo.down)
 actions.defensives+=/celestial_brew,if=(incoming_damage_5s>0)&!talent.endless_draught&(buff.purified_chi.stack>=variable.celestial_brew_purified_chi_threshold)&(variable.can_use_defensive_buff>0&variable.has_absorb_buff=0)&(!settings.max_damage|buff.blackout_combo.down)
